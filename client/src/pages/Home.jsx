@@ -26,7 +26,7 @@ export default function Home() {
                     </p>
 
                     <div className="m-8 flex flex-col gap-4 sm:flex-row sm:gap-6">
-                        <Link to="/matches">
+                        <Link to="/login">
                             <button className="w-full flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-[#f98c07ff] bg-orange-500 px-6 py-3 font-semibold text-white duration-300 hover:scale-105">
                                 <LogIn size={20} strokeWidth={2.5} />
                                 Sign In
