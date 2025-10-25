@@ -135,83 +135,85 @@ function Matches() {
     ];
 
     return (
-        <div className="mx-auto container pt-5 flex flex-col gap-8 min-h-screen">
-            <div>
-                <h1 className="text-4xl font-bold">Matches</h1>
-                <p className="text-[#000000a1]">View live scores and upcoming fixtures</p>
-            </div>
-            <div className="flex justify-between sm:flex-row flex-col gap-8 text-sm">
-                <div className="w-full sm:w-60 relative [&_button]:p-2 [&_button]:rounded-lg [&>button]:border [&>button]:border-[#00000039] bg-white">
-                    <button className="cursor-pointer flex items-center justify-between gap-4 w-full" onClick={() => setIsOpen(!isOpen)}>
-                        <Trophy className="h-5 w-5" />
-                        {sports[selectedSport]}
-                        <ChevronDown />
-                    </button>
-                    <div className={`${isOpen ? '' : 'hidden'} z-20 absolute flex flex-col bg-white w-full mt-2 rounded-lg border border-[#00000039] transition-y duration-300 ease-in-out p-1`}>
-                        {
-                            sports.map((sport, index) => {
-                                return <button className="flex items-center gap-4 hover:bg-[#cacaca98]" onClick={() => { toggleMenu(index) }}>{<Check className={`h-5 w-4 ${index == selectedSport ? '' : 'opacity-0'}`} />}{sport}</button>
-                            })
-                        }
+        <div className="space-y-6 px-4 sm:px-6 lg:px-8">
+            <div className="mx-auto container pt-5 flex flex-col gap-8 min-h-screen">
+                <div>
+                    <h1 className="text-4xl font-bold">Matches</h1>
+                    <p className="text-[#000000a1]">View live scores and upcoming fixtures</p>
+                </div>
+                <div className="flex justify-between sm:flex-row flex-col gap-8 text-sm">
+                    <div className="w-full sm:w-60 relative [&_button]:p-2 [&_button]:rounded-lg [&>button]:border [&>button]:border-[#00000039] bg-white">
+                        <button className="cursor-pointer flex items-center justify-between gap-4 w-full" onClick={() => setIsOpen(!isOpen)}>
+                            <Trophy className="h-5 w-5" />
+                            {sports[selectedSport]}
+                            <ChevronDown />
+                        </button>
+                        <div className={`${isOpen ? '' : 'hidden'} z-20 absolute flex flex-col bg-white w-full mt-2 rounded-lg border border-[#00000039] transition-y duration-300 ease-in-out p-1`}>
+                            {
+                                sports.map((sport, index) => {
+                                    return <button className="flex items-center gap-4 hover:bg-[#cacaca98]" onClick={() => { toggleMenu(index) }}>{<Check className={`h-5 w-4 ${index == selectedSport ? '' : 'opacity-0'}`} />}{sport}</button>
+                                })
+                            }
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div className="">
-                <LiveMatchCard
-                    stage="Semi-Final"
-                    score1={45}
-                    score2={38}
-                    team1="NIT Trichy Warriors"
-                    team2="NIT Warangal Eagles"
-                    sport="Basketball"
-                    venue="Main Court"
-                />
-            </div>
-            <div className="w-full">
-                <h2 className="mb-4 text-2xl font-bold text-gray-800">All Matches</h2>
-                <div className="space-y-4">
-                    {matchesData.map((match) => (
-                        <MatchCard
-                            key={match.id}
-                            status={match.status}
-                            team1Name={match.team1Name}
-                            team1Score={match.team1Score}
-                            team2Name={match.team2Name}
-                            team2Score={match.team2Score}
-                            stage={match.stage}
-                            sport={match.sport}
-                            date={match.date}
-                            time={match.time}
-                            venue={match.venue}
-                        />
-                    ))}
+                <div className="">
+                    <LiveMatchCard
+                        stage="Semi-Final"
+                        score1={45}
+                        score2={38}
+                        team1="NIT Trichy Warriors"
+                        team2="NIT Warangal Eagles"
+                        sport="Basketball"
+                        venue="Main Court"
+                    />
                 </div>
-            </div>
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 py-4">
-                <StatCard
-                    title="Total Teams"
-                    stat={10}
-                    subtitle="Competing institutions"
-                    Item={Calendar}
-                />
-                <StatCard
-                    title="Active Teams"
-                    stat={136}
-                    subtitle="Currently Competing"
-                    Item={Users}
-                />
-                <StatCard
-                    title="Total Players"
-                    stat={145}
-                    subtitle="Across all teams"
-                    Item={Clock}
-                />
-                <StatCard
-                    title="Sports Categories"
-                    stat={8}
-                    subtitle="Different sports"
-                    Item={Trophy}
-                />
+                <div className="w-full">
+                    <h2 className="mb-4 text-2xl font-bold text-gray-800">All Matches</h2>
+                    <div className="space-y-4">
+                        {matchesData.map((match) => (
+                            <MatchCard
+                                key={match.id}
+                                status={match.status}
+                                team1Name={match.team1Name}
+                                team1Score={match.team1Score}
+                                team2Name={match.team2Name}
+                                team2Score={match.team2Score}
+                                stage={match.stage}
+                                sport={match.sport}
+                                date={match.date}
+                                time={match.time}
+                                venue={match.venue}
+                            />
+                        ))}
+                    </div>
+                </div>
+                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 py-4">
+                    <StatCard
+                        title="Total Teams"
+                        stat={10}
+                        subtitle="Competing institutions"
+                        Item={Calendar}
+                    />
+                    <StatCard
+                        title="Active Teams"
+                        stat={136}
+                        subtitle="Currently Competing"
+                        Item={Users}
+                    />
+                    <StatCard
+                        title="Total Players"
+                        stat={145}
+                        subtitle="Across all teams"
+                        Item={Clock}
+                    />
+                    <StatCard
+                        title="Sports Categories"
+                        stat={8}
+                        subtitle="Different sports"
+                        Item={Trophy}
+                    />
+                </div>
             </div>
         </div>
     )

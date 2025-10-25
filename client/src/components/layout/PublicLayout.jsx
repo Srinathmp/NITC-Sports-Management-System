@@ -8,7 +8,7 @@ export default function PublicLayout() {
     const togglemenu = () => { setIsMenuOpen(!isMenuOpen) };
 
     return (
-        <div className={`flex flex-col min-h-screen bg-[#e7e7e78a] ${isMenuOpen?'overflow-hidden':''}`}>
+        <div className={`flex flex-col min-h-screen bg-[#e7e7e78a] ${isMenuOpen ? 'overflow-hidden' : ''}`}>
             <header className={`sticky top-0 z-30 bg-white border-b shadow-lg border-[#5184e3ff]`}>
                 <div className={`flex items-center justify-between h-14 text-sm mx-auto container px-4`}>
                     <Link to="/">
@@ -18,10 +18,10 @@ export default function PublicLayout() {
                         </div>
                     </Link>
                     <nav className="hidden md:flex justify-between gap-2 text-sm font-semibold">
-                         <Link to="/public/leaderboard"><NavBtn screen={true} Icon={ChartColumn} name="Leaderboard"  toggle={null} /></Link>
-                         <Link to="/public/teams"><NavBtn screen={true} Icon={Users} name="Teams"  toggle={null} /></Link>
-                         <Link to="/public/matches"><NavBtn screen={true} Icon={Swords} name="Matches"  toggle={null} /></Link>
-                         <Link to="/public/notifications"><NavBtn screen={true} Icon={Bell} name="Notifications"  toggle={null} /></Link>
+                        <Link to="/public/leaderboard"><NavBtn screen={true} Icon={ChartColumn} name="Leaderboard" path="/public/leaderboard" toggle={null} /></Link>
+                        <Link to="/public/teams"><NavBtn screen={true} Icon={Users} name="Teams" path="/public/teams" toggle={null} /></Link>
+                        <Link to="/public/matches"><NavBtn screen={true} Icon={Swords} name="Matches" path="/public/matches" toggle={null} /></Link>
+                        <Link to="/public/notifications"><NavBtn screen={true} Icon={Bell} name="Notifications" path="/public/notifications" toggle={null} /></Link>
                     </nav>
                     <div className="hidden md:block">
                         <Link to="/login">
@@ -43,7 +43,7 @@ export default function PublicLayout() {
                         <Link to="/public/matches"><NavBtn screen={false} Icon={Swords} name="Matches" toggle={togglemenu} /></Link>
                         <Link to="/public/notifications"><NavBtn screen={false} Icon={Bell} name="Notifications" toggle={togglemenu} /></Link>
                         <Link to="/login" className="mt-4 md:hidden">
-                             <button className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-white bg-white font-semibold text-[#2378daff] p-2 transition-all duration-200">
+                            <button className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-white bg-white font-semibold text-[#2378daff] p-2 transition-all duration-200">
                                 <LogIn size={20} strokeWidth={2.5} />
                                 Login
                             </button>
