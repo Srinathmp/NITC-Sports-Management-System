@@ -32,7 +32,7 @@ function Leaderboard() {
     const handlePrevPage = () => { setCurrentPage(currentPage - 1) }
 
     return (
-        <div className="w-full pt-15 flex flex-col gap-8 container mx-auto">
+        <div className="w-full pt-5 flex flex-col gap-8 container mx-auto">
             <div>
                 <h1 className="text-4xl font-bold">Leaderboard & Rankings</h1>
                 <p className="text-[#000000a1]">Overall performance across all sports</p>
@@ -76,11 +76,11 @@ function Leaderboard() {
                                                 <p className="text-sm text-[#767676ff] font-semibold">Total Medals:{institue.total}</p>
                                             </div>
                                         </div>
-                                        <div className="flex items-center gap-2 md:gap-6 text-center">
+                                        <div className="flex items-center gap-2 md:gap-6 text-center flex-col lg:flex-row">
                                             <div className="font-semibold flex gap-2 md:gap-4"><p>🥇{institue.gold}</p> <p>🥈{institue.silver}</p> <p>🥉{institue.bronze}</p></div>
-                                            <div className="text-right">
+                                            <div className="text-right flex gap-4 md:flex-col md:gap-0">
                                                 <p className="font-semibold text-xl">{institue.points}</p>
-                                                <p className="text-sm text-[#767676ff] font-semibold">points</p>
+                                                <p className="text-xl md:text-sm text-[#767676ff] font-semibold">points</p>
                                             </div>
                                         </div>
                                     </div>
