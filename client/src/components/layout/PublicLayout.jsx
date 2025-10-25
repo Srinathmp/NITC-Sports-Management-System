@@ -8,9 +8,9 @@ export default function PublicLayout() {
     const togglemenu = () => { setIsMenuOpen(!isMenuOpen) };
 
     return (
-        <div>
+        <div className="min-h-screen bg-[#e7e7e78a]">
             <header className="sticky top-0 z-20 bg-white border-b shadow-lg border-[#5184e3ff]">
-                <div className="flex items-center justify-between px-12 py-2 text-sm">
+                <div className="flex items-center justify-between p-4 md:py-2 text-sm mx-auto container">
                     <Link to="/">
                         <div className="flex items-center gap-2">
                             <Trophy className="text-blue-800 h-8 w-8" />
@@ -35,18 +35,29 @@ export default function PublicLayout() {
                         <Menu className="text-black" />
                     </button>
                 </div>
-                <div className={`${!isMenuOpen ? 'opacity-0' : 'opacity-100'} flex items-center bg-[#2378daff] justify-center fixed w-full h-full md:hidden transition-opacity duration-300 ease-in-out text-white text-2xl`}>
+                <div className={`${!isMenuOpen ? 'hidden opacity-0' : 'opacity-100'} flex items-center bg-[#2378daff] justify-center fixed w-full h-full md:hidden transition-opacity duration-300 ease-in-out text-white text-2xl`}>
                     <nav className="flex flex-col gap-4 font-semibold text-black font-semibold p-8 rounded-xl bg-white/30">
-                        <Link to="/public/leaderboard"><NavBtn screen={false} Icon="null" name="Leaderboard" toggle={togglemenu} /></Link>
-                        <Link to="/public/teams"><NavBtn screen={false} Icon="null" name="Teams"  toggle={togglemenu} /></Link>
-                        <Link to="/public/matches"><NavBtn screen={false} Icon="null" name="Matches"  toggle={togglemenu} /></Link>
-                        <Link to="/public/notifications"><NavBtn screen={false} Icon="null" name="Notifications"  toggle={togglemenu} /></Link>
+                        <Link to="/public/leaderboard"><NavBtn screen={false} Icon={ChartColumn} name="Leaderboard" toggle={togglemenu} /></Link>
+                        <Link to="/public/teams"><NavBtn screen={false} Icon={Users} name="Teams"  toggle={togglemenu} /></Link>
+                        <Link to="/public/matches"><NavBtn screen={false} Icon={Swords} name="Matches"  toggle={togglemenu} /></Link>
+                        <Link to="/public/notifications"><NavBtn screen={false} Icon={Bell} name="Notifications"  toggle={togglemenu} /></Link>
                     </nav>
                 </div>
             </header>
-            <main className={`${isMenuOpen ? 'hidden' : ''}`}>
+            <main className={`${isMenuOpen ? 'hidden' : 'mx-auto container'}`}>
                 <Outlet />
             </main>
+            <footer className="relative border-t border-primary/20 text-black mt-10">
+                <div className="container mx-auto px-6 py-8">
+                    <div className="mb-4 flex items-center justify-center gap-2">
+                        <Trophy className="h-6 w-6 text-primary" />
+                        <span className="text-lg font-bold text-gradient">INSMS</span>
+                    </div>
+                    <div className="text-center text-sm text-muted-foreground">
+                        <p>&copy; Inter-NIT Sports Management System</p>
+                    </div>
+                </div>
+            </footer>
         </div>
     )
 }
