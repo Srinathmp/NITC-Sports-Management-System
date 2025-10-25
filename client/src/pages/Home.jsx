@@ -32,7 +32,7 @@ export default function Home() {
                                 Sign In
                             </button>
                         </Link>
-                        <Link to="/matches">
+                        <Link to="/public/leaderboard">
                             <button className="flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-white/30 bg-white/20 px-6 py-3 font-semibold text-white backdrop-blur-sm transition-all duration-300 hover:scale-105 hover:bg-white hover:text-blue-600">
                                 <ChartColumn size={20} strokeWidth={2.5} />
                                 View Rankings
