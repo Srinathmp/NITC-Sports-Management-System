@@ -7,18 +7,21 @@ const rankStyles = {
         borderColor: 'border-amber-200',
         iconColor: 'text-[#f3ef25ff]',
         icon: <Crown size={32} />,
+        order: 'sm:order-2 order-1 md:scale-105'
     },
     2: {
         bgColor: 'bg-slate-100',
         borderColor: 'border-slate-200',
         iconColor: 'text-slate-500',
         icon: <Medal size={32} />,
+        order: 'sm:order-1 order-2'
     },
     3: {
         bgColor: 'bg-orange-50',
         borderColor: 'border-orange-200',
         iconColor: 'text-[#cc6600ff]',
         icon: <Star size={32} />,
+        order: 'order-3'
     },
 };
 
@@ -75,11 +78,11 @@ function PerformerCard({ rank, name, points, medals }) {
     const styles = rankStyles[rank];
 
     return (
-        <div className={`flex flex-col items-center justify-center space-y-2 rounded-xl border-2 px-6 py-4 text-center shadow-sm transition-all hover:scale-105 hover:shadow-2xl ${styles.bgColor} ${styles.borderColor}`} >
+        <div className={`flex flex-col items-center justify-center space-y-2 rounded-xl border-2 px-6 py-4 text-center shadow-sm transition-all hover:shadow-2xl ${styles.bgColor} ${styles.borderColor} ${styles.order}`} >
             <div className={styles.iconColor}>{styles.icon}</div>
             <h3 className="text-base font-semibold text-slate-800 sm:text-lg">{name}</h3>
             <p className="text-2xl font-bold text-blue-600 sm:text-3xl">{points} pts</p>
-            <p className="text-sm text-slate-500">{medals} medals</p>
+            <p className="text-sm text-slate-500 font-semibold">{medals} medals</p>
         </div>
     );
 }
