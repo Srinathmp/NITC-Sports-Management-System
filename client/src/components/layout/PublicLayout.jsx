@@ -21,6 +21,7 @@ export default function PublicLayout() {
                         <Link to="/public/leaderboard"><NavBtn screen={true} Icon={ChartColumn} name="Leaderboard" path="/public/leaderboard" toggle={null} /></Link>
                         <Link to="/public/teams"><NavBtn screen={true} Icon={Users} name="Teams" path="/public/teams" toggle={null} /></Link>
                         <Link to="/public/matches"><NavBtn screen={true} Icon={Swords} name="Matches" path="/public/matches" toggle={null} /></Link>
+                        <Link to="/public/events"><NavBtn screen={true} Icon={Trophy} name="Events" path="/public/events" toggle={null} /></Link>
                         <Link to="/public/notifications"><NavBtn screen={true} Icon={Bell} name="Notifications" path="/public/notifications" toggle={null} /></Link>
                     </nav>
                     <div className="hidden md:block">
@@ -41,6 +42,7 @@ export default function PublicLayout() {
                         <Link to="/public/leaderboard"><NavBtn screen={false} Icon={ChartColumn} name="Leaderboard" toggle={togglemenu} /></Link>
                         <Link to="/public/teams"><NavBtn screen={false} Icon={Users} name="Teams" toggle={togglemenu} /></Link>
                         <Link to="/public/matches"><NavBtn screen={false} Icon={Swords} name="Matches" toggle={togglemenu} /></Link>
+                        <Link to="/public/events"><NavBtn screen={false} Icon={Trophy} name="Events" toggle={togglemenu} /></Link>
                         <Link to="/public/notifications"><NavBtn screen={false} Icon={Bell} name="Notifications" toggle={togglemenu} /></Link>
                         <Link to="/login" className="mt-4 md:hidden">
                             <button className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-white bg-white font-semibold text-[#2378daff] p-2 transition-all duration-200">
