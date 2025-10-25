@@ -1,3 +1,5 @@
+import { useLocation } from "react-router-dom"
+
 function LinkBtn(props){
     return(
         <div className="
@@ -9,4 +11,13 @@ function LinkBtn(props){
     )
 }
 
-export {LinkBtn}
+function NavBtn(props){
+    return(
+        <button className={`${props.screen?'flex items-center cursor-pointer p-2 rounded-lg hover:bg-[#e1e7efff] w-30 justify-center gap-1':'p1 border-b focus:bg-black text-left active:text-white w-full'}`} onClick={props.toggle}>
+            <props.Icon />
+            {props.name}
+        </button>
+    )
+}
+
+export {LinkBtn,NavBtn}
