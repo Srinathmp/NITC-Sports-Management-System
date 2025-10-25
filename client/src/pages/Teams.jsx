@@ -61,7 +61,7 @@ function Teams() {
     ];
 
     return (
-        <div className="mx-auto container pt-15 flex flex-col gap-8 min-h-screen px-2">
+        <div className="mx-auto container pt-5 flex flex-col gap-8 min-h-screen px-2">
             <div>
                 <h1 className="text-4xl font-bold">Teams</h1>
                 <p className="text-[#000000a1]">Explore all participating teams</p>
