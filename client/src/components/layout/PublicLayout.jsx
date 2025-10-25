@@ -10,7 +10,7 @@ export default function PublicLayout() {
     return (
         <div className="min-h-screen bg-[#e7e7e78a]">
             <header className="sticky top-0 z-20 bg-white border-b shadow-lg border-[#5184e3ff]">
-                <div className="flex items-center justify-between p-4 md:py-2 text-sm mx-auto container">
+                <div className="flex items-center justify-between h-14 text-sm mx-auto container">
                     <Link to="/">
                         <div className="flex items-center gap-2">
                             <Trophy className="text-blue-800 h-8 w-8" />
@@ -44,7 +44,7 @@ export default function PublicLayout() {
                     </nav>
                 </div>
             </header>
-            <main className={`${isMenuOpen ? 'hidden' : 'mx-auto container'}`}>
+            <main className={`${isMenuOpen ? 'hidden' : 'w-full'}`}>
                 <Outlet />
             </main>
             <footer className="relative border-t border-primary/20 text-black mt-10">

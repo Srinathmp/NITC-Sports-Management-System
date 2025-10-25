@@ -154,7 +154,7 @@ export default function Home() {
             </main>
 
             {/* Footer */}
-            <footer className="relative border-t border-primary/20 text-white">
+            <footer className="relative border-t border-primary/20 text-white mt:min-h-screen">
                 <div className="container mx-auto px-6 py-8">
                     <div className="mb-4 flex items-center justify-center gap-2">
                         <Trophy className="h-6 w-6 text-primary" />
