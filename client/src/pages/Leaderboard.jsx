@@ -32,7 +32,7 @@ function Leaderboard() {
     const handlePrevPage = () => { setCurrentPage(currentPage - 1) }
 
     return (
-        <div className="w-full pt-5 flex flex-col gap-8 container mx-auto">
+        <div className="w-full p-8 flex flex-col gap-8 px-4 md:px-8">
             <div>
                 <h1 className="text-4xl font-bold">Leaderboard & Rankings</h1>
                 <p className="text-[#000000a1]">Overall performance across all sports</p>
@@ -125,4 +125,4 @@ function Leaderboard() {
     )
 }
 
-export { Leaderboard };
+export default Leaderboard;

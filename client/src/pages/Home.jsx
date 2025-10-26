@@ -60,7 +60,7 @@ export default function Home() {
                                     <div className="h-3 w-3 animate-pulse rounded-full bg-red-400"></div>
                                     Live Matches
                                 </h2>
-                                <Link to="/matches">
+                                <Link to="/public/matches">
                                     <LinkBtn>View All</LinkBtn>
                                 </Link>
                             </div>
@@ -75,7 +75,7 @@ export default function Home() {
                                     <Trophy className="text-amber-500" size={30} />
                                     Top Performers
                                 </h2>
-                                <Link to="/matches">
+                                <Link to="/public/leaderboard">
                                     <LinkBtn>Full Rankings</LinkBtn>
                                 </Link>
                             </div>
@@ -95,7 +95,7 @@ export default function Home() {
                                 <h2 className="text-xl font-bold md:text-3xl">
                                     Upcoming Events
                                 </h2>
-                                <Link to="/matches">
+                                <Link to="/public/events">
                                     <LinkBtn>View All</LinkBtn>
                                 </Link>
                             </div>
@@ -112,7 +112,7 @@ export default function Home() {
                                 <h2 className="text-xl font-bold md:text-2xl">
                                     Latest Announcements
                                 </h2>
-                                <Link to="/matches">
+                                <Link to="/public/notifications">
                                     <LinkBtn>View All</LinkBtn>
                                 </Link>
                             </div>

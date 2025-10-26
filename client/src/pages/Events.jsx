@@ -127,21 +127,21 @@ function Events() {
     const completedCount = events.filter(e => e.status === 'completed').length;
 
     return (
-        <div className="space-y-6 mx-auto container">
+        <div className="space-y-6 w-full p-8 pt-5 px-4 md:px-8">
             <div className="mb-6">
                 <h1 className="text-3xl font-bold text-gray-900">Events</h1>
                 <p className="text-gray-500 mt-1">Browse upcoming and ongoing tournaments</p>
             </div>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-between">
-                <div className="flex flex-col sm:flex-row gap-4 flex-1">
+                <div className="flex flex-col sm:flex-row gap-4 flex-1 justify-between">
                     <div className="relative flex-1 max-w-md">
                         <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-500" />
-                        <input type="text" placeholder="Search events, sports, or organizers..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-200 bg-white text-gray-900 placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
+                        <input type="text" placeholder="Search events, sports, or organizers..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-400 bg-white text-gray-900 placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
                     </div>
 
                     <div className="relative w-full sm:w-40">
-                        <button onClick={() => setIsFilterOpen(!isFilterOpen)} className="w-full px-4 py-2.5 rounded-lg border border-gray-200 bg-white text-gray-900 hover:bg-gray-100 transition-colors flex items-center justify-between" >
+                        <button onClick={() => setIsFilterOpen(!isFilterOpen)} className="w-full px-4 py-2.5 rounded-lg border border-gray-400 bg-white text-gray-900 hover:bg-gray-100 transition-colors flex items-center justify-between" >
                             <div className="flex items-center gap-2">
                                 <Filter className="h-4 w-4" />
                                 <span className="text-sm">
