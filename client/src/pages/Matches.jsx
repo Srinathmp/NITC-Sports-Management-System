@@ -49,7 +49,7 @@ function MatchCard({ status, team1Name, team1Score, team2Name, team2Score, stage
                 <div className="hidden text-right text-sm rounded-xl bg-blue-200 px-2 py-0.5 font-medium text-gray-700 sm:block">{stage}</div>
             </div>
 
-            <div className="flex flex-col items-center justify-around pt-10 sm:flex-row sm:pt-4">
+            <div className="flex flex-col items-center justify-between pt-10 sm:flex-row sm:pt-4 px-4">
                 <div className="flex w-full items-center justify-around gap-4 text-center sm:w-auto sm:justify-start lg:gap-8">
                     <span className="w-1/3 font-semibold text-[#535353ec] sm:w-auto sm:text-right">{team1Name}</span>
                     <span className="text-xl font-bold text-gray-900">{scoreDisplay}</span>
@@ -135,8 +135,8 @@ function Matches() {
     ];
 
     return (
-        <div className="space-y-6 px-4 sm:px-6 lg:px-8">
-            <div className="mx-auto container pt-5 flex flex-col gap-8 min-h-screen">
+        <div className="space-y-6 w-full p-8 pt-5 px-4 md:px-8">
+            <div className="pt-5 flex flex-col gap-8 min-h-screen">
                 <div>
                     <h1 className="text-4xl font-bold">Matches</h1>
                     <p className="text-[#000000a1]">View live scores and upcoming fixtures</p>
@@ -157,7 +157,7 @@ function Matches() {
                         </div>
                     </div>
                 </div>
-                <div className="">
+                <div>
                     <LiveMatchCard
                         stage="Semi-Final"
                         score1={45}
@@ -219,4 +219,4 @@ function Matches() {
     )
 }
 
-export { Matches };
+export default Matches;

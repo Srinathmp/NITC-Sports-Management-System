@@ -15,9 +15,9 @@ function NavBtn(props){
     const location = useLocation();
     const currentPath = location.pathname;
     return(
-        <button className={`${currentPath===props.path?'bg-orange-400 text-white hover:bg-orange-300':' hover:bg-[#e1e7efff] '} 
-        ${props.screen?'flex items-center cursor-pointer p-2 rounded-lg w-30 justify-center gap-1':
-        'flex items-center justofy-center gap-4 p1 border-b focus:text-white active:text-white w-full'}`} onClick={props.toggle}>
+        <button className={`p-2 rounded-lg ${currentPath===props.path?'bg-orange-500 text-white hover:bg-orange-300':' hover:bg-[#e1e7efff] '} 
+        ${props.screen?'flex items-center cursor-pointer rounded-lg w-30 justify-center gap-1':
+        'flex items-center justofy-center gap-4 p1 focus:text-white active:text-white w-full'}`} onClick={props.toggle}>
             <props.Icon />
             {props.name}
         </button>
