@@ -1,0 +1,235 @@
+{
+  "info": {
+    "name": "INSMS API Collection",
+    "_postman_id": "b23f8e62-12a7-4c14-9c7c-9d2123b2a100",
+    "description": "Postman collection for testing all INSMS backend endpoints (Auth, NITs, Teams, Events, Matches, Notifications)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "base_url", "value": "http://localhost:5000" },
+    { "key": "token", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register User",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/api/users/register",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Coach Test\",\n  \"email\": \"coach1@insms.com\",\n  \"password\": \"coach123\",\n  \"role\": \"Coach\",\n  \"nit_id\": \"<replace_with_nit_id>\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Login (Get Token)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/api/users/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"commonadmin@insms.com\",\n  \"password\": \"admin123\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "NIT Management",
+      "item": [
+        {
+          "name": "Register NIT",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/api/nits/register",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"NIT Warangal\",\n  \"code\": \"NITW\",\n  \"location\": \"Telangana\"\n}"
+            }
+          }
+        },
+        {
+          "name": "List Pending NITs",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{base_url}}/api/nits/pending"
+          }
+        },
+        {
+          "name": "Approve NIT",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": "{{base_url}}/api/nits/<replace_with_nit_id>/status",
+            "body": { "mode": "raw", "raw": "{\n  \"status\": \"Approved\"\n}" }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Teams",
+      "item": [
+        {
+          "name": "Create Team",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": "{{base_url}}/api/teams",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Warangal Warriors\",\n  \"sport\": \"Football\",\n  \"nit_id\": \"<replace_with_nit_id>\",\n  \"players\": [\n    { \"name\": \"Player A\", \"jerseyNo\": 9, \"position\": \"Forward\" }\n  ]\n}"
+            }
+          }
+        },
+        {
+          "name": "Get Teams by NIT",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/teams/nit/<replace_with_nit_id>"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Events",
+      "item": [
+        {
+          "name": "Create Event",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": "{{base_url}}/api/events",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Cricket Tournament\",\n  \"sport\": \"Cricket\",\n  \"venue\": \"Main Ground\",\n  \"datetime\": \"2025-11-02T09:00:00Z\",\n  \"tournamentYear\": 2025,\n  \"stage\": \"League\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Validate/Approve Event",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": "{{base_url}}/api/events/<replace_with_event_id>/status",
+            "body": { "mode": "raw", "raw": "{\n  \"status\": \"Scheduled\"\n}" }
+          }
+        },
+        {
+          "name": "List Events (Public)",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/events"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Matches",
+      "item": [
+        {
+          "name": "Create Fixture (Common Admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": "{{base_url}}/api/matches",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"event_id\": \"<replace_with_event_id>\",\n  \"teamA_id\": \"<replace_with_teamA_id>\",\n  \"teamB_id\": \"<replace_with_teamB_id>\",\n  \"matchDateTime\": \"2025-11-03T09:30:00Z\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Submit Result (NIT Admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": "{{base_url}}/api/matches/<replace_with_match_id>/result",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"scoreA\": 120,\n  \"scoreB\": 90,\n  \"remarks\": \"Excellent batting performance\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Publish Result (Common Admin)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": "{{base_url}}/api/matches/<replace_with_match_id>/status",
+            "body": { "mode": "raw", "raw": "{\n  \"action\": \"publish\"\n}" }
+          }
+        },
+        {
+          "name": "List Completed Matches (Public)",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/matches"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Notifications",
+      "item": [
+        {
+          "name": "Create Notification",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": "{{base_url}}/api/notifications",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"message\": \"Results published for cricket event\",\n  \"recipientRole\": \"All\",\n  \"type\": \"Announcement\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Get Notifications (Public)",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/notifications?recipientRole=All"
+          }
+        },
+        {
+          "name": "Get My Notifications",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{base_url}}/api/notifications"
+          }
+        }
+      ]
+    }
+  ]
+}
