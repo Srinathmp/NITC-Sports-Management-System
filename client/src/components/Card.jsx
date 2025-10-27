@@ -78,7 +78,7 @@ function PerformerCard({ rank, name, points, medals }) {
     const styles = rankStyles[rank];
 
     return (
-        <div className={`flex flex-col items-center justify-center space-y-2 rounded-xl border-2 px-6 py-4 text-center shadow-sm transition-all hover:shadow-2xl ${styles.bgColor} ${styles.borderColor} ${styles.order}`} >
+        <div className={`flex flex-col items-center justify-center space-y-2 rounded-xl border-2 p-6 text-center shadow-sm transition-all hover:shadow-2xl ${styles.bgColor} ${styles.borderColor} ${styles.order}`} >
             <div className={styles.iconColor}>{styles.icon}</div>
             <h3 className="text-base font-semibold text-slate-800 sm:text-lg">{name}</h3>
             <p className="text-2xl font-bold text-blue-600 sm:text-3xl">{points} pts</p>
