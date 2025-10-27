@@ -8,7 +8,7 @@ export default function PublicLayout() {
     const togglemenu = () => { setIsMenuOpen(!isMenuOpen) };
 
     return (
-        <div className={`flex flex-col min-h-screen bg-[#e7e7e78a]`}>
+        <div className={`flex flex-col min-h-screen`}>
             <header className={`sticky top-0 z-30 bg-white border-b md:px-10 shadow-lg border-[#5184e3ff]`}>
                 <div className={`flex items-center justify-between h-14 text-sm px-4`}>
                     <Link to="/">
