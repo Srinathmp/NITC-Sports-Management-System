@@ -1,4 +1,4 @@
-import { Award, Medal, Crown, Star, Check, ChevronDown, Trophy } from "lucide-react";
+import { Award, Medal, Crown, Star, Check, ChevronDown, Trophy, TrendingUp } from "lucide-react";
 import { useState } from "react";
 import { PerformerCard } from "../components/Card";
 
@@ -53,7 +53,7 @@ function Leaderboard() {
                     </div>
                 </div>
             </div>
-            <div className="bg-white rounded-xl flex flex-col items-center justify-center px-6 py-8 border border-[#9c9c9c5e]">
+            <div className="bg-white rounded-xl flex flex-col items-center justify-center px-6 py-8 border border-[#9c9c9c5e] shadow-lg">
                 <p className="text-2xl font-semibold">🏆 Top Performers 🏆</p>
                 <div className="mt-4 grid grid-cols-1 gap-6 sm:grid-cols-3 w-full mt-10">
                     <PerformerCard rank={1} points={10} medals={16} name="NIT Calicut" />
@@ -61,14 +61,17 @@ function Leaderboard() {
                     <PerformerCard rank={3} points={120} medals={16} name="NIT Calicut" />
                 </div>
             </div>
-            <div className="bg-white rounded-xl flex flex-col px-4 py-8 border border-[#9c9c9c5e] gap-6">
-                <h1 className="text-2xl font-semibold">Complete Rankings</h1>
+            <div className="bg-white rounded-xl flex flex-col px-4 py-8 border border-[#9c9c9c5e] gap-6 z-10">
+                <div className="flex items-center gap-4">
+                    <TrendingUp />
+                    <h1 className="text-2xl font-semibold"> Complete Rankings</h1>
+                </div>
                 <div className="flex flex-col gap-2">
                     {
                         items.map((institue, index) => {
                             if ((currentPage - 1) * 10 <= index && index < (currentPage) * 10) {
                                 return (
-                                    <div className="flex justify-between border border-[#9c9c9c5e] p-2 md:p-4 rounded-lg hover:shadow-lg">
+                                    <div key={index} className="flex justify-between items-center border border-gray-300 p-3 rounded-xl hover:shadow-lg">
                                         <div className="flex items-center gap-4">
                                             <h1 className="text-2xl font-bold text-[#767676ff]">#{index + 1}</h1>
                                             <div>
@@ -89,7 +92,7 @@ function Leaderboard() {
                         })
                     }
                 </div>
-                <div className="flex items-center justify-between md:px-30 [&_button]:border [&_button]:border-[#949494ff] [&_button]:p-2 [&_button]:rounded-xl [&_button]:cursor-pointer [&_button]:hover:bg-blue-400 [&_button]:hover:text-white">
+                <div className="flex items-center justify-between md:px-30 [&_button]:border [&_button]:border-[#7b7b7b5a] [&_button]:p-2 [&_button]:rounded-xl [&_button]:cursor-pointer [&_button]:hover:bg-blue-400 [&_button]:hover:text-white [&_button]:w-20">
                     <button onClick={handlePrevPage} disabled={currentPage === 1}> Previous </button>
                     Page {currentPage} of {totalPage}
                     <button onClick={handleNextPage} disabled={currentPage === totalPage}> Next </button>
