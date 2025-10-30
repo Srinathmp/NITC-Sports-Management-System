@@ -90,7 +90,7 @@ function Coach() {
             </header>
 
             <div className="flex min-h-screen bg-gray-50">
-                <aside className={`hidden md:block fixed h-screen left-0 z-20 flex flex-col gap-2 p-2 border-r bg-white shadow-sm ${isOpen ? 'w-52' : 'w-16'} transition-all duration-300 ease-in-out`} onMouseEnter={() => setIsOpen(true)} onMouseLeave={() => setIsOpen(false)} >
+                <aside className={`hidden md:block fixed h-screen left-0 z-20 flex flex-col gap-2 p-2 border-r border-[#9d9d9da4] bg-white shadow-sm ${isOpen ? 'w-52' : 'w-16'} transition-all duration-300 ease-in-out`} onMouseEnter={() => setIsOpen(true)} onMouseLeave={() => setIsOpen(false)} >
                     <SidebarNav isOpen={isOpen} />
                 </aside>
                 <main className={`flex-1 md:ml-16 transition-all duration-300 ease-in-out min-w-0`} >
