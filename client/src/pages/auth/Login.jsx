@@ -1,13 +1,15 @@
 import { Trophy, Mail, Lock } from "lucide-react"
 import { useState } from "react"
+import { useNavigate } from "react-router-dom"
 
 export default function Login() {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
+    const navigate = useNavigate();
 
     function handleSubmit(e) {
         e.preventDefault()
-        console.log(email, password)
+        navigate(`/${password}`)
         setEmail('')
         setPassword('')
     }
@@ -21,10 +23,6 @@ export default function Login() {
                         <p className="font-bold text-3xl">INSMS</p>
                         <p>Inter-NIT Sports Management System</p>
                     </div>
-                    {/* <div className="flex flex-col items-center justify-center text-center gap-2 p-4">
-                        <p className="font-semibold text-2xl">Sign In</p>
-                        <p className="text-sm">Enter your credentials to access your dashboard</p>
-                    </div> */}
                     <form className="p-4" onSubmit={handleSubmit}>
                         <div>
                             <label htmlFor="email_id" className="text-sm font-medium"> Email Address </label>

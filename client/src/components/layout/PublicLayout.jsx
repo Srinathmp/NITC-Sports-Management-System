@@ -8,9 +8,9 @@ export default function PublicLayout() {
     const togglemenu = () => { setIsMenuOpen(!isMenuOpen) };
 
     return (
-        <div className={`flex flex-col min-h-screen bg-[#e7e7e78a] ${isMenuOpen ? 'overflow-hidden' : ''}`}>
-            <header className={`sticky top-0 z-30 bg-white border-b shadow-lg border-[#5184e3ff]`}>
-                <div className={`flex items-center justify-between h-14 text-sm mx-auto container px-4`}>
+        <div className={`flex flex-col min-h-screen`}>
+            <header className={`sticky top-0 z-30 bg-white border-b md:px-10 shadow-lg border-[#5184e3ff]`}>
+                <div className={`flex items-center justify-between h-14 text-sm px-4`}>
                     <Link to="/">
                         <div className="flex items-center gap-2">
                             <Trophy className="text-blue-800 h-8 w-8" />
@@ -33,29 +33,28 @@ export default function PublicLayout() {
                         </Link>
                     </div>
                     <button className="md:hidden z-50" onClick={togglemenu}>
-                        {isMenuOpen ? <X className="text-white" /> : <Menu className="text-black" />}
+                        {isMenuOpen ? <X className="text-black" /> : <Menu className="text-black" />}
                     </button>
                 </div>
+            </header>
 
-                <div className={` fixed items-center inset-0 w-full h-full bg-[#2378daff] pt-14 flex justify-center md:hidden transition-opacity duration-300 ease-in-out z-40 text-white text-2xl ${!isMenuOpen ? 'opacity-0 pointer-events-none' : 'opacity-100'} `} >
-                    <nav className="flex flex-col gap-4 font-semibold text-black p-8 rounded-xl bg-white/30 h-fit mt-8">
-                        <Link to="/public/leaderboard"><NavBtn screen={false} Icon={ChartColumn} name="Leaderboard" toggle={togglemenu} /></Link>
-                        <Link to="/public/teams"><NavBtn screen={false} Icon={Users} name="Teams" toggle={togglemenu} /></Link>
-                        <Link to="/public/matches"><NavBtn screen={false} Icon={Swords} name="Matches" toggle={togglemenu} /></Link>
-                        <Link to="/public/events"><NavBtn screen={false} Icon={Trophy} name="Events" toggle={togglemenu} /></Link>
-                        <Link to="/public/notifications"><NavBtn screen={false} Icon={Bell} name="Notifications" toggle={togglemenu} /></Link>
-                        <Link to="/login" className="mt-4 md:hidden">
-                            <button className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-white bg-white font-semibold text-[#2378daff] p-2 transition-all duration-200">
+            <main className={`flex w-full md:px-10 min-h-screen`}>
+                <Outlet />
+                <div className={`md:hidden fixed h-screen right-0 z-20 flex flex-col gap-2 p-2 border-l pt-8 bg-white shadow-sm ${isMenuOpen ? 'w-52' : 'w-16 hidden'} transition-all duration-300 ease-in-out`} >
+                    <nav className="flex flex-col gap-4 font-semibold text-black rounded-xl bg-white/30 h-fit mt-8 pt-10">
+                        <Link to="/public/leaderboard"><NavBtn screen={false} Icon={ChartColumn} name="Leaderboard" toggle={togglemenu} path="/public/leaderboard" /></Link>
+                        <Link to="/public/teams"><NavBtn screen={false} Icon={Users} name="Teams" toggle={togglemenu} path="/public/teams" /></Link>
+                        <Link to="/public/matches"><NavBtn screen={false} Icon={Swords} name="Matches" toggle={togglemenu} path="/public/matches" /></Link>
+                        <Link to="/public/events"><NavBtn screen={false} Icon={Trophy} name="Events" toggle={togglemenu} path="/public/events" /></Link>
+                        <Link to="/public/notifications"><NavBtn screen={false} Icon={Bell} name="Notifications" toggle={togglemenu} path="/public/notifications" /></Link>
+                        <Link to="/login" className="mt-15">
+                            <button className="w-full flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-[#3198e7ff] bg-[#3198e7ff] font-semibold text-white p-2 hover:bg-[#1c89c9ff] hover:border-[#1c89c9ff] transition-all duration-200">
                                 <LogIn size={20} strokeWidth={2.5} />
                                 Login
                             </button>
                         </Link>
                     </nav>
                 </div>
-            </header>
-
-            <main className={`flex-grow ${isMenuOpen ? 'hidden' : 'w-full p-4'}`}>
-                <Outlet />
             </main>
 
             <footer className={`relative border-t border-primary/20 text-black mt-auto ${isMenuOpen ? 'hidden' : ''}`}>

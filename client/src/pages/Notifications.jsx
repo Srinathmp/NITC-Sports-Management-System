@@ -123,7 +123,7 @@ const Notifications = () => {
   ];
 
   return (
-    <div className="space-y-6 pt-5 mx-auto container">
+    <div className="space-y-6 p-8 w-full px-4 md:px-8">
       <div className="flex flex-col sm:flex-row flex-wrap w-full gap-4 items-start sm:items-center justify-between">
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold flex items-center gap-3 text-gray-900">
@@ -204,4 +204,4 @@ const Notifications = () => {
   );
 };
 
-export { Notifications };
+export default Notifications;
