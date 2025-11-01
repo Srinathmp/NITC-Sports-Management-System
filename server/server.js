@@ -23,7 +23,7 @@ app.use('/api/teams', require('./routes/teamRoutes'));
 app.use('/api/events', require('./routes/eventRoutes'));
 app.use('/api/matches', require('./routes/matchRoutes'));
 app.use('/api/notifications', require('./routes/notificationRoutes'));
-
+app.use('/api/auditlogs', require('./routes/auditLogRoutes'));
 // Error handler
 const { notFound, errorHandler } = require('./middleware/errorHandler');
 app.use(notFound);
