@@ -24,4 +24,17 @@ function NavBtn(props){
     )
 }
 
-export {LinkBtn,NavBtn}
+function Button({ loading }) {
+return (<button
+  type="submit"
+  disabled={loading}
+  className={`px-4 py-2 rounded-md font-semibold text-white ${loading
+    ? "bg-blue-300 cursor-not-allowed"
+    : "bg-blue-600 hover:bg-blue-700 transition-colors"
+    }`}
+>
+  {loading ? "Creating..." : "Create Event"}
+</button>)
+}
+
+export {LinkBtn,NavBtn,Button};

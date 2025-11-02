@@ -34,9 +34,9 @@ export default function Login() {
       localStorage.setItem("role", role);
 
       // Redirect based on role
-      if (role === "CommonAdmin") navigate("/dashboard/common");
-      else if (role === "NITAdmin") navigate("/dashboard/nit");
-      else if (role === "Coach") navigate("/dashboard/coach");
+      if (role === "CommonAdmin") navigate("common-admin/dashboard");
+      else if (role === "NITAdmin") navigate("/nit-admin/dashboard");
+      else if (role === "Coach") navigate("coach/dashboard");
       else navigate("/");
 
     } catch (err) {

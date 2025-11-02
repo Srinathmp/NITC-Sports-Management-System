@@ -1,5 +1,6 @@
 import React from 'react';
 import { Calendar, Users, MapPin, Utensils, Plus, Bed,Settings} from 'lucide-react';
+import { useNavigate } from "react-router-dom";
 
 const StatCard = ({ title, value, subtitle, Icon }) => (
   <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-all cursor-pointer">
@@ -50,6 +51,11 @@ const DashboardButton = ({ title, Icon }) => (
 );
 
 function NitDashboard() {
+  const navigate = useNavigate();
+  const handleRedirect = () => {
+    navigate("/nit-admin/create-event");
+  };
+
   return (
     <div className="min-h-screen bg-gray-100 p-4 md:p-8">
       <div className="mb-6">
@@ -92,7 +98,7 @@ function NitDashboard() {
               <h2 className="text-xl font-semibold text-gray-900">Upcoming Events</h2>
               <p className="text-sm text-gray-500">Events scheduled for this week</p>
             </div>
-            <button className="mt-4 sm:mt-0 w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors cursor-pointer">
+            <button onClick={handleRedirect} className="mt-4 sm:mt-0 w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors cursor-pointer">
               <Plus className="h-4 w-4" />
               Add Event
             </button>

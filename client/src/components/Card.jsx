@@ -87,4 +87,51 @@ function PerformerCard({ rank, name, points, medals }) {
     );
 }
 
-export { LiveCard, StatCard, UpcomingCard, PerformerCard };
+function EventCard({ title, sport, venue, date, status, onApprove, onCancel, role }) {
+    const statusColors = {
+        Scheduled: "bg-green-100 text-green-700 border-green-200",
+        PendingValidation: "bg-yellow-50 text-yellow-700 border-yellow-200",
+        Cancelled: "bg-red-100 text-red-700 border-red-200",
+        Completed: "bg-gray-100 text-gray-700 border-gray-200"
+    };
+
+    const statusStyle = statusColors[status] || "bg-gray-50 text-gray-700 border-gray-100";
+
+    return (
+        <div className={`rounded-xl border-2 p-5 shadow-sm transition-all hover:shadow-lg hover:scale-[1.02] ${statusStyle}`}>
+            <div className="flex items-center justify-between mb-2">
+                <h3 className="text-lg font-semibold text-slate-800">{title}</h3>
+                <span className="rounded-full px-3 py-0.5 text-xs font-semibold border">
+                    {status}
+                </span>
+            </div>
+            <div className="text-sm text-slate-700 space-y-1 mb-3">
+                <p><strong>Sport:</strong> {sport}</p>
+                <p><strong>Venue:</strong> {venue}</p>
+                <p><strong>Date:</strong> {new Date(date).toLocaleString()}</p>
+            </div>
+
+            {/* Conditional Action Buttons */}
+            {role === "CommonAdmin" && status === "PendingValidation" && (
+                <div className="flex gap-2">
+                    <button
+                        onClick={onApprove}
+                        className="flex-1 rounded-md bg-green-600 py-2 text-sm font-semibold text-white hover:bg-green-700"
+                    >
+                        Approve
+                    </button>
+                    <button
+                        onClick={onCancel}
+                        className="flex-1 rounded-md bg-red-600 py-2 text-sm font-semibold text-white hover:bg-red-700"
+                    >
+                        Cancel
+                    </button>
+                </div>
+            )}
+        </div>
+    );
+}
+
+
+
+export { LiveCard, StatCard, UpcomingCard, PerformerCard, EventCard };
