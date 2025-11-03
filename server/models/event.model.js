@@ -28,7 +28,7 @@ const eventSchema = new Schema({
     },
     status: {
         type: String,
-        enum: ['PendingValidation', 'Scheduled','Registration Open', , 'Completed', 'Cancelled'],
+        enum: ['PendingValidation', 'Scheduled', 'Registration Open', 'Completed', 'Cancelled'],
         default: 'PendingValidation'
     },
     tournamentYear: {
@@ -43,7 +43,7 @@ const eventSchema = new Schema({
         type: Number,
         default: 0
     },
-    registeredTeams :{
+    registeredTeams: {
         type: Number,
         default: 0
     }

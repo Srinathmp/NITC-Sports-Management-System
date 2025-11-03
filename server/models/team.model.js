@@ -1,8 +1,6 @@
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
-// By adding {_id: false}, you tell Mongoose not to create an ObjectId 
-// for each player subdocument. This is exactly what you want.
 const playerSchema = new Schema({
     name: { type: String, required: true },
     jerseyNo: { type: Number },
@@ -30,7 +28,6 @@ const teamSchema = new Schema({
         ref: 'NIT',
         required: true
     },
-    // This now uses the correctly configured playerSchema
     players: [playerSchema] 
 }, {
     timestamps: true

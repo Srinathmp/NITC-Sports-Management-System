@@ -1,11 +1,11 @@
-const AuditLog = require('../models/AuditLog');
-const User = require('../models/User');
+const AuditLog = require('../models/auditLog.model');
+const User = require('../models/user.model');
 const { Parser } = require('json2csv');
-/**
- * @desc Get all audit logs with user details populated
- * @route GET /api/auditlogs
- * @access CommonAdmin / NITAdmin (depending on role)
- */
+
+// @desc Get all audit logs with user details populated
+// @route GET /api/auditlogs
+// @access CommonAdmin / NITAdmin (depending on role)
+
 const getAuditLogs = async (req, res) => {
   try {
     const logs = await AuditLog.find({})

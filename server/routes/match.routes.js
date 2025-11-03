@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const { createFixture, submitResult, listMatches } = require('../controllers/matchController');
-const { protect, authorizeRoles } = require('../middleware/authMiddleware');
+const { createFixture, submitResult, listMatches } = require('../controllers/match.controller');
+const { protect, authorizeRoles } = require('../middleware/auth.middleware');
 
 router.post('/', protect, authorizeRoles('CommonAdmin'), createFixture);
 router.get('/', listMatches);

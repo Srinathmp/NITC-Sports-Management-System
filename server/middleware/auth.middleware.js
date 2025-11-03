@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 const asyncHandler = require('express-async-handler');
-const User = require('../models/User');
+const User = require('../models/user.model');
 
 const protect = asyncHandler(async (req, res, next) => {
   let token;
@@ -12,11 +12,11 @@ const protect = asyncHandler(async (req, res, next) => {
       next();
     } catch (error) {
       res.status(401);
-      throw new Error('Not authorized, token failed');
+      throw new Error('Not authorized : Token failed');
     }
   } else {
     res.status(401);
-    throw new Error('Not authorized, no token');
+    throw new Error('Not authorized : No token');
   }
 });
 
@@ -28,7 +28,7 @@ const authorizeRoles = (...roles) => {
     }
     if (!roles.includes(req.user.role)) {
       res.status(403);
-      throw new Error('Forbidden: insufficient role');
+      throw new Error(`Forbidden: ${req.user.role} not allowed!!!`);
     }
     next();
   };
