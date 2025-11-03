@@ -1,6 +1,14 @@
 # NITC-Sports-Management-System
 This project aims to manage the annual Inter-NIT sports tournament.
 
+# Key Features
+ - User Authentication: Secure login for different roles (Admin, Coach, Player).
+ - Team Management: Coaches can register teams and manage their player rosters.
+ - Match Scheduling: Admins can create and schedule matches for various sports.
+ - Live Score Updates: Real-time score updates for ongoing matches.
+ - Dynamic Standings: Automatic generation of points tables and rankings.
+ - Public Portal: A public-facing site for anyone to view schedules, scores, and team stats.
+
 ---
 
 ## 🧑‍💻 Author
@@ -8,6 +16,16 @@ This project aims to manage the annual Inter-NIT sports tournament.
 - Setup for [Harish Rana](https://github.com/HarishRa9a/) completed on September 22, 2025. Ready for the challenge!
 - Setup for [Virendra](https://github.com/Virendra0410) completed on September 22, 2025. Ready for the challenge!
 - Setup for [Achyut](https://github.com/achyutprabhakar) completed on September 26, 2025. Ready for the challenge!
+
+---
+
+## 🧰 Tech Stack
+
+- **Frontend:** React (Vite / CRA)
+- **Backend:** Node.js, Express.js
+- **Database:** MongoDB (Mongoose)
+- **Authentication:** JWT
+- **Seeder:** Custom data seeding scripts
 
 ---
 
@@ -112,15 +130,5 @@ npm start
 
 Frontend: [http://localhost:3000](http://localhost:3000)  
 Backend API: [http://localhost:5000](http://localhost:5000)
-
----
-
-## 🧰 Tech Stack
-
-- **Frontend:** React (Vite / CRA)
-- **Backend:** Node.js, Express.js
-- **Database:** MongoDB (Mongoose)
-- **Authentication:** JWT
-- **Seeder:** Custom data seeding scripts
 
 ---
