@@ -1,16 +1,20 @@
 const asyncHandler = require('express-async-handler');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const User = require('../models/User');
+const User = require('../models/user.model');
+const NIT = require('../models/nit.model');
 
 // Register user
 const registerUser = asyncHandler(async (req, res) => {
-  const { name, email, password, role, nit_id, contactNumber } = req.body;
+  const { name, email, password, role, nit_code, contactNumber } = req.body;
   const userExists = await User.findOne({ email });
   if (userExists) {
     res.status(400);
     throw new Error('User already exists');
   }
+  const nit = await NIT.find({ code: nit_code });
+  if (!nit) { res.status(404); throw new Error('NIT not found'); }
+  const nit_id = nit[0]._id
   const salt = await bcrypt.genSalt(10);
   const hash = await bcrypt.hash(password, salt);
   const user = await User.create({

@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.14",
-    "axios": "1.13.1",
+    "axios": "^1.13.1",
     "json2csv": "6.0.0-alpha.2",
     "lucide-react": "^0.545.0",
     "react": "^19.1.1",

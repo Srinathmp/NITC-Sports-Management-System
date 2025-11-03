@@ -1,14 +1,12 @@
-/**
- * seed.js
- * Run with:  node scripts/seed.js
- */
+// Populate database with some initial data
+
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 require('dotenv').config();
 
-const User = require('../models/User');
-const NIT = require('../models/NIT');
-const Team = require('../models/Team');
+const User = require('../models/user.model');
+const NIT = require('../models/nit.model');
+const Team = require('../models/team.model');
 
 const seed = async () => {
   try {
