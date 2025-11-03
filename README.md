@@ -4,9 +4,10 @@ This project aims to manage the annual Inter-NIT sports tournament.
 ---
 
 ## 🧑‍💻 Author
-- Setup for Harish Rana completed on September 22, 2025. Ready for the challenge!
-- Setup for Virendra completed on September 22, 2025. Ready for the challenge!
-- Setup for Achyut completed on September 26, 2025. Ready for the challenge!
+- Setup for [Srinath](https://github.com/Srinathmp) completed on September 22, 2025. Ready for the challenge!
+- Setup for [Harish Rana](https://github.com/HarishRa9a/) completed on September 22, 2025. Ready for the challenge!
+- Setup for [Virendra](https://github.com/Virendra0410) completed on September 22, 2025. Ready for the challenge!
+- Setup for [Achyut](https://github.com/achyutprabhakar) completed on September 26, 2025. Ready for the challenge!
 
 ---
 
@@ -34,8 +35,8 @@ root/
 
 ### 1. Clone the Repository
 ```bash
-git clone https://github.com/<your-username>/<repo-name>.git
-cd <repo-name>
+git clone https://github.com/Srinathmp/NITC-Sports-Management-System.git
+cd NITC-Sports-Management-System
 ```
 
 ---
@@ -78,12 +79,12 @@ NODE_ENV=development
 
 To populate your database with sample data:
 ```bash
-npm run seed
+npm run seed:import
 ```
 
 To clear seeded data:
 ```bash
-npm run clear
+npm run seed:destroy
 ```
 
 *(Make sure MongoDB is running and `.env` is properly configured before seeding.)*
