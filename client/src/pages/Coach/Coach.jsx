@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, Outlet, NavLink, useLocation } from "react-router-dom";
+import { Link, Outlet, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { Bell, Trophy, Settings, LogOut, Calendar, ChartColumn, User, Users, LayoutList, Menu, X } from "lucide-react";
 
 function SidebarNav({ isOpen }) {
@@ -32,12 +32,21 @@ function SidebarNav({ isOpen }) {
 }
 
 function Coach() {
+    const navigate = useNavigate();
     const [isOpen, setIsOpen] = useState(false);
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
     const toggleDropdown = () => {
         setIsDropdownOpen(!isDropdownOpen);
     };
+
+    const handleLogout = async (e) => {
+        e.preventDefault();
+        console.log("ASfasf")
+        localStorage.removeItem('token');
+        localStorage.removeItem('role');
+        navigate('/');
+    }
 
     return (
         <div className="flex flex-col min-h-screen">
@@ -73,7 +82,7 @@ function Coach() {
                                         <Settings className="h-5 w-5" />
                                         <span>Settings</span>
                                     </button>
-                                    <button className="flex items-center w-full px-4 py-2 text-red-600 hover:bg-gray-100 space-x-3">
+                                    <button className="flex items-center w-full px-4 py-2 text-red-600 hover:bg-gray-100 space-x-3" onClick={handleLogout}>
                                         <LogOut className="h-5 w-5" />
                                         <span>Log out</span>
                                     </button>

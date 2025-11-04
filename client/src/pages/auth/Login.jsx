@@ -1,15 +1,24 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Trophy, Mail, Lock } from "lucide-react";
 import api from "../../api/axios";
+import { useAuth } from "../../contexts/AuthContexts";
 
 export default function Login() {
-  const navigate = useNavigate();
-
+  const { login, isAuthenticated, user } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      if (user == 'CommonAdmin') navigate('/common-admin/dashboard')
+      if (user == 'NITAdmin') navigate('/nit-admin/dashboard')
+      if (user == 'Coach') navigate('/coach/dashboard')
+    }
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -27,10 +36,7 @@ export default function Login() {
       const { token, role } = res.data;
 
       console.log("login successful!");
-
-      localStorage.setItem("token", token);
-      localStorage.setItem("role", role);
-
+      login(token, role);
       if (role === "CommonAdmin") navigate("/common-admin/dashboard");
       else if (role === "NITAdmin") navigate("/nit-admin/dashboard");
       else if (role === "Coach") navigate("/coach/dashboard");
