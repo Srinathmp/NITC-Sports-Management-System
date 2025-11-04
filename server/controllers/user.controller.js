@@ -36,4 +36,24 @@ const authUser = asyncHandler(async (req, res) => {
   }
 });
 
-module.exports = { registerUser, authUser };
+const verify = asyncHandler(async (req, res) => {
+  let token;
+  if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+    try {
+      token = req.headers.authorization.split(' ')[1];
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      const user = await User.findById(decoded.id).select('-passwordHash');
+      res
+        .status(200)
+        .json({ role: user.role })
+    } catch (error) {
+      res.status(401);
+      throw new Error('Not authorized : Token failed');
+    }
+  } else {
+    res.status(401);
+    throw new Error('Not authorized : No token');
+  }
+});
+
+module.exports = { registerUser, authUser, verify };
