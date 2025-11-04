@@ -1,5 +1,5 @@
-import { Search, Filter, Check, ChevronDown, Users, Eye } from "lucide-react";
-import { useState } from "react";
+import { Search, Filter, Check, ChevronDown, Users, Eye, X, MapPin, Crown, Calendar, CheckCircle, XCircle } from "lucide-react";
+import React, { useState } from "react";
 
 function StatCard({ title, stat, subtitle }) {
     return (
@@ -50,19 +50,129 @@ function TeamCard({ teamName, nitName, status, playersCount, sport, coachName, o
     );
 };
 
+const Badge = ({ children, className }) => (
+  <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${className}`}>
+    {children}
+  </span>
+);
+
+function TeamDetailModal({ team, onClose }) {
+  if (!team) return null;
+  const teamStats = {
+    matches: 12,
+    wins: 9,
+    losses: 3,
+    captain: 'Rajesh Kumar', 
+    members: ["Rajesh Kumar", "Amit Singh", "Priya Sharma", "Vivek Patel", "Sneha Reddy"]
+  };
+
+  return (
+    <div 
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in"
+      onClick={onClose}
+    >
+      <div 
+        className="bg-white border border-gray-200 rounded-lg shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-center justify-between p-6 border-b border-gray-200 flex-shrink-0">
+          <div className="flex items-center gap-3">
+            <div className="bg-blue-100 p-2 rounded-full">
+              <Users className="h-6 w-6 text-blue-600" />
+            </div>
+            <h2 className="text-2xl font-bold text-gray-900">{team.teamName}</h2>
+          </div>
+          <button
+            onClick={onClose}
+            className="text-gray-500 hover:text-gray-900 transition-colors p-2 hover:bg-gray-100 rounded-full"
+          >
+            <X className="h-6 w-6" />
+          </button>
+        </div>
+        <div className="p-6 overflow-y-auto">
+          <div className="mb-6 text-center">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 rounded-full">
+              <MapPin className="h-4 w-4 text-gray-500" />
+              <p className="text-sm font-medium text-gray-600">{team.nitName}</p>
+            </div>
+          </div>
+
+          <div className="flex items-center justify-center gap-3 mb-6">
+            <Badge className="bg-gray-100 text-gray-700">{team.sport}</Badge>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+            <div className="text-center p-4 bg-white border border-gray-200 rounded-lg shadow-sm">
+              <Crown className="h-5 w-5 mx-auto mb-2 text-yellow-500" />
+              <p className="text-xs text-gray-500 mb-1">Team Captain</p>
+              <p className="text-lg font-semibold text-gray-900">{teamStats.captain}</p>
+            </div>
+            <div className="text-center p-4 bg-white border border-gray-200 rounded-lg shadow-sm">
+              <Users className="h-5 w-5 mx-auto mb-2 text-gray-500" />
+              <p className="text-xs text-gray-500 mb-1">Coach</p>
+              <p className="text-lg font-semibold text-gray-900">{team.coachName}</p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-3 gap-4 mb-6">
+            <div className="text-center p-4 bg-white rounded-lg shadow-sm border border-gray-200">
+              <Calendar className="h-5 w-5 mx-auto mb-2 text-gray-500" />
+              <p className="text-2xl font-bold text-gray-900">{teamStats.matches}</p>
+              <p className="text-xs text-gray-500">Matches</p>
+            </div>
+            <div className="text-center p-4 bg-green-50 rounded-lg shadow-sm border border-green-200">
+              <CheckCircle className="h-5 w-5 mx-auto mb-2 text-green-600" />
+              <p className="text-2xl font-bold text-green-600">{teamStats.wins}</p>
+              <p className="text-xs text-gray-500">Wins</p>
+            </div>
+            <div className="text-center p-4 bg-red-50 rounded-lg shadow-sm border border-red-200">
+              <XCircle className="h-5 w-5 mx-auto mb-2 text-red-600" />
+              <p className="text-2xl font-bold text-red-600">{teamStats.losses}</p>
+              <p className="text-xs text-gray-500">Losses</p>
+            </div>
+          </div>
+
+          <div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center justify-center gap-2">
+              <Users className="h-5 w-5 text-gray-700" />
+              Team Members ({team.playersCount})
+            </h3>
+            <div className="bg-gray-50 rounded-lg border border-gray-200">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 p-4">
+                {teamStats.members.slice(0, team.playersCount).map((member, index) => (
+                  <div
+                    key={index}
+                    className="flex items-center gap-3 p-3 bg-white rounded-md border border-gray-200 shadow-sm"
+                  >
+                    <div className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 text-blue-600 font-semibold text-sm">
+                      {member.charAt(0)}
+                    </div>
+                    <span className="text-sm font-medium text-gray-800">{member}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function Teams() {
     const [isOpen, setIsOpen] = useState(false);
     const [selectedSport, setSelectedSport] = useState(0);
     const [sports, setSports] = useState(["All Sports", "Basketball", "Football", "Cricket"]);
     const [searchTerm, setSearchTerm] = useState("");
+    const [selectedTeam, setSelectedTeam] = useState(null);
 
     const toggleMenu = (index) => {
         setIsOpen(false);
         setSelectedSport(index);
     }
 
-    const handleViewDetails = (id) => {
-        console.log("Viewing details for team:", id);
+    const handleViewDetails = (team) => {
+        setSelectedTeam(team);
     };
 
     const teamsData = [
@@ -74,8 +184,27 @@ function Teams() {
         { id: 'nit-durgapur-knights', teamName: "NIT Durgapur Knights", nitName: "NIT Durgapur", status: "Active", playersCount: 15, sport: "Cricket", coachName: "Alex Miller" },
     ];
 
+    const filteredTeams = teamsData.filter(team => {
+        const searchLower = searchTerm.toLowerCase();
+        const matchesSearch = 
+          team.teamName.toLowerCase().includes(searchLower) ||
+          team.nitName.toLowerCase().includes(searchLower) ||
+          team.coachName.toLowerCase().includes(searchLower);
+        const matchesSport = 
+          selectedSport === 0 || 
+          team.sport === sports[selectedSport];
+
+        return matchesSearch && matchesSport;
+    });
+
+    const totalTeams = teamsData.length;
+    const preparingTeams = teamsData.filter(t => t.status === 'Preparing').length;
+    const activeTeams = teamsData.filter(t => t.status === 'Active').length;
+    const totalPlayers = teamsData.reduce((acc, team) => acc + team.playersCount, 0);
+    const totalSports = new Set(teamsData.map(t => t.sport)).size;
+
     return (
-        <div className="flex flex-col gap-8 min-h-screen w-full p-8 pt-5 px-4 md:px-8">
+        <div className="flex flex-col gap-8 min-h-screen w-full p-8 pt-5 px-4 md:px-8 bg-gray-50">
             <div>
                 <h1 className="text-4xl font-bold">Teams</h1>
                 <p className="text-[#000000a1]">Explore all participating teams</p>
@@ -98,12 +227,12 @@ function Teams() {
                 <div className="w-full sm:w-60 relative [&_button]:p-2 [&_button]:rounded-lg [&>button]:border [&>button]:border-[#00000039] bg-white">
                     <button className="cursor-pointer flex items-center justify-between gap-4 w-full p-2.5" onClick={() => setIsOpen(!isOpen)}>
                         {sports[selectedSport]}
-                        <ChevronDown />
+                        <ChevronDown className={`transition-transform ${isOpen ? 'rotate-180' : ''}`} />
                     </button>
-                    <div className={`${isOpen ? '' : 'hidden'} z-20 absolute flex flex-col bg-white w-full mt-2 rounded-lg border border-[#00000039] transition-y duration-300 ease-in-out p-1`}>
+                    <div className={`${isOpen ? 'block' : 'hidden'} z-20 absolute flex flex-col bg-white w-full mt-2 rounded-lg border border-[#00000039] transition-y duration-300 ease-in-out p-1 shadow-lg`}>
                         {
                             sports.map((sport, index) => {
-                                return <button key={index} className="flex items-center gap-4 hover:bg-[#cacaca98]" onClick={() => { toggleMenu(index) }}>{<Check className={`h-5 w-4 ${index == selectedSport ? '' : 'opacity-0'}`} />}{sport}</button>
+                                return <button key={index} className="flex items-center gap-4 hover:bg-[#cacaca98] text-left" onClick={() => { toggleMenu(index) }}>{<Check className={`h-5 w-4 ${index === selectedSport ? 'opacity-100' : 'opacity-0'}`} />}{sport}</button>
                             })
                         }
                     </div>
@@ -111,7 +240,7 @@ function Teams() {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {teamsData.map((team) => (
+                {filteredTeams.map((team) => (
                     <TeamCard
                         key={team.id}
                         teamName={team.teamName}
@@ -120,33 +249,42 @@ function Teams() {
                         playersCount={team.playersCount}
                         sport={team.sport}
                         coachName={team.coachName}
-                        onViewDetails={() => handleViewDetails(team.id)}
+                        onViewDetails={() => handleViewDetails(team)} // Pass the full team object
                     />
                 ))}
+                {filteredTeams.length === 0 && (
+                    <p className="sm:col-span-2 lg:col-span-3 text-center text-gray-500 py-10">
+                        No teams found matching your criteria.
+                    </p>
+                )}
             </div>
-
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 py-4">
                 <StatCard
                     title="Total Teams"
-                    stat={6}
-                    subtitle="+1 preparing"
+                    stat={totalTeams}
+                    subtitle={`+${preparingTeams} preparing`}
                 />
                 <StatCard
                     title="Active Teams"
-                    stat={5}
+                    stat={activeTeams}
                     subtitle="Currently competing"
                 />
                 <StatCard
                     title="Total Players"
-                    stat={90}
+                    stat={totalPlayers}
                     subtitle="Across all teams"
                 />
                 <StatCard
                     title="Sports Categories"
-                    stat={3}
+                    stat={totalSports}
                     subtitle="Different sports"
                 />
             </div>
+
+            <TeamDetailModal 
+                team={selectedTeam} 
+                onClose={() => setSelectedTeam(null)} 
+            />
         </div>
     )
 }
