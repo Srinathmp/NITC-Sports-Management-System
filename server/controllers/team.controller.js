@@ -27,4 +27,13 @@ const getTeamsByNIT = asyncHandler(async (req, res) => {
   res.json(teams);
 });
 
-module.exports = { createTeam, getTeamsByNIT };
+const getAllNIT = asyncHandler(async (req, res) => {
+  const page = Number(req.query.page);
+  const teams = await Team
+    .find({})
+    .sort({ createdAt: -1 })
+    .limit(6)
+    .skip((page - 1) * 6);
+});
+
+module.exports = { createTeam, getTeamsByNIT, getAllNIT };

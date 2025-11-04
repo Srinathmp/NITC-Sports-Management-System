@@ -1,16 +1,24 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Trophy, Mail, Lock } from "lucide-react";
 import api from "../../api/axios";
 import { useAuth } from "../../contexts/AuthContexts";
 
 export default function Login() {
-  const navigate = useNavigate();
-  const { login } = useAuth();
+  const { login, isAuthenticated, user } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      if (user == 'CommonAdmin') navigate('/common-admin/dashboard')
+      if (user == 'NITAdmin') navigate('/nit-admin/dashboard')
+      if (user == 'Coach') navigate('/coach/dashboard')
+    }
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();

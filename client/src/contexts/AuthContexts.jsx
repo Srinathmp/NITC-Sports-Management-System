@@ -15,8 +15,7 @@ export function AuthProvider({ children }) {
         if (token) {
             try {
                 const response = await api.get('/users/me');
-                console.log(response.data)
-                
+                setUser(response.data.role)
             } catch (error) {
                 alert("Auth Error: Invalid token. Redirecting....");
                 logout();
