@@ -1,6 +1,6 @@
 const asyncHandler = require('express-async-handler');
-const Match = require('../models/Match');
-const AuditLog = require('../models/AuditLog');
+const Match = require('../models/match.model');
+const AuditLog = require('../models/auditLog.model');
 
 const createFixture = asyncHandler(async (req, res) => {
   const { event_id, teamA_id, teamB_id, matchDateTime } = req.body;

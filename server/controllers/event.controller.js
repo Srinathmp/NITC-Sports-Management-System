@@ -1,6 +1,6 @@
 const asyncHandler = require('express-async-handler');
-const Event = require('../models/Event');
-const AuditLog = require('../models/AuditLog');
+const Event = require('../models/event.model');
+const AuditLog = require('../models/auditLog.model');
 
 const createEvent = asyncHandler(async (req, res) => {
   const { name, sport, venue, datetime, tournamentYear, stage } = req.body;
@@ -10,6 +10,11 @@ const createEvent = asyncHandler(async (req, res) => {
 
 const listEvents = asyncHandler(async (req, res) => {
   const events = await Event.find({ status: 'Scheduled' }).sort({ datetime: 1 });
+  res.json(events);
+});
+
+const listPendingEvents = asyncHandler(async (req, res) => {
+  const events = await Event.find({ status: 'PendingValidation' }).sort({ datetime: 1 });
   res.json(events);
 });
 
@@ -24,4 +29,4 @@ const validateEvent = asyncHandler(async (req, res) => {
   res.json(ev);
 });
 
-module.exports = { createEvent, listEvents, validateEvent };
+module.exports = { createEvent, listEvents, validateEvent, listPendingEvents };

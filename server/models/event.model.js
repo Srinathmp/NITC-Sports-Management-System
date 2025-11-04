@@ -43,7 +43,7 @@ const eventSchema = new Schema({
         type: Number,
         default: 0
     },
-    registeredTeams :{
+    registeredTeams: {
         type: Number,
         default: 0
     }
