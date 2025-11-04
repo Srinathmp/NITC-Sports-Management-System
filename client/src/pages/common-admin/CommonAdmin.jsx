@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, Outlet, NavLink, useLocation, Navigate, useNavigate } from "react-router-dom";
 import { Bell, Trophy, Settings, LogOut, Calendar, ChartColumn, User, Users, LayoutList, Menu, X, Shield, Plus, Locate, LocationEdit } from "lucide-react";
+import { useAuth } from "../../contexts/AuthContexts";
 
 function SidebarNav({ isOpen }) {
     const Items = [
@@ -32,21 +33,14 @@ function SidebarNav({ isOpen }) {
 }
 
 function CommonAdmin() {
+    const { logout } = useAuth();
     const navigate = useNavigate();
     const [isOpen, setIsOpen] = useState(false);
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-    
+
     const toggleDropdown = () => {
         setIsDropdownOpen(!isDropdownOpen);
     };
-    
-    const handleLogout = async(e) => {
-        e.preventDefault();
-        console.log("ASfasf")
-        localStorage.removeItem('token');
-        localStorage.removeItem('role');
-        navigate('/');
-    }
 
     return (
         <div className="flex flex-col min-h-screen">
@@ -82,7 +76,7 @@ function CommonAdmin() {
                                         <Settings className="h-5 w-5" />
                                         <span>Settings</span>
                                     </button>
-                                    <button className="flex items-center w-full px-4 py-2 text-red-600 hover:bg-gray-100 space-x-3" onClick={handleLogout}>
+                                    <button className="flex items-center w-full px-4 py-2 text-red-600 hover:bg-gray-100 space-x-3" onClick={logout}>
                                         <LogOut className="h-5 w-5" />
                                         <span>Log out</span>
                                     </button>

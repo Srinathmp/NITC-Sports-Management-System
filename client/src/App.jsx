@@ -18,6 +18,7 @@ import Accomodation from "./pages/nit-admin/Accomodation";
 import CommonAdmin from "./pages/common-admin/CommonAdmin";
 import CommonAdminDashboard from "./pages/common-admin/CommonDashboard";
 import AuditLogPage from "./pages/common-admin/AuditLog";
+import {useAuth} from "./contexts/AuthContexts"
 
 export default function App() {
     return (
