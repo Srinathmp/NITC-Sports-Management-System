@@ -2,6 +2,7 @@
 import { Award, Crown, TrendingUp } from "lucide-react";
 import { useEffect, useState } from "react";
 import api from "../api/axios";
+import { PerformerCard } from "../components/Card";
 
 function StatCard({ title, stat, subtitle, Icon }) {
   return (
@@ -14,16 +15,6 @@ function StatCard({ title, stat, subtitle, Icon }) {
       <div className="rounded-lg bg-gray-100 p-3">
         <Icon className="h-6 w-6 text-gray-600" />
       </div>
-    </div>
-  );
-}
-
-function PerformerCard({ rank, name, points }) {
-  return (
-    <div className="rounded-xl border border-gray-200 p-4 text-center bg-white">
-      <div className="text-3xl font-bold">#{rank}</div>
-      <div className="mt-1 text-lg font-semibold">{name}</div>
-      <div className="text-sm text-gray-600">{points} pts</div>
     </div>
   );
 }
@@ -55,7 +46,7 @@ export default function Leaderboard() {
     <div className="w-full p-8 flex flex-col gap-8 px-4 md:px-8">
       <div>
         <h1 className="text-4xl font-bold">Leaderboard & Rankings</h1>
-        <p className="text-[#000000a1]">Overall performance (points only)</p>
+        <p className="text-[#000000a1]">Overall Performance</p>
       </div>
 
       {/* Top Performers */}
@@ -63,7 +54,7 @@ export default function Leaderboard() {
         <p className="text-2xl font-semibold">🏆 Top Performers 🏆</p>
         <div className="mt-4 grid grid-cols-1 gap-6 sm:grid-cols-3 w-full mt-10">
           {top.map((t, i) => (
-            <PerformerCard key={t.nit_id || i} rank={i + 1} name={t.name} points={t.points} />
+            <PerformerCard key={t.nit_id || i} rank={i + 1} points={t.points} name={t.name} />
           ))}
           {!top?.length && <div className="text-gray-500 text-sm">No data yet.</div>}
         </div>
@@ -103,7 +94,7 @@ export default function Leaderboard() {
       </div>
 
       {/* Summary Cards (no medals) */}
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 py-4">
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 py-4">
         <StatCard
           title="Participating NITs"
           stat={totalInstitutes}

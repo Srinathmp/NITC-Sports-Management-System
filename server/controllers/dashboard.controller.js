@@ -96,16 +96,99 @@ const nitAdmin = asyncHandler(
         res
             .status(200)
             .json({
-                isHost: isHost, totalCount: totalCount, distinctValues: distinctValues, upcomingEvents: upcomingEvents, myTeams: myTeams, mySports:mySports
+                isHost: isHost, totalCount: totalCount, distinctValues: distinctValues, upcomingEvents: upcomingEvents, myTeams: myTeams, mySports: mySports
             })
     }
 )
 
-const coach = asyncHandler(
-    async (req, res) => {
-        const approved = await NIT.countDocuments({ status: "Approved" })
-        const pending = await NIT.countDocuments({ status: "Pending" })
-        res.status(200).json({ approved: approved, pending: pending })
-    }
-)
+const coach = asyncHandler(async (req, res) => {
+    const coachId = req.user._id;
+
+    const myTeams = await teams.find({ coach_id: coachId }).select('name sport players');
+    const teamIds = myTeams.map(t => t._id);
+    const totalPlayers = myTeams.reduce((sum, t) => sum + (t.players?.length || 0), 0);
+
+    const now = new Date();
+    const weekEnd = new Date(now);
+    weekEnd.setDate(weekEnd.getDate() + 7);
+
+    const upcoming = await matches.find({
+        matchDateTime: { $gte: now },
+        $or: [{ teamA_id: { $in: teamIds } }, { teamB_id: { $in: teamIds } }]
+    })
+        .sort({ matchDateTime: 1 })
+        .populate('teamA_id', 'name sport')
+        .populate('teamB_id', 'name sport');
+
+    const completed = await matches.find({
+        status: 'Completed',
+        $or: [{ teamA_id: { $in: teamIds } }, { teamB_id: { $in: teamIds } }]
+    })
+        .sort({ matchDateTime: -1 })
+        .populate('teamA_id', 'name sport')
+        .populate('teamB_id', 'name sport');
+
+    const upcomingWeek = upcoming.filter(m => m.matchDateTime <= weekEnd).length;
+
+    const wins = completed.filter(m => m.winner_id && teamIds.some(id => id.equals(m.winner_id))).length;
+    const totalPlayed = completed.length;
+    const winRate = totalPlayed ? Math.round((wins / totalPlayed) * 100) : 0;
+
+    const fmtDate = d => new Date(d).toISOString().slice(0, 10);
+    const fmtTime = d => {
+        const dt = new Date(d);
+        const h = dt.getHours() % 12 || 12;
+        const m = dt.getMinutes().toString().padStart(2, '0');
+        return `${h}:${m} ${dt.getHours() >= 12 ? 'PM' : 'AM'}`;
+    };
+
+    const myTeamsFormatted = myTeams.map(t => {
+        const next = upcoming.find(m => (m.teamA_id._id.equals(t._id)) || (m.teamB_id._id.equals(t._id)));
+        return {
+            sport: t.sport,
+            players: t.players.length,
+            playerList: t.players,
+            status: next ? 'active' : 'preparing',
+            nextDate: next ? fmtDate(next.matchDateTime) : 'No Schedule'
+        };
+    });
+
+    const upcomingMatches = upcoming.slice(0, 2).map(m => {
+        const oursIsA = teamIds.some(id => id.equals(m.teamA_id._id));
+        const opponent = oursIsA ? m.teamB_id.name : m.teamA_id.name;
+        return {
+            sport: m.teamA_id.sport || m.teamB_id.sport,
+            opponent: `vs ${opponent}`,
+            timeLocation: fmtTime(m.matchDateTime),
+            date: fmtDate(m.matchDateTime)
+        };
+    });
+
+    const recentResults = completed.slice(0, 3).map(m => {
+        const oursIsA = teamIds.some(id => id.equals(m.teamA_id._id));
+        const ourScore = oursIsA ? m.scoreA : m.scoreB;
+        const oppScore = oursIsA ? m.scoreB : m.scoreA;
+        const opponent = oursIsA ? m.teamB_id.name : m.teamA_id.name;
+        const won = m.winner_id && teamIds.some(id => id.equals(m.winner_id));
+        return {
+            sport: m.teamA_id.sport || m.teamB_id.sport,
+            opponent,
+            score: `${won ? 'Won' : 'Lost'} ${ourScore}-${oppScore}`,
+            date: fmtDate(m.matchDateTime),
+            result: won ? 'Won' : 'Lost'
+        };
+    });
+
+    res.json({
+        stats: {
+            myTeams: myTeams.length,
+            totalPlayers,
+            upcomingMatches: upcomingWeek,
+            winRate: `${winRate}%`
+        },
+        myTeams: myTeamsFormatted,
+        upcomingMatches,
+        recentResults
+    });
+});
 module.exports = { commonAdmin, nitAdmin, coach }
