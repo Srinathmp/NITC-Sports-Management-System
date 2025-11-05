@@ -1,6 +1,11 @@
-import React from 'react';
-import { Calendar, Users, MapPin, Utensils, Plus, Bed,Settings} from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { Calendar, Users, MapPin, Utensils, Plus, Bed, Settings, Check } from 'lucide-react';
 import { useNavigate } from "react-router-dom";
+import api from '../../api/axios';
+import FullPageLoader from '../../components/FullPageLoader';
+import { useAuth } from '../../contexts/AuthContexts';
+import { format } from 'date-fns';
+
 
 const StatCard = ({ title, value, subtitle, Icon }) => (
   <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-all cursor-pointer">
@@ -13,13 +18,13 @@ const StatCard = ({ title, value, subtitle, Icon }) => (
   </div>
 );
 
-const EventItem = ({ title, details, tagText }) => (
+const EventItem = ({ title, date, loc, teams }) => (
   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 border border-[#ababab98] rounded-xl hover:shadow-md transition-all">
     <div>
       <h4 className="font-semibold text-gray-800">{title}</h4>
-      <p className="text-sm text-gray-500 mb-2 sm:mb-0">{details}</p>
+      <p className="text-sm text-gray-500 mb-2 sm:mb-0">{`${date} -- ${loc}`}</p>
       <span className="bg-orange-400 text-white text-xs font-medium px-3 py-1 rounded-full">
-        {tagText}
+        {teams} Teams Registered
       </span>
     </div>
     <button className="mt-3 sm:mt-0 w-full sm:w-auto px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-300 transition-colors cursor-pointer">
@@ -35,63 +40,84 @@ const ProgressBar = ({ label, percentage, colorClass }) => (
       <span className="text-sm font-medium text-gray-700">{percentage}%</span>
     </div>
     <div className="w-full bg-gray-200 rounded-full h-2">
-      <div 
-        className={`${colorClass} h-2 rounded-full`} 
+      <div
+        className={`${colorClass} h-2 rounded-full`}
         style={{ width: `${percentage}%` }}
       ></div>
     </div>
   </div>
 );
 
-const DashboardButton = ({ title, Icon }) => (
-  <button className="flex items-center justify-center gap-2 w-full px-4 py-3 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-300 transition-colors cursor-pointer">
+const DashboardButton = ({ title, Icon, navigate, location }) => (
+  <button className="flex items-center justify-center gap-2 w-full px-4 py-3 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-300 transition-colors cursor-pointer" onClick={() => navigate(location)}>
     <Icon className="h-4 w-4" />
     <span>{title}</span>
   </button>
 );
 
 function NitDashboard() {
+  const { name } = useAuth();
   const navigate = useNavigate();
-  const handleRedirect = () => {
-    navigate("/nit-admin/create-event");
+  const [isHost, setIsHost] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const [myTeams, setMyTeams] = useState(0)
+  const [mySports, setMySports] = useState(0)
+  const [totalNits, setTotalNits] = useState(0)
+  const [myEvents, setMyEvents] = useState(0);
+  const [myEventsList, setMyEventsList] = useState([]);
+  const [myEventsSubtitle, setMyEventsSubtitle] = useState('');
+  const [registeredTeams, setRegisteredTeams] = useState(0);
+  const [registeredTeamsSubtitle, setRegisteredTeamsSubtitle] = useState('');
+  const [accommodation, setAccommodation] = useState(0);
+  const [accommodationSubtitle, setAccommodationSubtitle] = useState('');
+  const [messBookings, setMessBookings] = useState(0);
+  const [messBookingsSubtitle, setMessBookingsSubtitle] = useState('');
+
+  const handleRedirect = () => navigate('/nit-admin/create-event');
+
+  const fetchDashboard = async () => {
+    try {
+      const res = await api.get('/dashboard/nit-admin');
+      setIsHost(res.data.isHost);
+      setRegisteredTeams(res.data.totalCount)
+      setTotalNits(res.data.distinctValues)
+      setMyEventsList(res.data.upcomingEvents)
+      setMyTeams(res.data.myTeams)
+      setMySports(res.data.mySports)
+    } catch (error) {
+      console.error("Failed to fetch dashboard data:", error);
+    } finally {
+      setIsLoading(false);
+    }
   };
+
+  useEffect(() => {
+    fetchDashboard();
+  }, []);
+
+  if (isLoading) {
+    return <FullPageLoader />;
+  }
 
   return (
     <div className="min-h-screen bg-gray-100 p-4 md:p-8">
       <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-900">NIT Admin Dashboard</h1>
+        <div className='flex items-center gap-4'>
+          <h1 className="text-3xl font-bold text-gray-900 flex">Welcome, {name}</h1>
+          {isHost && <p className='flex p-1 bg-blue-600 rounded-lg text-white'><Check /> HOST</p>}
+        </div>
         <p className="text-gray-600">NIT Trichy</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <StatCard 
-          title="My Events" 
-          value="8" 
-          subtitle="5 ongoing, 3 completed" 
-          Icon={Calendar} 
-        />
-        <StatCard 
-          title="Registered Teams" 
-          value="45" 
-          subtitle="From 23 NITs" 
-          Icon={Users} 
-        />
-        <StatCard 
-          title="Accommodation" 
-          value="98" 
-          subtitle="of 150 rooms occupied" 
-          Icon={MapPin} 
-        />
-        <StatCard 
-          title="Mess Bookings" 
-          value="320" 
-          subtitle="of 500 capacity" 
-          Icon={Utensils} 
-        />
+        <StatCard title="My Teams" value={myTeams} subtitle={`Across ${mySports} sports`} Icon={Calendar} />
+        <StatCard title="Registered Teams" value={registeredTeams} subtitle={`From ${totalNits} NITs`} Icon={Users} />
+        <StatCard title="Accommodation" value={accommodation} subtitle={accommodationSubtitle} Icon={MapPin} />
+        <StatCard title="Mess Bookings" value={messBookings} subtitle={messBookingsSubtitle} Icon={Utensils} />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        
         <div className="lg:col-span-2 bg-white rounded-lg shadow-sm">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-6">
             <div>
@@ -104,47 +130,29 @@ function NitDashboard() {
             </button>
           </div>
           <div className="flex flex-col gap-4 p-4">
-            <EventItem 
-              title="Basketball"
-              details="2024-02-15 • Main Court"
-              tagText="8 teams registered"
-            />
-            <EventItem 
-              title="Football"
-              details="2024-02-16 • Sports Ground"
-              tagText="12 teams registered"
-            />
-            <EventItem 
-              title="Cricket"
-              details="2024-02-17 • Cricket Field"
-              tagText="16 teams registered"
-            />
+            {
+              myEventsList.map((item, index) => {
+                const dateObj = new Date(item.datetime);
+                return <EventItem title={item.name} date={format(dateObj, 'MMM dd, yyyy')} loc={item.venue} teams={item.registeredTeams} />
+              })
+            }
+            {/* <EventItem title="Football" details="2024-02-16 • Sports Ground" tagText="12 teams registered" />
+            <EventItem title="Cricket" details="2024-02-17 • Cricket Field" tagText="16 teams registered" /> */}
           </div>
         </div>
 
         <div className="lg:col-span-1 bg-white rounded-lg shadow-sm p-6">
           <h2 className="text-xl font-semibold text-gray-900">Accommodation Overview</h2>
           <p className="text-sm text-gray-500 mb-6">Current accommodation and mess status</p>
-          
           <div className="space-y-4">
-            <ProgressBar 
-              label="Room Occupancy"
-              percentage={85}
-              colorClass="bg-blue-600"
-            />
-            <ProgressBar 
-              label="Mess Capacity"
-              percentage={64}
-              colorClass="bg-orange-500"
-            />
+            <ProgressBar label="Room Occupancy" percentage={85} colorClass="bg-blue-600" />
+            <ProgressBar label="Mess Capacity" percentage={64} colorClass="bg-orange-500" />
           </div>
-
           <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <DashboardButton title="Manage Rooms" Icon={Bed} />
-            <DashboardButton title="Mess Details" Icon={Utensils} />
+            <DashboardButton title="Manage Rooms" Icon={Bed} navigate={navigate} location='/nit-admin/accomodation' />
+            <DashboardButton title="Mess Details" Icon={Utensils} navigate={navigate} location='/nit-admin/accomodation' />
           </div>
         </div>
-
       </div>
     </div>
   );
