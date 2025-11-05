@@ -8,9 +8,11 @@ const { Parser } = require('json2csv');
 
 const getAuditLogs = async (req, res) => {
   try {
+    const totalItem = await AuditLog.countDocuments();
     const logs = await AuditLog.find({})
       .populate('user_id', 'name role email') // include user info
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 })
+      .limit(6);
 
     // Format logs for frontend
     const formatted = logs.map(log => ({
@@ -23,7 +25,9 @@ const getAuditLogs = async (req, res) => {
       timestamp: log.createdAt
     }));
 
-    res.status(200).json(formatted);
+    res
+      .status(200)
+      .json({ formatted: formatted, totalItem: totalItem });
   } catch (err) {
     console.error('Error fetching audit logs:', err);
     res.status(500).json({ message: 'Failed to fetch audit logs.' });
@@ -67,4 +71,4 @@ function mapStatus(action) {
   return 'info';
 }
 
-module.exports = { getAuditLogs,exportAuditLogs };
+module.exports = { getAuditLogs, exportAuditLogs };

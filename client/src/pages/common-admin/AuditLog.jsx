@@ -75,6 +75,8 @@ const AuditLogItem = ({
 };
 
 function AuditLogPage() {
+  const [page, setPage] = useState(0)
+  const [total, setTotal] = useState(0)
   const [logs, setLogs] = useState([]);
   const [filteredLogs, setFilteredLogs] = useState([]);
   const [search, setSearch] = useState("");
@@ -86,9 +88,11 @@ function AuditLogPage() {
     try {
       setLoading(true);
       setError("");
-      const res = await api.get("/auditlogs"); // ✅ your endpoint
-      setLogs(res.data || []);
-      setFilteredLogs(res.data || []);
+      const res = await api.get(`/auditlogs/?page=${page}`);
+      setLogs(res.data.formatted || []);
+      setTotal(res.data.totalItem);
+      setFilteredLogs(res.data.formatted || []);
+      
     } catch (err) {
       console.error(err);
       setError("Failed to load audit logs. Please try again later.");
@@ -173,7 +177,8 @@ function AuditLogPage() {
           <div className="p-5 text-center text-gray-500">No logs found.</div>
         ) : (
           <div className="p-5 space-y-4">
-            {filteredLogs.map((item, index) => (
+            {
+            filteredLogs.map((item, index) => (
               <AuditLogItem
                 key={item._id || index}
                 icon={

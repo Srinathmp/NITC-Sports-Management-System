@@ -69,7 +69,7 @@ function FullPageLoader() {
 }
 
 function CommonAdminDashboard() {
-  
+
   const [isLoading, setIsLoading] = useState(true)
   const [recentActivities, setRecentActivities] = useState([])
   const [nit, setNit] = useState(0)
@@ -131,7 +131,7 @@ function CommonAdminDashboard() {
             {
               pendingList.map((curr, index) => {
                 const dateObj = new Date(curr.createdAt);
-                return <PendingRegistrationItem key={index} nitName={curr.name} registeredDate={format(dateObj, 'MMM dd, yyyy')} code={curr.code} fetchData={fetchDashboard} />
+                return <PendingRegistrationItem key={curr.code} nitName={curr.name} registeredDate={format(dateObj, 'MMM dd, yyyy')} code={curr.code} fetchData={fetchDashboard} />
               })
             }
           </div>
@@ -149,7 +149,7 @@ function CommonAdminDashboard() {
           <ul className="space-y-4 min-h-30">
             {
               recentActivities.map((activity, index) => {
-                return <RecentActivityItem key={index}  text={activity.details} time={activity.createdAt} />
+                return <RecentActivityItem key={index} text={activity.details} time={activity.createdAt} />
               })
             }
           </ul>

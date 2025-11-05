@@ -56,6 +56,9 @@ const commonAdmin = asyncHandler(
                             'details': 1,
                             'createdAt': 1
                         }
+                    }, 
+                    {
+                        $sort: { createdAt: -1 }
                     }
                 ])
                 .limit(5)
