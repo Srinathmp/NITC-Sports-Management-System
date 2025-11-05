@@ -26,11 +26,6 @@ const mealSchema = new Schema(
 
 const messSchema = new Schema(
   {
-    nit_id: {
-      type: Schema.Types.ObjectId,
-      ref: "NIT",
-      required: true,
-    },
     mess_name: {
       type: String,
       required: true,
@@ -51,7 +46,7 @@ const messSchema = new Schema(
     },
     allocated_teams: [
       {
-        type: Schema.Types.ObjectId,
+        type: [Schema.Types.ObjectId],
         ref: "Team",
       },
     ],

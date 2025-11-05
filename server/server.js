@@ -25,6 +25,8 @@ app.use('/api/matches', require('./routes/match.routes'));
 app.use('/api/notifications', require('./routes/notification.routes'));
 app.use('/api/auditlogs', require('./routes/auditLog.routes'));
 app.use('/api/dashboard', require('./routes/dashboard.routes'));
+app.use('/api/mess', require('./routes/mess.routes'));
+app.use('/api/accommodation', require('./routes/accommodation.routes'));
 // Error handler
 const { notFound, errorHandler } = require('./middleware/errorHandler.middleware');
 app.use(notFound);
@@ -33,6 +35,10 @@ app.use(errorHandler);
 app.get('/', (req, res) => {
   res.send('INSMS API is running...');
 });
+
+// app._router.stack
+//   .filter(r => r.route)
+//   .map(r => console.log(Object.keys(r.route.methods), r.route.path));
 
 const PORT = process.env.PORT || 5000;
 
