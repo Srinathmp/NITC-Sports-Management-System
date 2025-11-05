@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, Outlet, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { Bell, Trophy, Settings, LogOut, Calendar, ChartColumn, User, Users, LayoutList, Menu, X, Shield, Plus, Locate, LocationEdit } from "lucide-react";
+import { useAuth } from "../../contexts/AuthContexts";
 
 function SidebarNav({ isOpen }) {
     const Items = [
@@ -33,10 +34,11 @@ function SidebarNav({ isOpen }) {
 }
 
 function NitAdmin() {
+    const { name, user, email } = useAuth();
+    const path = useLocation();
     const navigate = useNavigate();
     const [isOpen, setIsOpen] = useState(false);
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-
     const toggleDropdown = () => {
         setIsDropdownOpen(!isDropdownOpen);
     };
@@ -75,8 +77,8 @@ function NitAdmin() {
                                 <div className="absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-lg border border-gray-200 z-10 py-1">
                                     <div className="px-4 py-2 border-b border-gray-100">
                                         <p className="text-base font-medium text-gray-900">Team NitAdmin</p>
-                                        <p className="text-sm text-gray-500">cNitAdmin@insms.com</p>
-                                        <p className="text-xs text-gray-400">NitAdmin • NIT Trichy</p>
+                                        <p className="text-sm text-gray-500">{email}</p>
+                                        <p className="text-xs text-gray-400">{name}</p>
                                     </div>
                                     <button className="flex items-center w-full px-4 py-2 text-gray-700 hover:bg-gray-100 space-x-3">
                                         <Settings className="h-5 w-5" />

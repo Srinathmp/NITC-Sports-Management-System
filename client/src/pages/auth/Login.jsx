@@ -33,10 +33,10 @@ export default function Login() {
       setLoading(true);
 
       const res = await api.post("/users/login", { email, password });
-      const { token, role } = res.data;
+      const { token, role, name } = res.data;
 
       console.log("login successful!");
-      login(token, role);
+      login(token, role, name, email);
       if (role === "CommonAdmin") navigate("/common-admin/dashboard");
       else if (role === "NITAdmin") navigate("/nit-admin/dashboard");
       else if (role === "Coach") navigate("/coach/dashboard");
