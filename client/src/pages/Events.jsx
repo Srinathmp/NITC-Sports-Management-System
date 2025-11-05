@@ -1,205 +1,330 @@
-import { useState } from 'react';
-import { Trophy, Search, Filter, Plus, Calendar, MapPin, Users, Edit, ChevronDown } from 'lucide-react';
+import React, { useState, useEffect } from "react";
+import api from "../api/axios";
+import { Eye, Edit, Search, Filter } from "lucide-react";
 
-const getStatusStyles = (status) => {
-    switch (status) {
-        case 'ongoing':
-            return 'bg-blue-600 text-white border-blue-600';
-        case 'upcoming':
-            return 'bg-orange-400 text-white border-orange-400';
-        case 'registration':
-            return 'bg-yellow-400 text-white border-yellow-400';
-        case 'completed':
-            return 'bg-green-600 text-white border-green-600';
-        default:
-            return 'bg-gray-600 text-white border-gray-600';
+export default function Events() {
+  const [events, setEvents] = useState([]);
+  const [filteredEvents, setFilteredEvents] = useState([]);
+  const [selected, setSelected] = useState(null);
+  const [editEvent, setEditEvent] = useState(null);
+  const [showViewModal, setShowViewModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState("All");
+  const [form, setForm] = useState({});
+  const role = localStorage.getItem("user"); // e.g., "NITAdmin"
+//   console.log("role:"+role);
+  
+  // Fetch events
+  const fetchEvents = async () => {
+    try {
+      const res = await api.get("/events/allEvents");
+      setEvents(res.data || []);
+      setFilteredEvents(res.data || []);
+    } catch (err) {
+      console.error("Error fetching events:", err);
     }
-};
+  };
 
-const getStatusText = (status) => {
-    switch (status) {
-        case 'registration': return 'Registration Open';
-        case 'upcoming': return 'Upcoming';
-        case 'ongoing': return 'Ongoing';
-        case 'completed': return 'Completed';
-        default: return status;
+  useEffect(() => {
+    fetchEvents();
+  }, []);
+
+  // Filter and search
+  useEffect(() => {
+    let filtered = [...events];
+    if (statusFilter !== "All") {
+      filtered = filtered.filter((e) => e.status === statusFilter);
     }
-};
+    if (searchQuery.trim()) {
+      filtered = filtered.filter((e) =>
+        e.name.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+    setFilteredEvents(filtered);
+  }, [statusFilter, searchQuery, events]);
 
-const StatCard = ({ title, value, subtitle, Icon }) => {
-    return (<div className="bg-white border border-gray-200 rounded-lg shadow-sm">
-        <div className="p-6 flex flex-row items-center justify-between space-y-0 pb-2">
-            <h3 className="text-sm text-gray-900">{title}</h3>
-            <Icon className="h-4 w-4 text-gray-500" />
-        </div>
-        <div className="px-6 pb-6">
-            <div className="text-2xl font-bold text-gray-900">{value}</div>
-            <p className="text-xs text-gray-500">{subtitle}</p>
-        </div>
-    </div>);
-};
+  const openViewModal = (event) => {
+    setSelected(event);
+    setShowViewModal(true);
+  };
 
-const EventCard = ({ event }) => {
-    const registrationPercentage = Math.round((event.registeredTeams / event.maxTeams) * 100);
-
-    return (<div className="bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-all">
-        <div className="p-6 pb-0">
-            <div className="flex items-start justify-between">
-                <div>
-                    <h3 className="text-lg font-semibold text-gray-900">{event.name}</h3>
-                    <p className="text-sm text-gray-500 mt-1">Organized by {event.organizer}</p>
-                </div>
-                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold border ${getStatusStyles(event.status)}`}>
-                    {getStatusText(event.status)}
-                </span>
-            </div>
-        </div>
-
-        <div className="p-6">
-            <div className="space-y-3">
-                <div className="flex items-center gap-2">
-                    <Trophy className="h-4 w-4 text-gray-500 flex-shrink-0" />
-                    <span className="text-sm text-gray-900">{event.sport}</span>
-                </div>
-
-                <div className="flex items-center gap-2">
-                    <Calendar className="h-4 w-4 text-gray-500 flex-shrink-0" />
-                    <span className="text-sm text-gray-900">{event.startDate} to {event.endDate}</span>
-                </div>
-
-                <div className="flex items-center gap-2">
-                    <MapPin className="h-4 w-4 text-gray-500 flex-shrink-0" />
-                    <span className="text-sm text-gray-900">{event.venue}</span>
-                </div>
-
-                <div className="flex items-center gap-2">
-                    <Users className="h-4 w-4 text-gray-500 flex-shrink-0" />
-                    <span className="text-sm text-gray-900">
-                        {event.registeredTeams}/{event.maxTeams} teams registered
-                    </span>
-                </div>
-
-                <div className="space-y-1 pt-2">
-                    <div className="flex justify-between text-xs text-gray-500">
-                        <span>Registration Progress</span>
-                        <span>{registrationPercentage}%</span>
-                    </div>
-                    <div className="w-full bg-gray-200 rounded-full h-2">
-                        <div
-                            className="bg-blue-600 h-2 rounded-full transition-all"
-                            style={{ width: `${registrationPercentage}%` }}
-                        ></div>
-                    </div>
-                </div>
-
-                <div className="flex justify-center gap-2 pt-2">
-                    <button className="cursor-pointer w-full px-4 py-2 text-sm font-semibold rounded-lg border border-gray-200 bg-white hover:bg-gray-100 transition-colors">
-                        View Details
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>);
-};
-
-function Events() {
-    const [searchQuery, setSearchQuery] = useState('');
-    const [selectedStatus, setSelectedStatus] = useState('all');
-    const [isFilterOpen, setIsFilterOpen] = useState(false);
-
-    const events = [
-        { id: 1, name: 'Inter-NIT Basketball Championship', sport: 'Basketball', status: 'ongoing', startDate: '2024-02-15', endDate: '2024-02-20', venue: 'Main Sports Complex', registeredTeams: 16, maxTeams: 16, organizer: 'NIT Trichy' },
-        { id: 2, name: 'Football Premier League', sport: 'Football', status: 'upcoming', startDate: '2024-02-25', endDate: '2024-03-05', venue: 'Football Stadium', registeredTeams: 12, maxTeams: 16, organizer: 'NIT Warangal' },
-        { id: 3, name: 'Cricket T20 Tournament', sport: 'Cricket', status: 'registration', startDate: '2024-03-10', endDate: '2024-03-20', venue: 'Cricket Ground', registeredTeams: 8, maxTeams: 16, organizer: 'NIT Surathkal' },
-        { id: 4, name: 'Volleyball Championship', sport: 'Volleyball', status: 'completed', startDate: '2024-01-15', endDate: '2024-01-25', venue: 'Indoor Sports Hall', registeredTeams: 12, maxTeams: 12, organizer: 'NIT Rourkela' },
-        { id: 5, name: 'Tennis Open', sport: 'Tennis', status: 'upcoming', startDate: '2024-03-25', endDate: '2024-04-05', venue: 'Tennis Courts', registeredTeams: 24, maxTeams: 32, organizer: 'NIT Calicut' },
-    ];
-
-    const filteredEvents = events.filter(event => {
-        const matchesSearch = event.name.toLowerCase().includes(searchQuery.toLowerCase()) || event.sport.toLowerCase().includes(searchQuery.toLowerCase()) || event.organizer.toLowerCase().includes(searchQuery.toLowerCase());
-        const matchesStatus = selectedStatus === 'all' || event.status === selectedStatus;
-        return matchesSearch && matchesStatus;
+  const openEditModal = (event) => {
+    setEditEvent(event);
+    setForm({
+      name: event.name,
+      sport: event.sport,
+      venue: event.venue,
+      datetime: event.datetime.split("T")[0],
+      status: event.status,
+      stage: event.stage || "",
+      maxTeams: event.maxTeams || 0,
+      registeredTeams: event.registeredTeams || 0,
     });
+    setShowEditModal(true);
+  };
 
-    const ongoingCount = events.filter(e => e.status === 'ongoing').length;
-    const registrationCount = events.filter(e => e.status === 'registration').length;
-    const totalTeams = events.reduce((sum, event) => sum + event.registeredTeams, 0);
-    const completedCount = events.filter(e => e.status === 'completed').length;
+  const handleUpdateEvent = async () => {
+    try {
+      await api.put(`/events/${editEvent._id}`, form);
+      setShowEditModal(false);
+      fetchEvents();
+    } catch (err) {
+      console.error("Error updating event:", err);
+      alert("Failed to update event.");
+    }
+  };
 
-    return (
-        <div className="space-y-6 w-full p-8 pt-5 px-4 md:px-8">
-            <div className="mb-6">
-                <h1 className="text-3xl font-bold text-gray-900">Events</h1>
-                <p className="text-gray-500 mt-1">Browse upcoming and ongoing tournaments</p>
-            </div>
+  const statusClasses = {
+    Scheduled: "text-green-600 bg-green-50 border border-green-200",
+    Pending: "text-yellow-600 bg-yellow-50 border border-yellow-200",
+    Cancelled: "text-red-600 bg-red-50 border border-red-200",
+    Completed: "text-blue-600 bg-blue-50 border border-blue-200",
+  };
 
-            <div className="flex flex-col sm:flex-row gap-4 justify-between">
-                <div className="flex flex-col sm:flex-row gap-4 flex-1 justify-between">
-                    <div className="relative flex-1 max-w-md">
-                        <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-500" />
-                        <input type="text" placeholder="Search events, sports, or organizers..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-400 bg-white text-gray-900 placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
-                    </div>
+  return (
+    <div className="p-8 max-w-7xl mx-auto">
+      <h2 className="text-3xl font-bold mb-6 text-blue-700">Events</h2>
 
-                    <div className="relative w-full sm:w-40">
-                        <button onClick={() => setIsFilterOpen(!isFilterOpen)} className="w-full px-4 py-2.5 rounded-lg border border-gray-400 bg-white text-gray-900 hover:bg-gray-100 transition-colors flex items-center justify-between" >
-                            <div className="flex items-center gap-2">
-                                <Filter className="h-4 w-4" />
-                                <span className="text-sm">
-                                    {selectedStatus === 'all' ? 'All Status' : getStatusText(selectedStatus)}
-                                </span>
-                            </div>
-                            <ChevronDown className="h-4 w-4" />
-                        </button>
+      {/* Search & Filter Bar */}
+      <div className="flex flex-col sm:flex-row items-center gap-4 mb-8">
+        <div className="relative w-full sm:w-2/3">
+          <Search className="absolute left-3 top-2.5 text-gray-400" size={18} />
+          <input
+            type="text"
+            placeholder="Search events by name..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full pl-9 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+          />
+        </div>
 
-                        {isFilterOpen && (
-                            <>
-                                <div className="fixed inset-0 z-10" onClick={() => setIsFilterOpen(false)} />
-                                <div className="absolute z-20 mt-2 w-full rounded-lg border border-gray-200 bg-white shadow-lg">
-                                    <button onClick={() => { setSelectedStatus('all'); setIsFilterOpen(false); }} className={`w-full px-4 py-2.5 text-left text-sm hover:bg-gray-100 transition-colors first:rounded-t-lg ${selectedStatus === 'all' ? 'bg-gray-100' : ''}`} >
-                                        All Status
-                                    </button>
-                                    <button onClick={() => { setSelectedStatus('registration'); setIsFilterOpen(false); }} className={`w-full px-4 py-2.5 text-left text-sm hover:bg-gray-100 transition-colors ${selectedStatus === 'registration' ? 'bg-gray-100' : ''}`} >
-                                        Registration
-                                    </button>
-                                    <button onClick={() => { setSelectedStatus('upcoming'); setIsFilterOpen(false); }} className={`w-full px-4 py-2.5 text-left text-sm hover:bg-gray-100 transition-colors ${selectedStatus === 'upcoming' ? 'bg-gray-100' : ''}`} >
-                                        Upcoming
-                                    </button>
-                                    <button onClick={() => { setSelectedStatus('ongoing'); setIsFilterOpen(false); }} className={`w-full px-4 py-2.5 text-left text-sm hover:bg-gray-100 transition-colors ${selectedStatus === 'ongoing' ? 'bg-gray-100' : ''}`} >
-                                        Ongoing
-                                    </button>
-                                    <button onClick={() => { setSelectedStatus('completed'); setIsFilterOpen(false); }} className={`w-full px-4 py-2.5 text-left text-sm hover:bg-gray-100 transition-colors last:rounded-b-lg ${selectedStatus === 'completed' ? 'bg-gray-1G00' : ''}`} >
-                                        Completed
-                                    </button>
-                                </div>
-                            </>
-                        )}
-                    </div>
+        <div className="relative w-full sm:w-1/3">
+          <Filter className="absolute left-3 top-2.5 text-gray-400" size={18} />
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            className="w-full pl-9 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+          >
+            <option value="All">All Status</option>
+            <option value="Scheduled">Scheduled</option>
+            <option value="Pending">Pending</option>
+            <option value="Cancelled">Cancelled</option>
+            <option value="Completed">Completed</option>
+          </select>
+        </div>
+      </div>
+
+      {filteredEvents.length === 0 ? (
+        <p className="text-gray-600">No events found.</p>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredEvents.map((ev) => (
+            <div
+              key={ev._id}
+              className="bg-white rounded-xl border border-gray-200 shadow-sm p-5 hover:shadow-lg transition-all"
+            >
+              <div className="flex justify-between items-center mb-2">
+                <h3 className="text-lg font-semibold text-gray-900">
+                  {ev.name}
+                </h3>
+                <span
+                  className={`text-xs px-3 py-1 rounded-full font-medium ${
+                    statusClasses[ev.status] || "bg-gray-100 text-gray-700"
+                  }`}
+                >
+                  {ev.status}
+                </span>
+              </div>
+
+              <p className="text-sm text-gray-700">
+                <strong>Sport:</strong> {ev.sport}
+              </p>
+              <p className="text-sm text-gray-700">
+                <strong>Venue:</strong> {ev.venue}
+              </p>
+              <p className="text-sm text-gray-600">
+                <strong>Date:</strong>{" "}
+                {new Date(ev.datetime).toLocaleDateString()}
+              </p>
+
+              {/* Registration Progress */}
+              {ev.maxTeams ? (
+                <div className="mt-3">
+                  <div className="flex justify-between text-xs mb-1">
+                    <span>Registration</span>
+                    <span>
+                      {ev.registeredTeams || 0}/{ev.maxTeams}
+                    </span>
+                  </div>
+                  <div className="h-2 w-full bg-gray-200 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-blue-500"
+                      style={{
+                        width: `${
+                          ((ev.registeredTeams || 0) / ev.maxTeams) * 100
+                        }%`,
+                      }}
+                    ></div>
+                  </div>
                 </div>
+              ) : null}
+
+              {/* Buttons */}
+              <div className="flex gap-2 mt-4">
+                <button
+                  onClick={() => openViewModal(ev)}
+                  className="flex items-center gap-1 px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-sm"
+                >
+                  <Eye size={16} /> View Details
+                </button>
+
+                {role === "NITAdmin" && (
+                  <button
+                    onClick={() => openEditModal(ev)}
+                    className="flex items-center gap-1 px-3 py-1 bg-yellow-500 text-white rounded-md hover:bg-yellow-600 text-sm"
+                  >
+                    <Edit size={16} /> Update
+                  </button>
+                )}
+              </div>
             </div>
+          ))}
+        </div>
+      )}
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {filteredEvents.map((event) => <EventCard key={event.id} event={event} />)}
-            </div>
+      {/* View Modal */}
+      {showViewModal && selected && (
+        <Modal title="Event Details" onClose={() => setShowViewModal(false)}>
+          <p><strong>Name:</strong> {selected.name}</p>
+          <p><strong>Sport:</strong> {selected.sport}</p>
+          <p><strong>Venue:</strong> {selected.venue}</p>
+          <p><strong>Date:</strong> {new Date(selected.datetime).toLocaleString()}</p>
+          <p><strong>Status:</strong> {selected.status}</p>
+          <p><strong>Stage:</strong> {selected.stage || "N/A"}</p>
+          <p><strong>Max Teams:</strong> {selected.maxTeams || "N/A"}</p>
+          <p><strong>Registered Teams:</strong> {selected.registeredTeams || 0}</p>
+        </Modal>
+      )}
 
-            {filteredEvents.length === 0 && (
-                <div className="bg-white border border-gray-200 rounded-lg shadow-sm">
-                    <div className="flex flex-col items-center justify-center py-12 px-6">
-                        <Trophy className="h-12 w-12 text-gray-500 mb-4" />
-                        <h3 className="text-lg font-semibold text-gray-900 mb-2">No events found</h3>
-                        <p className="text-gray-500 text-center">
-                            {searchQuery || selectedStatus !== 'all' ? 'Try adjusting your search or filters' : 'No events have been created yet'}
-                        </p>
-                    </div>
-                </div>
-            )}
+      {/* Edit Modal */}
+      {showEditModal && (
+        <Modal
+          title="Update Event"
+          onClose={() => setShowEditModal(false)}
+          onSave={handleUpdateEvent}
+        >
+          <FormInput
+            label="Event Name"
+            value={form.name}
+            onChange={(v) => setForm({ ...form, name: v })}
+          />
+          <FormInput
+            label="Sport"
+            value={form.sport}
+            onChange={(v) => setForm({ ...form, sport: v })}
+          />
+          <FormInput
+            label="Venue"
+            value={form.venue}
+            onChange={(v) => setForm({ ...form, venue: v })}
+          />
+          <FormInput
+            label="Date"
+            type="date"
+            value={form.datetime}
+            onChange={(v) => setForm({ ...form, datetime: v })}
+          />
+          <FormInput
+            label="Stage"
+            value={form.stage}
+            onChange={(v) => setForm({ ...form, stage: v })}
+          />
+          <FormInput
+            label="Max Teams"
+            type="number"
+            value={form.maxTeams}
+            onChange={(v) => setForm({ ...form, maxTeams: Number(v) })}
+          />
+          <FormInput
+            label="Registered Teams"
+            type="number"
+            value={form.registeredTeams}
+            onChange={(v) => setForm({ ...form, registeredTeams: Number(v) })}
+          />
+          <FormSelect
+            label="Status"
+            value={form.status}
+            options={["Scheduled", "Cancelled", "Completed"]}
+            onChange={(v) => setForm({ ...form, status: v })}
+          />
+        </Modal>
+      )}
+    </div>
+  );
+}
 
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                <StatCard title="Total Events" value={events.length} subtitle={`${ongoingCount} ongoing`} Icon={Trophy} />
-                <StatCard title="Registrations Open" value={registrationCount} subtitle="Events accepting teams" Icon={Users} />
-                <StatCard title="Total Teams" value={totalTeams} subtitle="Across all events" Icon={Users} />
-                <StatCard title="Completed Events" value={completedCount} subtitle="This season" Icon={Trophy} />
-            </div>
-        </div>);
-};
+/* --- Reusable Components --- */
+function FormInput({ label, type = "text", value, onChange }) {
+  return (
+    <div className="mb-3">
+      <label className="block text-sm font-medium text-gray-700 mb-1">
+        {label}
+      </label>
+      <input
+        type={type}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+      />
+    </div>
+  );
+}
 
-export default Events;
+function FormSelect({ label, value, options, onChange }) {
+  return (
+    <div className="mb-3">
+      <label className="block text-sm font-medium text-gray-700 mb-1">
+        {label}
+      </label>
+      <select
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+      >
+        {options.map((opt) => (
+          <option key={opt} value={opt}>
+            {opt}
+          </option>
+        ))}
+      </select>
+    </div>
+  );
+}
+
+function Modal({ title, children, onClose, onSave }) {
+  return (
+    <div className="fixed inset-0 bg-black/40 flex justify-center items-center z-50">
+      <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-lg">
+        <h2 className="text-lg font-semibold mb-4">{title}</h2>
+        {children}
+        <div className="flex justify-end gap-2 mt-4">
+          <button
+            onClick={onClose}
+            className="px-4 py-2 bg-gray-200 rounded-md hover:bg-gray-300"
+          >
+            Close
+          </button>
+          {onSave && (
+            <button
+              onClick={onSave}
+              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+            >
+              Save
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
