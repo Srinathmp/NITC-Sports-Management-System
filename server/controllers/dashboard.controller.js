@@ -4,6 +4,7 @@ const events = require('../models/event.model')
 const matches = require('../models/match.model')
 const AuditLog = require('../models/auditLog.model');
 const User = require('../models/user.model');
+const teams = require('../models/team.model')
 
 function mapStatus(action) {
     const lower = action?.toLowerCase() || '';
@@ -31,7 +32,7 @@ const commonAdmin = asyncHandler(
                 .sort({ createdAt: -1 })
                 .limit(3)
                 .skip((page - 1) * 3)
-                .select("name createdAt code");
+                .select("name createdAt code isHost");
             const logs = await AuditLog
                 .aggregate([
                     {
@@ -56,6 +57,9 @@ const commonAdmin = asyncHandler(
                             'details': 1,
                             'createdAt': 1
                         }
+                    },
+                    {
+                        $sort: { createdAt: -1 }
                     }
                 ])
                 .limit(5)
@@ -78,9 +82,22 @@ const commonAdmin = asyncHandler(
 
 const nitAdmin = asyncHandler(
     async (req, res) => {
-        const approved = await NIT.countDocuments({ status: "Approved" })
-        const pending = await NIT.countDocuments({ status: "Pending" })
-        res.status(200).json({ approved: approved, pending: pending })
+        const nit = await NIT.findOne({ _id: req.user.nit_id }).select("isHost")
+        const isHost = nit.isHost;
+        const myTeams = await teams.find({ nit_id: req.user.nit_id }).countDocuments()
+        const mySports = await teams.find({ nit_id: req.user.nit_id }).distinct("sport").countDocuments()
+        const totalCount = await teams.countDocuments();
+        const distinctValues = await teams.distinct("nit_id").countDocuments();
+        const upcomingEvents = await events
+            .find({})
+            .sort({ datetime: -1 })
+            .limit(4)
+            .select("name venue datetime registeredTeams")
+        res
+            .status(200)
+            .json({
+                isHost: isHost, totalCount: totalCount, distinctValues: distinctValues, upcomingEvents: upcomingEvents, myTeams: myTeams, mySports:mySports
+            })
     }
 )
 
