@@ -4,6 +4,8 @@ import { useNavigate } from "react-router-dom";
 import api from '../../api/axios';
 import FullPageLoader from '../../components/FullPageLoader';
 import { useAuth } from '../../contexts/AuthContexts';
+import { format } from 'date-fns';
+
 
 const StatCard = ({ title, value, subtitle, Icon }) => (
   <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-all cursor-pointer">
@@ -16,13 +18,13 @@ const StatCard = ({ title, value, subtitle, Icon }) => (
   </div>
 );
 
-const EventItem = ({ title, details, tagText }) => (
+const EventItem = ({ title, date, loc, teams }) => (
   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 border border-[#ababab98] rounded-xl hover:shadow-md transition-all">
     <div>
       <h4 className="font-semibold text-gray-800">{title}</h4>
-      <p className="text-sm text-gray-500 mb-2 sm:mb-0">{details}</p>
+      <p className="text-sm text-gray-500 mb-2 sm:mb-0">{`${date} -- ${loc}`}</p>
       <span className="bg-orange-400 text-white text-xs font-medium px-3 py-1 rounded-full">
-        {tagText}
+        {teams} Teams Registered
       </span>
     </div>
     <button className="mt-3 sm:mt-0 w-full sm:w-auto px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-300 transition-colors cursor-pointer">
@@ -59,8 +61,11 @@ function NitDashboard() {
   const [isHost, setIsHost] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
+  const [myTeams, setMyTeams] = useState(0)
+  const [mySports, setMySports] = useState(0)
   const [totalNits, setTotalNits] = useState(0)
   const [myEvents, setMyEvents] = useState(0);
+  const [myEventsList, setMyEventsList] = useState([]);
   const [myEventsSubtitle, setMyEventsSubtitle] = useState('');
   const [registeredTeams, setRegisteredTeams] = useState(0);
   const [registeredTeamsSubtitle, setRegisteredTeamsSubtitle] = useState('');
@@ -77,7 +82,9 @@ function NitDashboard() {
       setIsHost(res.data.isHost);
       setRegisteredTeams(res.data.totalCount)
       setTotalNits(res.data.distinctValues)
-
+      setMyEventsList(res.data.upcomingEvents)
+      setMyTeams(res.data.myTeams)
+      setMySports(res.data.mySports)
     } catch (error) {
       console.error("Failed to fetch dashboard data:", error);
     } finally {
@@ -104,8 +111,8 @@ function NitDashboard() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <StatCard title="My Events" value={myEvents} subtitle={myEventsSubtitle} Icon={Calendar} />
-        <StatCard title="Registered Teams" value={registeredTeams} subtitle={`Across ${totalNits} NITs`} Icon={Users} />
+        <StatCard title="My Teams" value={myTeams} subtitle={`Across ${mySports} sports`} Icon={Calendar} />
+        <StatCard title="Registered Teams" value={registeredTeams} subtitle={`From ${totalNits} NITs`} Icon={Users} />
         <StatCard title="Accommodation" value={accommodation} subtitle={accommodationSubtitle} Icon={MapPin} />
         <StatCard title="Mess Bookings" value={messBookings} subtitle={messBookingsSubtitle} Icon={Utensils} />
       </div>
@@ -123,13 +130,14 @@ function NitDashboard() {
             </button>
           </div>
           <div className="flex flex-col gap-4 p-4">
-            {/* {
-              events.map((item,index)=>{
-                return <EventItem title={item.name} date={item.date} loc={item.location} teams={item.teams} />
+            {
+              myEventsList.map((item, index) => {
+                const dateObj = new Date(item.datetime);
+                return <EventItem title={item.name} date={format(dateObj, 'MMM dd, yyyy')} loc={item.venue} teams={item.registeredTeams} />
               })
-            } */}
-            <EventItem title="Football" details="2024-02-16 • Sports Ground" tagText="12 teams registered" />
-            <EventItem title="Cricket" details="2024-02-17 • Cricket Field" tagText="16 teams registered" />
+            }
+            {/* <EventItem title="Football" details="2024-02-16 • Sports Ground" tagText="12 teams registered" />
+            <EventItem title="Cricket" details="2024-02-17 • Cricket Field" tagText="16 teams registered" /> */}
           </div>
         </div>
 

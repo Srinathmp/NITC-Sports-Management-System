@@ -84,12 +84,19 @@ const nitAdmin = asyncHandler(
     async (req, res) => {
         const nit = await NIT.findOne({ _id: req.user.nit_id }).select("isHost")
         const isHost = nit.isHost;
+        const myTeams = await teams.find({ nit_id: req.user.nit_id }).countDocuments()
+        const mySports = await teams.find({ nit_id: req.user.nit_id }).distinct("sport").countDocuments()
         const totalCount = await teams.countDocuments();
         const distinctValues = await teams.distinct("nit_id").countDocuments();
+        const upcomingEvents = await events
+            .find({})
+            .sort({ datetime: -1 })
+            .limit(4)
+            .select("name venue datetime registeredTeams")
         res
             .status(200)
             .json({
-                isHost: isHost, totalCount: totalCount, distinctValues: distinctValues
+                isHost: isHost, totalCount: totalCount, distinctValues: distinctValues, upcomingEvents: upcomingEvents, myTeams: myTeams, mySports:mySports
             })
     }
 )

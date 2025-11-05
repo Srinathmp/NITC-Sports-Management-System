@@ -19,7 +19,7 @@ function StatCard({ title, value, subtitle, icon: Icon }) {
 }
 
 function PlayerTableRow({ player }) {
-    const { jersey, name, position, age, email, phone, status } = player;
+    const { jersey, name, age, email, phone } = player;
 
     const statusColors = {
         Active: 'bg-blue-100 text-blue-700',
@@ -30,16 +30,10 @@ function PlayerTableRow({ player }) {
         <tr className="border-b border-gray-200 bg-white hover:bg-gray-50">
             <td className="px-4 py-3 text-sm font-medium text-gray-700">{jersey}</td>
             <td className="px-4 py-3 text-sm font-semibold text-gray-900">{name}</td>
-            <td className="px-4 py-3 text-sm text-gray-500">{position}</td>
             <td className="px-4 py-3 text-sm text-gray-500">{age}</td>
             <td className="px-4 py-3 text-sm text-gray-500">
                 <div>{email}</div>
                 <div className="text-xs text-gray-400">{phone}</div>
-            </td>
-            <td className="px-4 py-3">
-                <span className={`inline-flex items-center rounded-full px-3 py-0.5 text-xs font-medium ${statusColors[status] || 'bg-gray-200 text-gray-800'}`}>
-                    {status}
-                </span>
             </td>
             <td className="px-4 py-3">
                 <div className="flex gap-2">
@@ -126,10 +120,8 @@ export default function ManageTeams() {
                             <tr className='[&>*]:px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
                                 <th scope="col">Jersey</th>
                                 <th scope="col">Name</th>
-                                <th scope="col">Position</th>
                                 <th scope="col">Age</th>
                                 <th scope="col">Contact</th>
-                                <th scope="col">Status</th>
                                 <th scope="col">Actions</th>
                             </tr>
                         </thead>

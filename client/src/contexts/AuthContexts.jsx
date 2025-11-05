@@ -6,6 +6,7 @@ import React, { createContext, useState, useEffect, useContext } from 'react';
 const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
+    const [email, setEmail] = useState('')
     const [user, setUser] = useState(localStorage.getItem('user'));
     const [name, setName] = useState(localStorage.getItem('name'));
     const [isLoading, setIsLoading] = useState(true);
@@ -30,10 +31,11 @@ export function AuthProvider({ children }) {
         validateToken();
     }, [])
 
-    const login = (userToken, userData, userName) => {
+    const login = (userToken, userData, userName, email) => {
         localStorage.setItem('token', userToken);
         localStorage.setItem('user', userData);
         localStorage.setItem('name', userName);
+        setEmail(email)
         api.defaults.headers.common['Authorization'] = `Bearer ${userToken}`;
         setToken(userToken);
         setUser(userData);
@@ -48,7 +50,7 @@ export function AuthProvider({ children }) {
         navigate('/');
     };
 
-    const value = { name, user, token, isLoading, login, logout, isAuthenticated: !!user, validateToken };
+    const value = { name, email, user, token, isLoading, login, logout, isAuthenticated: !!user, validateToken };
 
     return (
         <AuthContext.Provider value={value}>
