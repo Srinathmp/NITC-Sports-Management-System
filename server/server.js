@@ -27,6 +27,7 @@ app.use('/api/auditlogs', require('./routes/auditLog.routes'));
 app.use('/api/dashboard', require('./routes/dashboard.routes'));
 app.use('/api/mess', require('./routes/mess.routes'));
 app.use('/api/accommodation', require('./routes/accommodation.routes'));
+app.use('/api/events', require('./routes/event.routes'));
 // Error handler
 const { notFound, errorHandler } = require('./middleware/errorHandler.middleware');
 app.use(notFound);
