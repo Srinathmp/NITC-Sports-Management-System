@@ -18,6 +18,8 @@ app.use('/api/users',         require('./routes/user.routes'));
 app.use('/api/nits',          require('./routes/nit.routes'));
 app.use('/api/teams',         require('./routes/team.routes'));      // existing
 app.use('/api/v1/teams',      require('./routes/team.routes'));      // NEW alias for your JSX
+app.use('/api/v1/leaderboard', require('./routes/leaderboard.routes'));
+
 app.use('/api/events',        require('./routes/event.routes'));
 app.use('/api/matches',       require('./routes/match.routes'));
 app.use('/api/notifications', require('./routes/notification.routes'));
