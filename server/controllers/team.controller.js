@@ -1,39 +1,208 @@
 const asyncHandler = require('express-async-handler');
 const Team = require('../models/team.model');
-const NIT = require('../models/nit.model');
+const NIT  = require('../models/nit.model');
+
+// ------- existing handlers (kept) -------
 
 const createTeam = asyncHandler(async (req, res) => {
   const { name, sport, nit_code, players } = req.body;
+
   const exists = await Team.findOne({ name, sport, nit_code });
   const nit = await NIT.find({ code: nit_code });
-  if (!nit) { res.status(404); throw new Error('NIT not found'); }
-  const nit_id = nit[0]._id
+  if (!nit || nit.length === 0) { res.status(404); throw new Error('NIT not found'); }
+  const nit_id = nit[0]._id;
+
   if (exists) {
     res.status(400);
     throw new Error('Team already registered for this sport in the NIT');
   }
+
   const team = await Team.create({
     name, sport, nit_id, players, coach_id: req.user._id
   });
+
   res.status(201).json(team);
 });
 
 const getTeamsByNIT = asyncHandler(async (req, res) => {
   const { code } = req.params;
-  const nit = await NIT.find({ code: code });
-  if (!nit) { res.status(404); throw new Error('NIT not found'); }
-  const nit_id = nit[0]._id
-  const teams = await Team.find({ nit_id: nit_id }).populate('coach_id', 'name');
+  const nit = await NIT.find({ code });
+  if (!nit || nit.length === 0) { res.status(404); throw new Error('NIT not found'); }
+  const nit_id = nit[0]._id;
+
+  const teams = await Team.find({ nit_id }).populate('coach_id', 'name');
   res.json(teams);
 });
 
 const getAllNIT = asyncHandler(async (req, res) => {
-  const page = Number(req.query.page);
+  const page = Number(req.query.page || 1);
   const teams = await Team
     .find({})
     .sort({ createdAt: -1 })
     .limit(6)
     .skip((page - 1) * 6);
+
+  res.json(teams);
 });
 
-module.exports = { createTeam, getTeamsByNIT, getAllNIT };
+// ------- coach: fetch team by sport -------
+
+/**
+ * GET /api/v1/teams/me/by-sport?sport=Basketball
+ */
+const getMyTeamBySport = asyncHandler(async (req, res) => {
+  const coachId = req.user?._id;
+  const { sport } = req.query;
+
+  if (!coachId) return res.status(401).json({ message: 'Unauthorized' });
+  if (!sport)   return res.status(400).json({ message: 'sport is required' });
+
+  const team = await Team.findOne({ coach_id: coachId, sport }).lean();
+  if (!team) return res.status(404).json({ message: 'Team not found for this sport' });
+
+  // playerSchema has _id:false, so use jerseyNo as stable row key for UI
+  const players = (team.players || []).map(p => ({
+    id: p.jerseyNo ?? null,
+    name: p.name,
+    position: p.position || '',
+    jerseyNo: p.jerseyNo ?? null
+  }));
+
+  res.json({
+    team: {
+      id: team._id,
+      name: team.name,
+      sport: team.sport,
+      nit_id: team.nit_id,
+      totalPlayers: players.length
+    },
+    players
+  });
+});
+
+// ------- coach: add player -------
+
+/**
+ * POST /api/v1/teams/me/by-sport/players
+ * body: { sport, player: { name, position, jerseyNo } }
+ */
+const addPlayerToMyTeamBySport = asyncHandler(async (req, res) => {
+  const coachId = req.user?._id;
+  const { sport, player } = req.body;
+
+  if (!coachId) return res.status(401).json({ message: 'Unauthorized' });
+  if (!sport)    return res.status(400).json({ message: 'sport is required' });
+
+  if (!player || !player.name || !player.position || player.jerseyNo == null) {
+    return res.status(400).json({ message: 'player.name, player.position, player.jerseyNo are required' });
+  }
+
+  const team = await Team.findOne({ coach_id: coachId, sport });
+  if (!team) return res.status(404).json({ message: 'Team not found for this sport' });
+
+  const jerseyNo = Number(player.jerseyNo);
+  if (!Number.isFinite(jerseyNo) || jerseyNo <= 0) {
+    return res.status(400).json({ message: 'jerseyNo must be a positive number' });
+  }
+
+  const dup = (team.players || []).some(p => Number(p.jerseyNo) === jerseyNo);
+  if (dup) return res.status(409).json({ message: 'A player with this jersey number already exists' });
+
+  team.players.push({
+    name: String(player.name).trim(),
+    position: String(player.position).trim(),
+    jerseyNo
+  });
+
+  await team.save();
+
+  res.status(201).json({
+    player: { id: jerseyNo, name: player.name, position: player.position, jerseyNo },
+    totalPlayers: team.players.length
+  });
+});
+
+// ------- coach: update player (by old jerseyNo in URL) -------
+
+/**
+ * PATCH /api/v1/teams/me/by-sport/players/:jerseyNo
+ * body: { sport, player: { name?, position?, jerseyNo? } }
+ */
+const updatePlayerInMyTeamBySport = asyncHandler(async (req, res) => {
+  const coachId = req.user?._id;
+  const oldJerseyNo = Number(req.params.jerseyNo);
+  const { sport, player = {} } = req.body;
+
+  if (!coachId) return res.status(401).json({ message: 'Unauthorized' });
+  if (!sport)    return res.status(400).json({ message: 'sport is required' });
+  if (!Number.isFinite(oldJerseyNo) || oldJerseyNo <= 0) {
+    return res.status(400).json({ message: 'Invalid jerseyNo in URL' });
+  }
+
+  const team = await Team.findOne({ coach_id: coachId, sport });
+  if (!team) return res.status(404).json({ message: 'Team not found for this sport' });
+
+  const idx = (team.players || []).findIndex(p => Number(p.jerseyNo) === oldJerseyNo);
+  if (idx === -1) return res.status(404).json({ message: 'Player not found' });
+
+  // if jerseyNo changes, check duplicate
+  if (player.jerseyNo != null) {
+    const n = Number(player.jerseyNo);
+    if (!Number.isFinite(n) || n <= 0) return res.status(400).json({ message: 'jerseyNo must be a positive number' });
+    const dup = team.players.some((p, i) => i !== idx && Number(p.jerseyNo) === n);
+    if (dup) return res.status(409).json({ message: 'A player with this jersey number already exists' });
+    team.players[idx].jerseyNo = n;
+  }
+
+  if (player.name != null)     team.players[idx].name = String(player.name).trim();
+  if (player.position != null) team.players[idx].position = String(player.position).trim();
+
+  await team.save();
+
+  const updated = team.players[idx];
+  return res.json({
+    player: {
+      id: updated.jerseyNo,
+      name: updated.name,
+      position: updated.position || '',
+      jerseyNo: updated.jerseyNo
+    }
+  });
+});
+
+// ------- coach: delete player (by jerseyNo in URL) -------
+
+/**
+ * DELETE /api/v1/teams/me/by-sport/players/:jerseyNo?sport=Basketball
+ */
+const deletePlayerInMyTeamBySport = asyncHandler(async (req, res) => {
+  const coachId = req.user?._id;
+  const jerseyNo = Number(req.params.jerseyNo);
+  const { sport } = req.query;
+
+  if (!coachId) return res.status(401).json({ message: 'Unauthorized' });
+  if (!sport)    return res.status(400).json({ message: 'sport is required' });
+  if (!Number.isFinite(jerseyNo) || jerseyNo <= 0) {
+    return res.status(400).json({ message: 'Invalid jerseyNo in URL' });
+  }
+
+  const team = await Team.findOne({ coach_id: coachId, sport });
+  if (!team) return res.status(404).json({ message: 'Team not found for this sport' });
+
+  const before = team.players.length;
+  team.players = (team.players || []).filter(p => Number(p.jerseyNo) !== jerseyNo);
+  if (team.players.length === before) return res.status(404).json({ message: 'Player not found' });
+
+  await team.save();
+  return res.json({ ok: true, totalPlayers: team.players.length });
+});
+
+module.exports = {
+  createTeam,
+  getTeamsByNIT,
+  getAllNIT,
+  getMyTeamBySport,
+  addPlayerToMyTeamBySport,
+  updatePlayerInMyTeamBySport,   // ✅ NEW
+  deletePlayerInMyTeamBySport    // ✅ NEW
+};
