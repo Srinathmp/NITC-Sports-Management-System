@@ -231,7 +231,7 @@ export default function Events() {
           />
           <FormInput
             label="Date"
-            type="date"
+            type="datetime-local"
             value={form.datetime}
             onChange={(v) => setForm({ ...form, datetime: v })}
           />

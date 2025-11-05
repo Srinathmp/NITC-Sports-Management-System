@@ -14,7 +14,7 @@ const registerUser = asyncHandler(async (req, res) => {
   }
   const nit = await NIT.find({ code: nit_code });
   if (!nit) { res.status(404); throw new Error('NIT not found'); }
-  const nit_id = nit[0]._id
+  const nit_id = nit._id
   const salt = await bcrypt.genSalt(10);
   const hash = await bcrypt.hash(password, salt);
   const user = await User.create({
