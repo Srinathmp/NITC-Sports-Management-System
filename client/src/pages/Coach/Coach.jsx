@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, Outlet, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { Bell, Trophy, Settings, LogOut, Calendar, ChartColumn, User, Users, LayoutList, Menu, X } from "lucide-react";
+import { useAuth } from "../../contexts/AuthContexts";
 
 function SidebarNav({ isOpen }) {
     const Items = [
@@ -32,6 +33,7 @@ function SidebarNav({ isOpen }) {
 }
 
 function Coach() {
+    const { logout }= useAuth();
     const navigate = useNavigate();
     const [isOpen, setIsOpen] = useState(false);
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -42,9 +44,7 @@ function Coach() {
 
     const handleLogout = async (e) => {
         e.preventDefault();
-        console.log("ASfasf")
-        localStorage.removeItem('token');
-        localStorage.removeItem('role');
+        logout();
         navigate('/');
     }
 

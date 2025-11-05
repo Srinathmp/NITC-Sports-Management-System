@@ -40,10 +40,7 @@ function LiveCard({ game_name, T1, T2, S1, S2, X }) {
         <div className='mt-6 rounded-2xl border border-red-300 bg-pink-50 p-3 shadow-md transition-all hover:scale-[1.03] hover:shadow-xl sm:p-4'>
             <div className="flex items-center justify-between pb-2 md:pb-3">
                 <h2 className="flex items-center gap-3 font-bold">
-                    <div className="animate-pulse rounded-full bg-red-400 px-2 py-0.5 text-center text-xs text-white">🔴 LIVE</div>
-                </h2>
-                <h2 className="rounded-full border border-gray-200 bg-gray-100 px-2 py-0.5 text-center text-xs font-semibold text-black">
-                    {game_name}
+                    <div className="rounded-full bg-red-400 px-2 py-0.5 text-center text-xs text-white">{game_name}</div>
                 </h2>
             </div>
             <div className='grid grid-cols-3 items-center gap-2 sm:gap-4'>

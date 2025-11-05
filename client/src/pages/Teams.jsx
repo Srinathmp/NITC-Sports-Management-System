@@ -2,6 +2,7 @@ import { Search, Check, ChevronDown, Users, Eye, X, MapPin } from "lucide-react"
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../api/axios";
+import FullPageLoader from "../components/FullPageLoader";
 
 function StatCard({ title, stat, subtitle }) {
   return (
@@ -158,17 +159,17 @@ export default function Teams() {
   const [selectedTeam, setSelectedTeam] = useState(null);
 
   const [teams, setTeams] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const sport = sports[selectedSport];
 
   const fetchTeams = async () => {
-    setLoading(true);
     try {
       const { data } = await api.get('/v1/teams/public', {
         params: { search: searchTerm || undefined, sport }
       });
       setTeams(data.items || []);
+      setLoading(false)
     } catch (e) {
       console.error(e);
       setTeams([]);
@@ -177,10 +178,15 @@ export default function Teams() {
     }
   };
 
+  
   useEffect(() => {
     fetchTeams();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedSport]);
+  
+  if(loading){
+    return <FullPageLoader />
+  }
 
   const onSearch = (e) => setSearchTerm(e.target.value);
   const submitSearch = (e) => { e.preventDefault(); fetchTeams(); };

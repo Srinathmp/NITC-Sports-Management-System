@@ -1,12 +1,47 @@
 import "../index.css";
 import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import api from "../api/axios";
+
+import {
+    Trophy,
+    LogIn,
+    ChartColumn,
+    Medal,
+    University,
+    Dumbbell,
+    ClipboardList
+} from "lucide-react";
+
 import { LinkBtn } from "../components/Button";
 import { LiveCard, StatCard, UpcomingCard, PerformerCard } from "../components/Card";
-import { Trophy, LogIn, ChartColumn, Medal, University, Dumbbell, ClipboardList, } from "lucide-react";
 
 export default function Home() {
+    const [stats, setStats] = useState({});
+    const [top, setTop] = useState([]);
+    const [live, setLive] = useState([]);
+    const [events, setEvents] = useState([]);
+    const [notes, setNotes] = useState([]);
+
+    useEffect(() => {
+        async function load() {
+            try {
+                const { data } = await api.get("/dashboard/public");
+                setStats(data.stats);
+                setTop(data.topPerformers);
+                setLive(data.liveMatches);
+                setEvents(data.upcomingEvents);
+                setNotes(data.announcements);
+            } catch (err) {
+                console.error("Public home load failed", err);
+            }
+        }
+        load();
+    }, []);
+
     return (
         <div className="backdrop-blur-sm bg-gradient-to-b from-blue-700/70 via-slate-600/80 to-blue-900/90">
+
             {/* Header */}
             <section className="relative flex min-h-screen items-center justify-center overflow-hidden bg-white/20 text-white shadow-lg backdrop-blur-lg">
                 <div className="relative z-10 mx-auto flex flex-col items-center justify-center px-4 py-24 text-center sm:px-8">
@@ -21,8 +56,7 @@ export default function Home() {
                     </h2>
 
                     <p className="mb-10 text-sm font-medium tracking-wider text-white/70 sm:text-base">
-                        Excellence in Competition &bull; Unity Through Sport &bull; Champions
-                        in Making
+                        Excellence in Competition • Unity Through Sport • Champions in Making
                     </p>
 
                     <div className="m-8 flex flex-col gap-4 sm:flex-row sm:gap-6">
@@ -39,11 +73,13 @@ export default function Home() {
                             </button>
                         </Link>
                     </div>
+
+                    {/* Stats */}
                     <div className="m-10 grid grid-cols-2 gap-4 md:grid-cols-4">
-                        <StatCard Icon={University} Stat={23} Name="NITs Competing" />
-                        <StatCard Icon={Dumbbell} Stat={8} Name="Sports Events" />
-                        <StatCard Icon={ClipboardList} Stat={156} Name="Total Matches" />
-                        <StatCard Icon={Medal} Stat={89} Name="Medals Awarded" />
+                        <StatCard Icon={University} Stat={stats.totalNITs} Name="NITs Competing" />
+                        <StatCard Icon={Dumbbell} Stat={stats.totalEvents} Name="Sports Events" />
+                        <StatCard Icon={ClipboardList} Stat={stats.totalMatches} Name="Total Matches" />
+                        <StatCard Icon={Medal} Stat={stats.totalMedals} Name="Medals Awarded" />
                     </div>
                 </div>
             </section>
@@ -51,102 +87,113 @@ export default function Home() {
             {/* Main Section */}
             <main className="mt-4 p-4 lg:p-10">
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    {/* First-Col */}
+
+                    {/* First Column */}
                     <div className="lg:col-span-2">
-                        {/* Live Match */}
+
+                        {/* Live Matches */}
                         <div className="rounded-2xl border border-white/30 bg-white/30 px-4 py-6 text-center text-white shadow-lg backdrop-blur-lg sm:px-6 md:px-10">
                             <div className="flex items-center justify-between">
                                 <h2 className="flex items-center gap-3 text-xl font-bold md:text-3xl">
-                                    <div className="h-3 w-3 animate-pulse rounded-full bg-red-400"></div>
-                                    Live Matches
+                                    <ClipboardList />
+                                    Matches
                                 </h2>
-                                <Link to="/public/matches">
-                                    <LinkBtn>View All</LinkBtn>
-                                </Link>
+                                <Link to="/public/matches"><LinkBtn>View All</LinkBtn></Link>
                             </div>
-                            <LiveCard game_name="Basketball" T1="NIT Calicut" T2="NIT Calicut" S1={40} S2={50} X="Q3" />
-                            <LiveCard game_name="Basketball" T1="NIT Calicut" T2="NIT Calicut" S1={40} S2={50} X="Q3" />
+
+                            {live?.length > 0 ? (
+                                live.map((m, i) => {
+                                    console.log(m);
+                                    return <LiveCard
+                                        key={i}
+                                        game_name={m.sport}
+                                        T1={m.teamA_id?.name}
+                                        T2={m.teamB_id?.name}
+                                        S1={m.scoreA}
+                                        S2={m.scoreB}
+                                        X={m.status}
+                                    />
+                                })
+                            ) : (
+                                <p className="mt-4 text-sm text-white/80">No Live Matches</p>
+                            )}
                         </div>
 
-                        {/* Top-Performer */}
+                        {/* Top Performers */}
                         <div className="mt-10 rounded-2xl border border-white/30 bg-white/35 px-4 py-6 text-center text-white shadow-lg backdrop-blur-lg sm:px-6 md:px-10">
                             <div className="mt-4 flex items-center justify-between">
                                 <h2 className="text-left flex items-center gap-3 text-xl font-bold md:text-3xl">
                                     <Trophy className="text-amber-500" size={30} />
                                     Top Performers
                                 </h2>
-                                <Link to="/public/leaderboard">
-                                    <LinkBtn>Full Rankings</LinkBtn>
-                                </Link>
+                                <Link to="/public/leaderboard"><LinkBtn>Full Rankings</LinkBtn></Link>
                             </div>
+
                             <div className="mt-4 grid grid-cols-1 gap-6 sm:grid-cols-3">
-                                <PerformerCard rank={1} points={120} medals={16} name="NIT Calicut" />
-                                <PerformerCard rank={2} points={120} medals={16} name="NIT Calicut" />
-                                <PerformerCard rank={3} points={120} medals={16} name="NIT Calicut" />
+                                {top?.length > 0 ? (
+                                    top.map((t, i) => (
+                                        <PerformerCard
+                                            key={i}
+                                            rank={i + 1}
+                                            points={t.points}
+                                            name={t.name}
+                                        />
+                                    ))
+                                ) : (
+                                    <p className="text-white text-sm mt-2">No Data</p>
+                                )}
                             </div>
                         </div>
                     </div>
 
-                    {/* Second-Col */}
+                    {/* Right Column */}
                     <div className="flex flex-col">
+
                         {/* Upcoming Events */}
                         <div className="mb-8 rounded-2xl border border-white/30 bg-white/35 px-4 py-6 text-center text-white shadow-lg backdrop-blur-lg sm:px-6">
                             <div className="flex items-center justify-between">
-                                <h2 className="text-xl font-bold md:text-3xl">
-                                    Upcoming Events
-                                </h2>
-                                <Link to="/public/events">
-                                    <LinkBtn>View All</LinkBtn>
-                                </Link>
+                                <h2 className="text-xl font-bold md:text-3xl">Upcoming Events</h2>
+                                <Link to="/public/events"><LinkBtn>View All</LinkBtn></Link>
                             </div>
+
                             <div className="mt-2 flex flex-col">
-                                <UpcomingCard game="Cricket" date="20-02-17" teams="17 teams" />
-                                <UpcomingCard game="Cricket" date="20-02-17" teams="17 teams" />
-                                <UpcomingCard game="Cricket" date="20-02-17" teams="17 teams" />
+                                {events?.length > 0 ? (
+                                    events.map((e, i) => (
+                                        <UpcomingCard
+                                            key={i}
+                                            game={e.sport}
+                                            date={new Date(e.date).toLocaleDateString()}
+                                            teams={`${e.teams?.length || 0} teams`}
+                                        />
+                                    ))
+                                ) : (
+                                    <div className="flex items-center justify-center min-h-40">
+                                        <p className="text-white text-lg">No upcoming events</p></div>
+                                )}
                             </div>
                         </div>
 
                         {/* Announcements */}
                         <div className="mb-10 space-y-6 rounded-2xl border border-white/30 bg-white/35 px-4 py-6 text-left text-white shadow-lg backdrop-blur-lg sm:px-6">
                             <div className="flex items-center justify-between">
-                                <h2 className="text-xl font-bold md:text-2xl">
-                                    Latest Announcements
-                                </h2>
-                                <Link to="/public/notifications">
-                                    <LinkBtn>View All</LinkBtn>
-                                </Link>
+                                <h2 className="text-xl font-bold md:text-2xl">Latest Announcements</h2>
+                                <Link to="/public/notifications"><LinkBtn>View All</LinkBtn></Link>
                             </div>
+
                             <div className="flex flex-col space-y-4">
-                                <div className="space-y-1 rounded-xl bg-white/70 p-4 text-black">
-                                    <p className="font-semibold">
-                                        Basketball Semi-finals Today
-                                    </p>
-                                    <p className="text-sm">
-                                        Catch the exciting semi-final matches at the Main Sports
-                                        Complex.
-                                    </p>
-                                    <p className="text-sm">2 hours ago</p>
-                                </div>
-                                <div className="space-y-1 rounded-xl bg-white/70 p-4 text-black">
-                                    <p className="font-semibold">
-                                        Basketball Semi-finals Today
-                                    </p>
-                                    <p className="text-sm">
-                                        Catch the exciting semi-final matches at the Main Sports
-                                        Complex.
-                                    </p>
-                                    <p className="text-sm">2 hours ago</p>
-                                </div>
-                                <div className="space-y-1 rounded-xl bg-white/70 p-4 text-black">
-                                    <p className="font-semibold">
-                                        Basketball Semi-finals Today
-                                    </p>
-                                    <p className="text-sm">
-                                        Catch the exciting semi-final matches at the Main Sports
-                                        Complex.
-                                    </p>
-                                    <p className="text-sm">2 hours ago</p>
-                                </div>
+                                {notes?.length > 0 ? (
+                                    notes.map((n, i) => (
+                                        <div key={i} className="space-y-1 rounded-xl bg-white/70 p-4 text-black">
+                                            <p className="font-semibold">{n.title}</p>
+                                            <p className="text-sm">{n.message}</p>
+                                            <p className="text-sm">{new Date(n.createdAt).toLocaleString()}</p>
+                                        </div>
+                                    ))
+                                ) : (
+                                    <div className="flex items-center justify-center min-h-40">
+                                    <p className="text-white text-lg">No announcements yet</p>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </div>
@@ -154,7 +201,7 @@ export default function Home() {
             </main>
 
             {/* Footer */}
-            <footer className="relative border-t border-primary/20 text-white mt:min-h-screen">
+            <footer className="relative border-t border-primary/20 text-white">
                 <div className="container mx-auto px-6 py-8">
                     <div className="mb-4 flex items-center justify-center gap-2">
                         <Trophy className="h-6 w-6 text-primary" />
