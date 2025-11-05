@@ -82,7 +82,7 @@ function PerformerCard({ rank, name, points, medals }) {
             <div className={styles.iconColor}>{styles.icon}</div>
             <h3 className="text-base font-semibold text-slate-800 sm:text-lg">{name}</h3>
             <p className="text-2xl font-bold text-blue-600 sm:text-3xl">{points} pts</p>
-            <p className="text-sm text-slate-500 font-semibold">{medals} medals</p>
+            {/* <p className="text-sm text-slate-500 font-semibold">{medals} medals</p> */}
         </div>
     );
 }

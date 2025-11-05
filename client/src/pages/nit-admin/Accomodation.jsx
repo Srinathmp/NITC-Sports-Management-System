@@ -1,149 +1,379 @@
-import React, { useState } from 'react';
-import { Search, Star, Users, MapPin, Clock, Mail } from 'lucide-react';
-
-const TypeTag = ({ type }) => {
-    let colors = '';
-    switch (type.toLowerCase()) {
-        case 'hostel':
-            colors = 'bg-blue-100 text-blue-700';
-            break;
-        case 'guesthouse':
-            colors = 'bg-green-100 text-green-700';
-            break;
-        case 'dormitory':
-            colors = 'bg-orange-100 text-orange-700';
-            break;
-        default:
-            colors = 'bg-gray-100 text-gray-700';
-    }
-    return (
-        <span className={`inline-block px-2.5 py-0.5 rounded-full text-xs font-medium ${colors}`}>
-            {type}
-        </span>
-    );
-};
-
-const AccommodationCard = ({ data }) => {
-    const { id, title, type, rating, price, description, availability, distance, checkIn, checkOut, amenities, email, occupancy, } = data;
-
-    return (
-        <div className="bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow">
-            <div className="p-6">
-                <div className="flex justify-between items-start">
-                    <div>
-                        <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
-                        <div className="flex items-center gap-2 mt-1.5">
-                            <TypeTag type={type} />
-                            <div className="flex items-center gap-1">
-                                <Star className="h-4 w-4 text-yellow-400 fill-yellow-400" />
-                                <span className="text-sm text-gray-600 font-medium">{rating}</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="text-right flex-shrink-0">
-                        <p className="text-xl font-bold text-blue-600">{price}</p>
-                        <p className="text-sm text-gray-500">per night</p>
-                    </div>
-                </div>
-                
-                <p className="text-sm text-gray-600 mt-4">{description}</p>
-    
-                <div className="space-y-3 mt-4">
-                    <div className="flex items-center gap-2">
-                        <Users className="h-4 w-4 text-gray-500" />
-                        <span className="text-sm text-gray-700">{availability}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                        <MapPin className="h-4 w-4 text-gray-500" />
-                        <span className="text-sm text-gray-700">{distance}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                        <Clock className="h-4 w-4 text-gray-500" />
-                        <span className="text-sm text-gray-700">Check-in: {checkIn} | Check-out: {checkOut}</span>
-                    </div>
-                </div>
-
-                <div className="mt-4">
-                    <h4 className="text-sm font-medium text-gray-700">Amenities:</h4>
-                    <div className="flex flex-wrap gap-2 mt-2">
-                        {amenities.map(amenity => (
-                            <span key={amenity} className="text-xs bg-gray-100 text-gray-800 px-3 py-1 rounded-full">
-                                {amenity}
-                            </span>
-                        ))}
-                    </div>
-                </div>
-
-                <div className="flex items-center gap-2 mt-4">
-                    <Mail className="h-4 w-4 text-gray-500" />
-                    <span className="text-sm text-blue-600 hover:underline cursor-pointer">{email}</span>
-                </div>
-
-                <div className="mt-6">
-                    <div className="flex justify-between text-xs text-gray-500 mb-1">
-                        <span>{occupancy}% occupied</span>
-                    </div>
-                    <div className="w-full bg-gray-200 rounded-full h-2">
-                        <div className="bg-blue-600 h-2 rounded-full" style={{ width: `${occupancy}%` }}></div>
-                    </div>
-                </div>
-
-                <button className="w-full bg-blue-600 text-white py-2.5 rounded-lg font-medium hover:bg-blue-700 transition-colors mt-6 cursor-pointer">
-                    Book Now
-                </button>
-            </div>
-        </div>
-    );
-};
+import React, { useState, useEffect } from "react";
+import { Plus, Edit } from "lucide-react";
+import api from "../../api/axios";
 
 function Accommodation() {
-    const [activeTab, setActiveTab] = useState('accommodation');
+  const [accommodations, setAccommodations] = useState([]);
+  const [messes, setMesses] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [showMessModal, setShowMessModal] = useState(false);
+  const [editItem, setEditItem] = useState(null);
+  const [form, setForm] = useState({
+    hostel_name: "",
+    room_number: "",
+    capacity: "",
+    occupied: "",
+    check_in_date: "",
+    check_out_date: "",
+    remarks: "",
+  });
+  const [messForm, setMessForm] = useState({
+    mess_name: "",
+    capacity_per_meal: "",
+    location: "",
+    remarks: "",
+  });
 
-    const accommodationData = [
-        { id: 1, title: 'Main Campus Hostel', type: 'Hostel', rating: 4.5, price: '₹500/night', description: 'Well-maintained hostel with modern amenities, located within the campus premises.', availability: '45 of 120 rooms available', distance: '0.5 km from Main Ground', checkIn: '14:00', checkOut: '11:00', amenities: ['WiFi', 'AC', 'Mess', 'Laundry', 'Sports Room'], email: 'hostel@nitrichy.ac.in', occupancy: 63, },
-        { id: 2, title: 'Guest House Block A', type: 'Guesthouse', rating: 4.8, price: '₹800/night', description: 'Premium guest house with excellent facilities for comfortable stay.', availability: '23 of 80 rooms available', distance: '1.2 km from Main Ground', checkIn: '15:00', checkOut: '12:00', amenities: ['WiFi', 'AC', 'Restaurant', 'Room Service', 'Parking'], email: 'guesthouse@nitrichy.ac.in', occupancy: 71, },
-        { id: 3, title: 'Sports Complex Dormitory', type: 'Dormitory', rating: 4.2, price: '₹300/night', description: 'Budget-friendly accommodation right next to the sports complex.', availability: '89 of 200 rooms available', distance: '0.2 km from Main Ground', checkIn: '13:00', checkOut: '10:00', amenities: ['WiFi', 'Fan', 'Shared Bath', 'Mess', 'Gym Access'], email: 'sports@nitrichy.ac.in', occupancy: 56, },
-    ];
+  // Fetch accommodation and mess data
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      const [accRes, messRes] = await Promise.all([
+        api.get("/accommodation"),
+        api.get("/mess"),
+      ]);
+      setAccommodations(accRes.data || []);
+      setMesses(messRes.data || []);
+    } catch (err) {
+      console.error("Error fetching data:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    return (
-        <div className="min-h-screen bg-gray-100 p-4 md:p-8">
-            <h1 className="text-3xl font-bold text-gray-900">Accommodation & Mess Information</h1>
-            <p className="text-gray-600 mt-1">Complete details about accommodation options and dining facilities at NIT Trichy</p>
+  useEffect(() => {
+    fetchData();
+  }, []);
 
-            <div className="relative my-6">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                    <Search className="h-5 w-5 text-gray-400" />
+  // Handle Save for Accommodation
+  const handleSaveAccommodation = async () => {
+    try {
+      if (editItem) {
+        await api.put(`/accommodation/${editItem._id}`, form);
+      } else {
+        await api.post("/accommodation", form);
+      }
+      setShowModal(false);
+      setEditItem(null);
+      fetchData();
+    } catch (err) {
+      console.error("Error saving accommodation:", err);
+      console.log("Error saving accommodation:", err);
+      alert("Failed to save accommodation details.");
+    }
+  };
+
+  // Handle Save for Mess
+  const handleSaveMess = async () => {
+    try {
+      if (editItem) {
+        await api.put(`/mess/${editItem._id}`, messForm);
+      } else {
+        if (!messForm.mess_name || !messForm.capacity_per_meal || !messForm.location) {
+            alert("Please fill all required fields before saving.");
+            return;
+        }
+        await api.post("/mess", messForm);
+      }
+      setShowMessModal(false);
+      setEditItem(null);
+      fetchData();
+    } catch (err) {
+      console.error("Error saving mess details:", err);
+      alert("Failed to save mess details.");
+    }
+  };
+
+  const openAddAccommodation = () => {
+    setForm({
+      hostel_name: "",
+      room_number: "",
+      capacity: "",
+      occupied: "",
+      check_in_date: "",
+      check_out_date: "",
+      remarks: "",
+    });
+    setEditItem(null);
+    setShowModal(true);
+  };
+
+  const openEditAccommodation = (item) => {
+    setEditItem(item);
+    setForm({
+      hostel_name: item.hostel_name,
+      room_number: item.room_number,
+      capacity: item.capacity,
+      occupied: item.occupied,
+      check_in_date: item.check_in_date?.split("T")[0] || "",
+      check_out_date: item.check_out_date?.split("T")[0] || "",
+      remarks: item.remarks,
+    });
+    setShowModal(true);
+  };
+
+  const openAddMess = () => {
+    setMessForm({
+      mess_name: "",
+      capacity_per_meal: "",
+      location: "",
+      remarks: "",
+    });
+    setEditItem(null);
+    setShowMessModal(true);
+  };
+
+  const openEditMess = (item) => {
+    setEditItem(item);
+    setMessForm({
+      mess_name: item.mess_name,
+      capacity_per_meal: item.capacity_per_meal,
+      location: item.location,
+      remarks: item.remarks,
+    });
+    setShowMessModal(true);
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-100 p-6 md:p-8">
+      <h1 className="text-3xl font-bold text-gray-900 mb-8">
+        Accommodation & Mess Management
+      </h1>
+
+      {/* Action Buttons */}
+      <div className="flex flex-wrap gap-4 mb-8">
+        <button
+          onClick={openAddAccommodation}
+          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors"
+        >
+          <Plus className="h-5 w-5" /> Add Accommodation
+        </button>
+
+        <button
+          onClick={openAddMess}
+          className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition-colors"
+        >
+          <Plus className="h-5 w-5" /> Add Mess
+        </button>
+      </div>
+
+      {loading ? (
+        <p>Loading details...</p>
+      ) : (
+        <>
+          {/* Accommodation Section */}
+          <h2 className="text-2xl font-semibold mb-4 text-gray-800">
+            🏠 Accommodation
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
+            {accommodations.map((item) => (
+              <div
+                key={item._id}
+                className="bg-white border border-gray-200 rounded-xl shadow-sm p-5 hover:shadow-md transition-all"
+              >
+                <div className="flex justify-between items-center mb-3">
+                  <h3 className="text-lg font-semibold text-gray-900">
+                    {item.hostel_name}
+                  </h3>
+                  <button
+                    onClick={() => openEditAccommodation(item)}
+                    className="p-2 rounded-md hover:bg-gray-100"
+                  >
+                    <Edit className="h-4 w-4 text-gray-500" />
+                  </button>
                 </div>
-                <input type="text" placeholder="Search accommodation options..." className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
-            </div>
-
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-                <nav className="flex space-x-2 p-1.5">
-                    <button onClick={() => setActiveTab('accommodation')} className={`w-1/2 py-2.5 rounded-md text-sm font-medium ${activeTab === 'accommodation'? 'bg-white shadow text-blue-600': 'text-gray-600 hover:bg-gray-100'}`} >
-                        Accommodation
-                    </button>
-                    <button onClick={() => setActiveTab('mess')} className={`w-1/2 py-2.5 rounded-md text-sm font-medium ${activeTab === 'mess' ? 'bg-white shadow text-blue-600' : 'text-gray-600 hover:bg-gray-100' }`} >
-                        Mess & Dining
-                    </button>
-                </nav>
-            </div>
-
-            <div className="pt-6">
-                {activeTab === 'accommodation' && (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {accommodationData.map(item => (
-                            <AccommodationCard key={item.id} data={item} />
-                        ))}
-                    </div>
+                <p className="text-sm text-gray-600">
+                  Room No: {item.room_number}
+                </p>
+                <p className="text-sm text-gray-600">
+                  Capacity: {item.capacity} | Occupied: {item.occupied}
+                </p>
+                <p className="text-sm text-gray-600">
+                  Check-in:{" "}
+                  {item.check_in_date
+                    ? new Date(item.check_in_date).toLocaleDateString()
+                    : "N/A"}
+                </p>
+                <p className="text-sm text-gray-600">
+                  Check-out:{" "}
+                  {item.check_out_date
+                    ? new Date(item.check_out_date).toLocaleDateString()
+                    : "N/A"}
+                </p>
+                {item.remarks && (
+                  <p className="text-sm text-gray-600 mt-2">
+                    <strong>Amenities:</strong> {item.remarks}
+                  </p>
                 )}
-                {activeTab === 'mess' && (
-                    <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6 text-center">
-                        <p className="text-gray-600">Mess & Dining content goes here.</p>
-                    </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Mess Section */}
+          <h2 className="text-2xl font-semibold mb-4 text-gray-800">
+            🍽️ Mess Details
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {messes.map((item) => (
+              <div
+                key={item._id}
+                className="bg-white border border-gray-200 rounded-xl shadow-sm p-5 hover:shadow-md transition-all"
+              >
+                <div className="flex justify-between items-center mb-3">
+                  <h3 className="text-lg font-semibold text-gray-900">
+                    {item.mess_name}
+                  </h3>
+                  <button
+                    onClick={() => openEditMess(item)}
+                    className="p-2 rounded-md hover:bg-gray-100"
+                  >
+                    <Edit className="h-4 w-4 text-gray-500" />
+                  </button>
+                </div>
+                <p className="text-sm text-gray-600">
+                  Capacity: {item.capacity_per_meal} per meal
+                </p>
+                <p className="text-sm text-gray-600">
+                  Location: {item.location}
+                </p>
+                {item.remarks && (
+                  <p className="text-sm text-gray-600 mt-2">
+                    <strong>Remarks:</strong> {item.remarks}
+                  </p>
                 )}
-            </div>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+
+      {/* Accommodation Modal */}
+      {showModal && (
+        <Modal
+          title={editItem ? "Edit Accommodation" : "Add Accommodation"}
+          onClose={() => setShowModal(false)}
+          onSave={handleSaveAccommodation}
+        >
+          <FormInput
+            label="Hostel Name"
+            value={form.hostel_name}
+            onChange={(v) => setForm({ ...form, hostel_name: v })}
+          />
+          <FormInput
+            label="Room Number"
+            value={form.room_number}
+            onChange={(v) => setForm({ ...form, room_number: v })}
+          />
+          <FormInput
+            label="Capacity"
+            type="number"
+            value={form.capacity}
+            onChange={(v) => setForm({ ...form, capacity: v })}
+          />
+          <FormInput
+            label="Occupied"
+            type="number"
+            value={form.occupied}
+            onChange={(v) => setForm({ ...form, occupied: v })}
+          />
+          <FormInput
+            label="Check-in Date"
+            type="date"
+            value={form.check_in_date}
+            onChange={(v) => setForm({ ...form, check_in_date: v })}
+          />
+          <FormInput
+            label="Check-out Date"
+            type="date"
+            value={form.check_out_date}
+            onChange={(v) => setForm({ ...form, check_out_date: v })}
+          />
+          <FormInput
+            label="Amenities"
+            value={form.remarks}
+            onChange={(v) => setForm({ ...form, remarks: v })}
+          />
+        </Modal>
+      )}
+
+      {/* Mess Modal */}
+      {showMessModal && (
+        <Modal
+          title={editItem ? "Edit Mess" : "Add Mess"}
+          onClose={() => setShowMessModal(false)}
+          onSave={handleSaveMess}
+        >
+          <FormInput
+            label="Mess Name"
+            value={messForm.mess_name}
+            onChange={(v) => setMessForm({ ...messForm, mess_name: v })}
+          />
+          <FormInput
+            label="Capacity per Meal"
+            type="number"
+            value={messForm.capacity_per_meal}
+            onChange={(v) =>
+              setMessForm({ ...messForm, capacity_per_meal: v })
+            }
+          />
+          <FormInput
+            label="Location"
+            value={messForm.location}
+            onChange={(v) => setMessForm({ ...messForm, location: v })}
+          />
+          <FormInput
+            label="Remarks"
+            value={messForm.remarks}
+            onChange={(v) => setMessForm({ ...messForm, remarks: v })}
+          />
+        </Modal>
+      )}
+    </div>
+  );
+}
+
+/* Reusable Form Input */
+function FormInput({ label, type = "text", value, onChange }) {
+  return (
+    <div className="mb-3">
+      <label className="block text-sm font-medium text-gray-700 mb-1">
+        {label}
+      </label>
+      <input
+        type={type}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+      />
+    </div>
+  );
+}
+
+/* Reusable Modal Component */
+function Modal({ title, children, onClose, onSave }) {
+  return (
+    <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50">
+      <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-lg">
+        <h2 className="text-xl font-semibold mb-4">{title}</h2>
+        {children}
+        <div className="flex justify-end gap-3 mt-4">
+          <button
+            onClick={onClose}
+            className="px-4 py-2 bg-gray-300 rounded-lg hover:bg-gray-400"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={onSave}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+          >
+            Save Details
+          </button>
         </div>
-    );
+      </div>
+    </div>
+  );
 }
 
 export default Accommodation;
