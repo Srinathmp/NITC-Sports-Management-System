@@ -34,7 +34,7 @@ function SidebarNav({ isOpen }) {
 }
 
 function NitAdmin() {
-    const { name, user, email } = useAuth();
+    const { name, user, email, logout } = useAuth();
     const path = useLocation();
     const navigate = useNavigate();
     const [isOpen, setIsOpen] = useState(false);
@@ -45,8 +45,7 @@ function NitAdmin() {
 
     const handleLogout = async (e) => {
         e.preventDefault();
-        localStorage.removeItem('token');
-        localStorage.removeItem('role');
+        logout();
         navigate('/');
     }
 
