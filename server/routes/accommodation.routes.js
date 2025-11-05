@@ -1,10 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const {
-  getAllAccommodations,
-  addAccommodation,
-  updateAccommodation,
-} = require("../controllers/accommodation.controller");
+const { getAllAccommodations, addAccommodation, updateAccommodation, } = require("../controllers/accommodation.controller");
 
 router.get("/", getAllAccommodations);
 router.post("/", addAccommodation);

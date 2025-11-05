@@ -7,6 +7,7 @@ const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
     const [user, setUser] = useState(localStorage.getItem('user'));
+    const [name, setName] = useState(localStorage.getItem('name'));
     const [isLoading, setIsLoading] = useState(true);
     const [token, setToken] = useState(localStorage.getItem('token'));
     const navigate = useNavigate();
@@ -16,6 +17,7 @@ export function AuthProvider({ children }) {
             try {
                 const response = await api.get('/users/me');
                 setUser(response.data.role)
+                setUser(response.data.name)
             } catch (error) {
                 alert("Auth Error: Invalid token. Redirecting....");
                 logout();
@@ -28,9 +30,10 @@ export function AuthProvider({ children }) {
         validateToken();
     }, [])
 
-    const login = (userToken, userData) => {
+    const login = (userToken, userData, userName) => {
         localStorage.setItem('token', userToken);
         localStorage.setItem('user', userData);
+        localStorage.setItem('name', userName);
         api.defaults.headers.common['Authorization'] = `Bearer ${userToken}`;
         setToken(userToken);
         setUser(userData);
@@ -45,7 +48,7 @@ export function AuthProvider({ children }) {
         navigate('/');
     };
 
-    const value = { user, token, isLoading, login, logout, isAuthenticated: !!user, validateToken };
+    const value = { name, user, token, isLoading, login, logout, isAuthenticated: !!user, validateToken };
 
     return (
         <AuthContext.Provider value={value}>

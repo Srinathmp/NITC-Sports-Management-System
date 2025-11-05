@@ -33,10 +33,10 @@ function SidebarNav({ isOpen }) {
 }
 
 function NitAdmin() {
+    const path=useLocation();
     const navigate = useNavigate();
     const [isOpen, setIsOpen] = useState(false);
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-
     const toggleDropdown = () => {
         setIsDropdownOpen(!isDropdownOpen);
     };
