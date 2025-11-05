@@ -7,18 +7,19 @@ const NIT  = require('../models/nit.model');
 const createTeam = asyncHandler(async (req, res) => {
   const { name, sport, nit_code, players } = req.body;
 
-  const exists = await Team.findOne({ name, sport, nit_code });
-  const nit = await NIT.find({ code: nit_code });
-  if (!nit || nit.length === 0) { res.status(404); throw new Error('NIT not found'); }
-  const nit_id = nit[0]._id;
+  // find NIT first
+  const nit = await NIT.findOne({ code: nit_code });
+  if (!nit) { res.status(404); throw new Error('NIT not found'); }
 
+  // ensure uniqueness within the same NIT & sport
+  const exists = await Team.findOne({ name, sport, nit_id: nit._id });
   if (exists) {
     res.status(400);
     throw new Error('Team already registered for this sport in the NIT');
   }
 
   const team = await Team.create({
-    name, sport, nit_id, players, coach_id: req.user._id
+    name, sport, nit_id: nit._id, players, coach_id: req.user._id
   });
 
   res.status(201).json(team);
@@ -26,11 +27,10 @@ const createTeam = asyncHandler(async (req, res) => {
 
 const getTeamsByNIT = asyncHandler(async (req, res) => {
   const { code } = req.params;
-  const nit = await NIT.find({ code });
-  if (!nit || nit.length === 0) { res.status(404); throw new Error('NIT not found'); }
-  const nit_id = nit[0]._id;
+  const nit = await NIT.findOne({ code });
+  if (!nit) { res.status(404); throw new Error('NIT not found'); }
 
-  const teams = await Team.find({ nit_id }).populate('coach_id', 'name');
+  const teams = await Team.find({ nit_id: nit._id }).populate('coach_id', 'name');
   res.json(teams);
 });
 
@@ -60,7 +60,6 @@ const getMyTeamBySport = asyncHandler(async (req, res) => {
   const team = await Team.findOne({ coach_id: coachId, sport }).lean();
   if (!team) return res.status(404).json({ message: 'Team not found for this sport' });
 
-  // playerSchema has _id:false, so use jerseyNo as stable row key for UI
   const players = (team.players || []).map(p => ({
     id: p.jerseyNo ?? null,
     name: p.name,
@@ -145,7 +144,6 @@ const updatePlayerInMyTeamBySport = asyncHandler(async (req, res) => {
   const idx = (team.players || []).findIndex(p => Number(p.jerseyNo) === oldJerseyNo);
   if (idx === -1) return res.status(404).json({ message: 'Player not found' });
 
-  // if jerseyNo changes, check duplicate
   if (player.jerseyNo != null) {
     const n = Number(player.jerseyNo);
     if (!Number.isFinite(n) || n <= 0) return res.status(400).json({ message: 'jerseyNo must be a positive number' });
@@ -197,12 +195,82 @@ const deletePlayerInMyTeamBySport = asyncHandler(async (req, res) => {
   return res.json({ ok: true, totalPlayers: team.players.length });
 });
 
+
+// -------------------------------------------------------------------
+// NEW: Public listing + Coach’s own teams (for Teams page & modal edit)
+// -------------------------------------------------------------------
+
+/**
+ * GET /api/v1/teams/public?search=&sport=
+ * Public list; if req.user exists (optional auth), marks isMyTeam.
+ */
+const listTeamsPublic = asyncHandler(async (req, res) => {
+  const { search = '', sport } = req.query;
+  const q = {};
+  if (sport && sport !== 'All Sports') q.sport = sport;
+
+  const teams = await Team.find(q)
+    .populate({ path: 'nit_id', select: 'name' })
+    .populate({ path: 'coach_id', select: 'name role' })
+    .lean();
+
+  const filtered = (search
+    ? teams.filter(t => {
+        const rx = new RegExp(search.trim(), 'i');
+        const coachName = t.coach_id?.name || '';
+        const nitName   = t.nit_id?.name || '';
+        return rx.test(t.name) || rx.test(coachName) || rx.test(nitName);
+      })
+    : teams
+  );
+
+  const me = req.user?._id?.toString();
+  const out = filtered.map(t => ({
+    id: t._id,
+    teamName: t.name,
+    nitName: t.nit_id?.name || 'NIT',
+    sport: t.sport,
+    coachName: t.coach_id?.name || '—',
+    playersCount: Array.isArray(t.players) ? t.players.length : 0,
+    isMyTeam: me ? (t.coach_id?._id?.toString() === me) : false,
+  }));
+
+  res.json({ items: out, total: out.length });
+});
+
+/**
+ * GET /api/v1/teams/mine
+ * All teams for the logged-in Coach.
+ */
+const listMyTeams = asyncHandler(async (req, res) => {
+  const coachId = req.user?._id;
+  if (!coachId) return res.status(401).json({ message: 'Unauthorized' });
+
+  const teams = await Team.find({ coach_id: coachId })
+    .populate({ path: 'nit_id', select: 'name' })
+    .lean();
+
+  const out = teams.map(t => ({
+    id: t._id,
+    teamName: t.name,
+    nitName: t.nit_id?.name || 'NIT',
+    sport: t.sport,
+    coachName: req.user?.name || 'You',
+    playersCount: Array.isArray(t.players) ? t.players.length : 0,
+    isMyTeam: true,
+  }));
+
+  res.json({ items: out, total: out.length });
+});
+
 module.exports = {
   createTeam,
   getTeamsByNIT,
   getAllNIT,
   getMyTeamBySport,
   addPlayerToMyTeamBySport,
-  updatePlayerInMyTeamBySport,   // ✅ NEW
-  deletePlayerInMyTeamBySport    // ✅ NEW
+  updatePlayerInMyTeamBySport,
+  deletePlayerInMyTeamBySport,
+  listTeamsPublic,   // ✅ NEW
+  listMyTeams        // ✅ NEW
 };
