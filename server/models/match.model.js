@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { boolean } = require('webidl-conversions');
 const { Schema } = mongoose;
 
 const matchSchema = new Schema({
@@ -35,6 +36,10 @@ const matchSchema = new Schema({
     matchDateTime: {
         type: Date,
         required: true
+    },
+    pendingPublishing:{
+        type: Boolean,
+        default: false
     }
 }, {
     timestamps: true
