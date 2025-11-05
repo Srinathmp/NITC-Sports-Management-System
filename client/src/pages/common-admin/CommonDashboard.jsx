@@ -3,14 +3,14 @@ import { Users, Award, Calendar, FileText, Check, X, ClipboardCheck } from 'luci
 import api from '../../api/axios';
 import { format } from 'date-fns';
 
-const StatCard = ({ title, value, subtitle, Icon }) => (
+// Reusable Stat Card
+const StatCard = ({ title, value, Icon }) => (
   <div className="bg-white p-6 rounded-lg shadow-md">
     <div className="flex justify-between items-center mb-2">
       <h3 className="text-sm font-medium text-gray-500">{title}</h3>
       <Icon className="h-5 w-5 text-gray-400" />
     </div>
     <p className="text-3xl font-semibold text-gray-900">{value}</p>
-    <p className="text-xs text-gray-500">{subtitle}</p>
   </div>
 );
 

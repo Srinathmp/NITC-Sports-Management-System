@@ -16,28 +16,28 @@ function StatCard({ title, stat, subtitle, Item }) {
     );
 };
 
-function MatchCard({ status, team1Name, team1Score, team2Name, team2Score, stage, sport, date, time, venue }) {
+function MatchCard({ team1Name, team1Score, team2Name, team2Score, stage, sport, date, time, venue }) {
     let badgeClasses = '';
-    switch (status.toLowerCase()) {
-        case 'live':
-            badgeClasses = 'bg-red-100 text-red-800';
-            break;
-        case 'starting soon':
-            badgeClasses = 'bg-orange-100 text-orange-800';
-            break;
-        case 'completed':
-            badgeClasses = 'bg-blue-100 text-blue-800';
-            break;
-        default:
-            badgeClasses = 'bg-gray-100 text-gray-800';
-    }
+    // switch (status.toLowerCase()) {
+    //     case 'live':
+    //         badgeClasses = 'bg-red-100 text-red-800';
+    //         break;
+    //     case 'starting soon':
+    //         badgeClasses = 'bg-orange-100 text-orange-800';
+    //         break;
+    //     case 'completed':
+    //         badgeClasses = 'bg-blue-100 text-blue-800';
+    //         break;
+    //     default:
+    //         badgeClasses = 'bg-gray-100 text-gray-800';
+    // }
 
     const scoreDisplay = team1Score && team2Score ? `${team1Score} - ${team2Score}` : 'vs';
 
     return (
         <div className="relative rounded-xl border border-[#b8b8b8ab] bg-white p-4 shadow-sm transition hover:shadow-md">
             <div className="top-4 left-4 font-medium flex justify-between">
-                <div className={`rounded-full px-2.5 py-0.5 text-xs items-center flex ${badgeClasses}`}>
+                {/* <div className={`rounded-full px-2.5 py-0.5 text-xs items-center flex ${badgeClasses}`}>
                     {status.toLowerCase() === 'live' && (
                         <span className="relative mr-1.5 flex h-2 w-2">
                             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
@@ -45,7 +45,7 @@ function MatchCard({ status, team1Name, team1Score, team2Name, team2Score, stage
                         </span>
                     )}
                     {status}
-                </div>
+                </div> */}
                 <div className="hidden text-right text-sm rounded-xl bg-blue-200 px-2 py-0.5 font-medium text-gray-700 sm:block">{stage}</div>
             </div>
 
@@ -66,41 +66,41 @@ function MatchCard({ status, team1Name, team1Score, team2Name, team2Score, stage
     );
 };
 
-const LiveMatchCard = ({ stage, score1, score2, team1, team2, sport, venue }) => {
-    return (
-        <div className="w-full max-w-lg">
-            <h2 className="mb-2 flex items-center text-lg font-semibold text-red-600">
-                <span className="relative mr-2 flex h-3 w-3">
-                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75"></span>
-                    <span className="relative inline-flex h-3 w-3 rounded-full bg-red-500"></span>
-                </span>
-                Live Matches
-            </h2>
-            <div className="rounded-lg border border-red-200 bg-red-50 p-6 shadow-sm">
-                <div className="mb-4 flex items-start justify-between">
-                    <span className="inline-flex items-center rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-medium text-red-800">
-                        LIVE
-                    </span>
-                    <span className="text-sm font-medium text-red-700">{stage}</span>
-                </div>
-                <div className="text-center">
-                    <p className="text-3xl font-bold text-gray-900">{`${score1}-${score2}`}</p>
-                    <p className="mt-2 text-lg font-semibold text-gray-800">{team1}</p>
-                    <p className="my-1 text-lg text-gray-500">vs</p>
-                    <p className="text-lg font-semibold text-gray-800">{team2}</p>
-                </div>
-                <div className="mt-4 flex items-center justify-center gap-4 text-sm text-gray-500">
-                    <span className="flex items-center">
-                        <Trophy size={14} className="mr-1" /> {sport}
-                    </span>
-                    <span className="flex items-center">
-                        <MapPin size={14} className="mr-1" /> {venue}
-                    </span>
-                </div>
-            </div>
-        </div>
-    );
-};
+// const LiveMatchCard = ({ stage, score1, score2, team1, team2, sport, venue }) => {
+//     return (
+//         <div className="w-full max-w-lg">
+//             <h2 className="mb-2 flex items-center text-lg font-semibold text-red-600">
+//                 <span className="relative mr-2 flex h-3 w-3">
+//                     <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75"></span>
+//                     <span className="relative inline-flex h-3 w-3 rounded-full bg-red-500"></span>
+//                 </span>
+//                 Live Matches
+//             </h2>
+//             <div className="rounded-lg border border-red-200 bg-red-50 p-6 shadow-sm">
+//                 <div className="mb-4 flex items-start justify-between">
+//                     <span className="inline-flex items-center rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-medium text-red-800">
+//                         LIVE
+//                     </span>
+//                     <span className="text-sm font-medium text-red-700">{stage}</span>
+//                 </div>
+//                 <div className="text-center">
+//                     <p className="text-3xl font-bold text-gray-900">{`${score1}-${score2}`}</p>
+//                     <p className="mt-2 text-lg font-semibold text-gray-800">{team1}</p>
+//                     <p className="my-1 text-lg text-gray-500">vs</p>
+//                     <p className="text-lg font-semibold text-gray-800">{team2}</p>
+//                 </div>
+//                 <div className="mt-4 flex items-center justify-center gap-4 text-sm text-gray-500">
+//                     <span className="flex items-center">
+//                         <Trophy size={14} className="mr-1" /> {sport}
+//                     </span>
+//                     <span className="flex items-center">
+//                         <MapPin size={14} className="mr-1" /> {venue}
+//                     </span>
+//                 </div>
+//             </div>
+//         </div>
+//     );
+// };
 
 function Matches() {
     const [isOpen, setIsOpen] = useState(false);
@@ -157,7 +157,7 @@ function Matches() {
                         </div>
                     </div>
                 </div>
-                <div>
+                {/* <div>
                     <LiveMatchCard
                         stage="Semi-Final"
                         score1={45}
@@ -167,14 +167,14 @@ function Matches() {
                         sport="Basketball"
                         venue="Main Court"
                     />
-                </div>
+                </div> */}
                 <div className="w-full">
                     <h2 className="mb-4 text-2xl font-bold text-gray-800">All Matches</h2>
                     <div className="space-y-4">
                         {matchesData.map((match) => (
                             <MatchCard
                                 key={match.id}
-                                status={match.status}
+                                // status={match.status}
                                 team1Name={match.team1Name}
                                 team1Score={match.team1Score}
                                 team2Name={match.team2Name}

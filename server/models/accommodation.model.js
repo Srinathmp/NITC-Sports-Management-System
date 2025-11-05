@@ -3,11 +3,6 @@ const { Schema } = mongoose;
 
 const accommodationSchema = new Schema(
   {
-    nit_id: {
-      type: Schema.Types.ObjectId,
-      ref: "NIT",
-      required: true,
-    },
     hostel_name: {
       type: String,
       required: true,
@@ -29,7 +24,7 @@ const accommodationSchema = new Schema(
       min: 0,
     },
     team_id: {
-      type: Schema.Types.ObjectId,
+      type: [Schema.Types.ObjectId],
       ref: "Team",
       default: null, // null means unallocated
     },
