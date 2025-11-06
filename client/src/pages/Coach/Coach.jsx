@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, Outlet, NavLink, useLocation, useNavigate } from "react-router-dom";
-import { Bell, Trophy, Settings, LogOut, Calendar, ChartColumn, User, Users, LayoutList, Menu, X } from "lucide-react";
+import { Bell, Trophy, Settings, LogOut, Calendar, ChartColumn, User, Users, LayoutList, Menu, X, LocationEdit } from "lucide-react";
 import { useAuth } from "../../contexts/AuthContexts";
 
 function SidebarNav({ isOpen }) {
@@ -11,6 +11,8 @@ function SidebarNav({ isOpen }) {
         { title: 'Events', icon: Trophy, link: '/coach/events' },
         { title: 'Matches', icon: Calendar, link: '/coach/matches' },
         { title: 'Leaderboard', icon: ChartColumn, link: '/coach/leaderboard' },
+        { title: 'Accomodation', icon: LocationEdit, link: '/coach/accomodation' },
+
     ];
 
     const path = useLocation();

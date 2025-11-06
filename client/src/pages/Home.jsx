@@ -115,7 +115,9 @@ export default function Home() {
                                     />
                                 })
                             ) : (
-                                <p className="mt-4 text-sm text-white/80">No Live Matches</p>
+                                <div className="flex items-center justify-center min-h-40"> 
+                                    <p className="mt-4 text-lg text-white/80">No Live Matches</p>
+                                </div>
                             )}
                         </div>
 
@@ -129,7 +131,7 @@ export default function Home() {
                                 <Link to="/public/leaderboard"><LinkBtn>Full Rankings</LinkBtn></Link>
                             </div>
 
-                            <div className="mt-4 grid grid-cols-1 gap-6 sm:grid-cols-3">
+                            <div className={`mt-4 grid ${top?.length>0?'grid-cols-1 gap-6 sm:grid-cols-3':''}`}>
                                 {top?.length > 0 ? (
                                     top.map((t, i) => (
                                         <PerformerCard
@@ -140,7 +142,9 @@ export default function Home() {
                                         />
                                     ))
                                 ) : (
-                                    <p className="text-white text-sm mt-2">No Data</p>
+                                    <div className="flex items-center justify-center min-h-40">
+                                        <p className="text-white text-lg mt-4">No Data</p>
+                                    </div>
                                 )}
                             </div>
                         </div>
@@ -168,7 +172,8 @@ export default function Home() {
                                     ))
                                 ) : (
                                     <div className="flex items-center justify-center min-h-40">
-                                        <p className="text-white text-lg">No upcoming events</p></div>
+                                        <p className="text-white text-lg">No upcoming events</p>
+                                    </div>
                                 )}
                             </div>
                         </div>

@@ -173,8 +173,6 @@ export default function Teams() {
     } catch (e) {
       console.error(e);
       setTeams([]);
-    } finally {
-      setLoading(false);
     }
   };
 

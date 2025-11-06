@@ -3,6 +3,8 @@ import { Award, Crown, TrendingUp } from "lucide-react";
 import { useEffect, useState } from "react";
 import api from "../api/axios";
 import { PerformerCard } from "../components/Card";
+import { useAuth } from "../contexts/AuthContexts";
+import FullPageLoader from "../components/FullPageLoader";
 
 function StatCard({ title, stat, subtitle, Icon }) {
   return (
@@ -20,6 +22,7 @@ function StatCard({ title, stat, subtitle, Icon }) {
 }
 
 export default function Leaderboard() {
+  const [isLoading, setIsLoading] = useState(true)
   const [top, setTop] = useState([]);
   const [rows, setRows] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -35,9 +38,12 @@ export default function Leaderboard() {
     setTotalPage(data.totalPages || 1);
     setHighestScore(data.highestScore || 0);
     setCurrentPage(page);
+    setIsLoading(false)
   }
 
   useEffect(() => { load(1); }, []);
+
+  if (isLoading) { return <FullPageLoader /> }
 
   const handleNextPage = () => currentPage < totalPage && load(currentPage + 1);
   const handlePrevPage = () => currentPage > 1 && load(currentPage - 1);
