@@ -1,10 +1,23 @@
 const asyncHandler = require('express-async-handler');
 const Event = require('../models/event.model');
 const AuditLog = require('../models/auditLog.model');
+const User = require('../models/user.model');
+const NIT = require('../models/nit.model');
+
+/* ------------------ Existing Controllers ------------------ */
 
 const createEvent = asyncHandler(async (req, res) => {
   const { name, sport, venue, datetime, tournamentYear, stage } = req.body;
-  const ev = await Event.create({ name, sport, venue, datetime, created_by: req.user._id, tournamentYear, stage, status: 'PendingValidation' });
+  const ev = await Event.create({
+    name,
+    sport,
+    venue,
+    datetime,
+    created_by: req.user._id,
+    tournamentYear,
+    stage,
+    status: 'PendingValidation'
+  });
   res.status(201).json(ev);
 });
 
@@ -20,107 +33,147 @@ const listPendingEvents = asyncHandler(async (req, res) => {
 
 const validateEvent = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  const { status } = req.body; // 'Scheduled' or 'Rejected'
+  const { status } = req.body; // 'Scheduled' or 'Cancelled'
   const ev = await Event.findById(id);
-  if (!ev) { res.status(404); throw new Error('Event not found'); }
+  if (!ev) {
+    res.status(404);
+    throw new Error('Event not found');
+  }
   ev.status = status;
   await ev.save();
-  await AuditLog.create({ action: 'Approve', user_id: req.user._id, entity: 'Event', entity_id: ev._id, details: `status=${status}` });
+  await AuditLog.create({
+    action: 'Approve',
+    user_id: req.user._id,
+    entity: 'Event',
+    entity_id: ev._id,
+    details: `status=${status}`,
+  });
   res.json(ev);
 });
 
-
-// New Controllers
-
+/* ------------------ Helper ------------------ */
 async function isHostNITAdmin(userId) {
   const user = await User.findById(userId);
-  if (!user || user.role !== "NITAdmin") return false;
+  if (!user || user.role !== 'NITAdmin') return false;
   const nit = await NIT.findById(user.nit_id);
   return nit?.isHost === true;
 }
 
-// Get all events
-const getAllEvents = async (req, res) => {
+/* ------------------ New / Updated Controllers ------------------ */
+
+// Get all events (dynamic visibility)
+const getAllEvents = asyncHandler(async (req, res) => {
   try {
-    const events = await Event.find().populate('created_by', 'name role email').sort({ datetime: 1 });
+    let filter = {};
+
+    // NITAdmin & CommonAdmin can see everything (including pending)
+    if (req.user?.role === 'NITAdmin' || req.user?.role === 'CommonAdmin') {
+      filter = {};
+    } else {
+      // Other users cannot see pending events
+      filter = { status: { $ne: 'PendingValidation' } };
+    }
+    const events = await Event.find(filter)
+      .populate('created_by', 'name role email')
+      .sort({ datetime: 1 });
     res.status(200).json(events);
   } catch (err) {
     console.error('Error fetching events:', err.message);
     res.status(500).json({ error: 'Failed to fetch events' });
   }
-};
+});
 
-// Get event by ID
-const getEventById = async (req, res) => {
+const getAllEventsPublic = asyncHandler(async (req, res) => {
   try {
-    const event = await Event.findById(req.params.id).populate('created_by', 'name role email');
-    if (!event) return res.status(404).json({ error: 'Event not found' });
-    res.status(200).json(event);
+    let filter = { status: { $ne: 'PendingValidation' } };
+    const events = await Event.find(filter)
+      .populate('created_by', 'name role email')
+      .sort({ datetime: 1 });
+    res.status(200).json(events);
   } catch (err) {
-    console.error('Error fetching event:', err.message);
-    res.status(500).json({ error: 'Failed to fetch event' });
+    console.error('Error fetching events:', err.message);
+    res.status(500).json({ error: 'Failed to fetch events' });
   }
-};
+});
 
-// Create event
-// const createEvent = async (req, res) => {
-//   try {
-//     const newEvent = new Event({
-//       ...req.body,
-//       created_by: req.user?._id || req.body.created_by // fallback if no auth middleware
-//     });
-//     await newEvent.save();
-//     res.status(201).json(newEvent);
-//   } catch (err) {
-//     console.error('Error creating event:', err.message);
-//     res.status(400).json({ error: err.message });
-//   }
-// };
+// Get single event
+const getEventById = asyncHandler(async (req, res) => {
+  const event = await Event.findById(req.params.id).populate('created_by', 'name role email');
+  if (!event) return res.status(404).json({ error: 'Event not found' });
+  res.status(200).json(event);
+});
 
-// Update event (for host NIT admin)
-const updateEvent = async (req, res) => {
-
+// Update event by NIT admin
+const updateEvent = asyncHandler(async (req, res) => {
   if (!(await isHostNITAdmin(req.user._id))) {
-  return res.status(403).json({ message: "Only host NIT admins can perform this action" });
+    return res.status(403).json({ message: 'Only host NIT admins can perform this action' });
   }
 
-  try {
-    const updated = await Event.findByIdAndUpdate(req.params.id, req.body, { new: true });
-    if (!updated) return res.status(404).json({ error: 'Event not found' });
-    res.status(200).json(updated);
-  } catch (err) {
-    console.error('Error updating event:', err.message);
-    res.status(400).json({ error: err.message });
-  }
-};
+  const updated = await Event.findByIdAndUpdate(req.params.id, req.body, { new: true });
+  if (!updated) return res.status(404).json({ error: 'Event not found' });
+  res.status(200).json(updated);
+});
 
-// Update event status (for common admin)
-const updateEventStatus = async (req, res) => {
-
+// Update event status (by NIT admin)
+const updateEventStatus = asyncHandler(async (req, res) => {
   if (!(await isHostNITAdmin(req.user._id))) {
-  return res.status(403).json({ message: "Only host NIT admins can perform this action" });
+    return res.status(403).json({ message: 'Only host NIT admins can perform this action' });
   }
 
-  try {
-    const { status } = req.body;
-    const updated = await Event.findByIdAndUpdate(req.params.id, { status }, { new: true });
-    if (!updated) return res.status(404).json({ error: 'Event not found' });
-    res.status(200).json(updated);
-  } catch (err) {
-    console.error('Error updating event status:', err.message);
-    res.status(400).json({ error: err.message });
-  }
-};
+  const { status } = req.body;
+  const updated = await Event.findByIdAndUpdate(req.params.id, { status }, { new: true });
+  if (!updated) return res.status(404).json({ error: 'Event not found' });
+  res.status(200).json(updated);
+});
 
 // Delete event
-const deleteEvent = async (req, res) => {
-  try {
-    const deleted = await Event.findByIdAndDelete(req.params.id);
-    if (!deleted) return res.status(404).json({ error: 'Event not found' });
-    res.status(200).json({ message: 'Event deleted successfully' });
-  } catch (err) {
-    console.error('Error deleting event:', err.message);
-    res.status(400).json({ error: err.message });
+const deleteEvent = asyncHandler(async (req, res) => {
+  const deleted = await Event.findByIdAndDelete(req.params.id);
+  if (!deleted) return res.status(404).json({ error: 'Event not found' });
+  res.status(200).json({ message: 'Event deleted successfully' });
+});
+
+/* ------------------ NEW FEATURE ------------------ */
+// CommonAdmin Approve / Reject Pending Event
+const validateEventByAdmin = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const { status } = req.body; // 'Scheduled' or 'Cancelled'
+
+  if (req.user.role !== 'CommonAdmin') {
+    return res.status(403).json({ message: 'Only Common Admins can validate events' });
   }
+
+  const ev = await Event.findById(id);
+  if (!ev) return res.status(404).json({ message: 'Event not found' });
+
+  if (ev.status !== 'PendingValidation') {
+    return res.status(400).json({ message: 'Event is not pending validation' });
+  }
+
+  ev.status = status;
+  await ev.save();
+
+  await AuditLog.create({
+    action: status === 'Scheduled' ? 'Approve' : 'Reject',
+    user_id: req.user._id,
+    entity: 'Event',
+    entity_id: ev._id,
+    details: `Event ${status}`,
+  });
+
+  res.status(200).json({ message: `Event ${status}`, event: ev });
+});
+
+module.exports = {
+  createEvent,
+  listEvents,
+  listPendingEvents,
+  validateEvent,
+  getAllEvents,
+  getEventById,
+  updateEvent,
+  updateEventStatus,
+  deleteEvent,
+  getAllEventsPublic,
+  validateEventByAdmin, // new controller
 };
-module.exports = { createEvent, listEvents, validateEvent, listPendingEvents, getAllEvents, getEventById, updateEvent, updateEventStatus, deleteEvent };

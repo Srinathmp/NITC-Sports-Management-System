@@ -7,6 +7,7 @@ const {
   getPendingPublishingMatches,
   updateMatchResult,
   publishMatchResult,
+  getAllTeams
 } = require("../controllers/match.controller");
 const { protect, authorizeRoles } = require('../middleware/auth.middleware');
 
@@ -27,5 +28,6 @@ router.patch("/:id/result", protect, authorizeRoles("NITAdmin"), updateMatchResu
 // CommonAdmin publishes result
 router.patch("/:id/publish", protect, authorizeRoles("CommonAdmin"), publishMatchResult);
 
+router.get("/teams", getAllTeams);
 
 module.exports = router;

@@ -41,6 +41,7 @@ export default function App() {
                 <Route path="teams" element={<Teams />} />
                 <Route path="matches" element={<Matches />} />
                 <Route path="events" element={<Events />} />
+                <Route path="accomodation" element={<Accomodation />} />
             </Route>
             <Route path="/nit-admin" element={<NitAdmin />} >
                 <Route index element={<Navigate to="dashboard" replace />} />

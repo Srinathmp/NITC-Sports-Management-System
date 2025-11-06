@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from "react";
 import api from "../api/axios";
 import {
-  Calendar, Check, ChevronDown, Trophy, Users,
-  Eye, Clock, MapPin, PlusCircle, Edit
+  Calendar, Clock, MapPin, Trophy, Users, PlusCircle, Edit
 } from "lucide-react";
-import FullPageLoader from '../components/FullPageLoader';
+import FullPageLoader from "../components/FullPageLoader";
 
 /* ------------------ UI Components ------------------ */
 
@@ -24,13 +23,14 @@ function StatCard({ title, stat, subtitle, Item }) {
 }
 
 function MatchCard({ m }) {
-  const statusLabel = m.status === "Completed" ? "Completed" :
+  const statusLabel =
+    m.status === "Completed" ? "Completed" :
     m.status === "Ongoing" ? "LIVE" : "Upcoming";
 
   const badgeClasses =
     statusLabel === "LIVE" ? "bg-red-100 text-red-800" :
-      statusLabel === "Completed" ? "bg-blue-100 text-blue-800" :
-        "bg-orange-100 text-orange-800";
+    statusLabel === "Completed" ? "bg-blue-100 text-blue-800" :
+    "bg-orange-100 text-orange-800";
 
   const team1Score = m.scoreA ?? null;
   const team2Score = m.scoreB ?? null;
@@ -60,7 +60,7 @@ function MatchCard({ m }) {
         <div className="mt-4 flex w-full flex-wrap items-center justify-center gap-x-4 gap-y-2 border-t pt-4 text-sm text-gray-500 font-semibold sm:mt-0 sm:w-auto sm:flex-nowrap sm:justify-end sm:border-t-0 sm:pt-0">
           <span>{m.event_id?.sport}</span>
           <span className="flex items-center"><Calendar size={12} className="mr-1" /> {new Date(m.matchDateTime).toLocaleDateString()}</span>
-          <span className="flex items-center"><Clock size={12} className="mr-1" /> {new Date(m.matchDateTime).toLocaleTimeString()}</span>
+          <span className="flex items-center"><Clock size={12} className="mr-1" /> {new Date(m.matchDateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
           <span className="flex items-center"><MapPin size={12} className="mr-1" /> {m.venue || "TBD"}</span>
         </div>
       </div>
@@ -68,77 +68,65 @@ function MatchCard({ m }) {
   );
 }
 
-function LiveMatchCard({ m }) {
-  return (
-    <div className="w-full max-w-lg">
-      <h2 className="mb-2 flex items-center text-lg font-semibold text-red-600">
-        <span className="relative mr-2 flex h-3 w-3">
-          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75"></span>
-          <span className="relative inline-flex h-3 w-3 rounded-full bg-red-500"></span>
-        </span>
-        Live Matches
-      </h2>
-
-      <div className="rounded-lg border border-red-200 bg-red-50 p-6 shadow-sm">
-        <div className="text-center">
-          <p className="text-3xl font-bold text-gray-900">{`${m.scoreA}-${m.scoreB}`}</p>
-          <p className="mt-2 text-lg font-semibold text-gray-800">{m.teamA_id?.name}</p>
-          <p className="my-1 text-lg text-gray-500">vs</p>
-          <p className="text-lg font-semibold text-gray-800">{m.teamB_id?.name}</p>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-/* ------------------ Main Page ------------------ */
+/* ------------------ Main Component ------------------ */
 
 export default function Matches() {
   const [matches, setMatches] = useState([]);
   const [pending, setPending] = useState([]);
-  const role = localStorage.getItem("user");
-
-  // Modal states
+  const [teams, setTeams] = useState([]);
+  const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showAdd, setShowAdd] = useState(false);
   const [showUpdate, setShowUpdate] = useState(false);
   const [form, setForm] = useState({});
   const [selectedMatch, setSelectedMatch] = useState(null);
+  const role = localStorage.getItem("user");
 
   /* ---- Fetch Data ---- */
-  const fetchdata = async () => {
-    const res = await api.get("/matches");
-    setMatches(res.data);
-    if (role === "CommonAdmin") {
-      const res1 = await api.get("/matches/pending");
-      setPending(res1.data);
+  const fetchData = async () => {
+    try {
+      const [matchesRes, teamsRes, eventsRes] = await Promise.all([
+        api.get("/matches"),
+        api.get("/matches/teams"),
+        api.get("/events/allEvents")
+      ]);
+      setMatches(matchesRes.data);
+      setTeams(teamsRes.data);
+      setEvents(eventsRes.data);
+
+      if (role === "CommonAdmin") {
+        const res1 = await api.get("/matches/pending");
+        setPending(res1.data);
+      }
+    } catch (err) {
+      console.error("Error fetching data:", err);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false)
-  }
+  };
 
   useEffect(() => {
-    fetchdata()
+    fetchData();
   }, []);
 
-  if(loading){
-    return <FullPageLoader />
-  }
-  /* ---- Actions ---- */
+  if (loading) return <FullPageLoader />;
+
+  /* ---- Handlers ---- */
   const handleAddMatch = async () => {
     await api.post("/matches", form);
     setShowAdd(false);
-    fetchdata();
+    fetchData();
   };
 
   const handleUpdateResult = async () => {
     await api.patch(`/matches/${selectedMatch._id}/result`, form);
     setShowUpdate(false);
-    fetchdata();
+    fetchData();
   };
 
   const handlePublish = async (id) => {
     await api.patch(`/matches/${id}/publish`);
-    fetchPending();
+    fetchData();
   };
 
   const liveMatches = matches.filter(m => m.status === "Ongoing");
@@ -147,13 +135,11 @@ export default function Matches() {
 
   return (
     <div className="mx-auto container p-5 flex flex-col gap-8 min-h-screen">
-
-      <div className="flex justify-between">
+      <div className="flex justify-between items-center">
         <div>
           <h1 className="text-4xl font-bold">Matches</h1>
           <p className="text-[#000000a1]">View scores and upcoming fixtures</p>
         </div>
-
         {role === "CommonAdmin" && (
           <button
             onClick={() => setShowAdd(true)}
@@ -164,18 +150,12 @@ export default function Matches() {
         )}
       </div>
 
-      {/* Live Matches */}
-      {/* {liveMatches.length > 0 && (
-        <LiveMatchCard m={liveMatches[0]} />
-      )} */}
-
       {/* All Matches */}
       <h2 className="text-2xl font-bold">All Matches</h2>
       <div className="space-y-4 min-h-80">
         {matches.map((m) => (
           <div key={m._id}>
             <MatchCard m={m} />
-
             {role === "NITAdmin" && m.status !== "Completed" && (
               <button
                 onClick={() => { setSelectedMatch(m); setShowUpdate(true); }}
@@ -197,7 +177,7 @@ export default function Matches() {
               <span>{p.teamA_id?.name} vs {p.teamB_id?.name}</span>
               <button
                 onClick={() => handlePublish(p._id)}
-                className="bg-green-600 text-white px-3 py-1 rounded-md"
+                className="bg-green-600 text-white px-3 py-1 rounded-md hover:bg-green-700"
               >
                 Publish
               </button>
@@ -214,39 +194,62 @@ export default function Matches() {
         <StatCard title="Upcoming" stat={upcoming.length} subtitle="Fixtures scheduled" Item={Trophy} />
       </div>
 
-      {/* Modals */}
+      {/* Add Match Modal */}
       {showAdd && (
         <Modal title="Add Match" onClose={() => setShowAdd(false)} onSave={handleAddMatch}>
-          <FormInput label="Event ID" onChange={v => setForm({ ...form, event_id: v })} />
-          <FormInput label="Team A ID" onChange={v => setForm({ ...form, teamA_id: v })} />
-          <FormInput label="Team B ID" onChange={v => setForm({ ...form, teamB_id: v })} />
-          <FormInput label="Venue" onChange={v => setForm({ ...form, venue: v })} />
-          <FormInput type="datetime-local" label="Match Date & Time" onChange={v => setForm({ ...form, matchDateTime: v })} />
+          <FormSelect label="Event" options={events} valueKey="_id" labelKey="name"
+            onChange={(v) => setForm({ ...form, event_id: v })} />
+          <FormSelect label="Team A" options={teams} valueKey="_id" labelKey="name"
+            onChange={(v) => setForm({ ...form, teamA_id: v })} />
+          <FormSelect label="Team B" options={teams} valueKey="_id" labelKey="name"
+            onChange={(v) => setForm({ ...form, teamB_id: v })} />
+          <FormInput label="Venue" onChange={(v) => setForm({ ...form, venue: v })} />
+          <FormInput type="datetime-local" label="Match Date & Time" onChange={(v) => setForm({ ...form, matchDateTime: v })} />
         </Modal>
       )}
 
+      {/* Update Result Modal */}
       {showUpdate && selectedMatch && (
         <Modal title="Update Match Result" onClose={() => setShowUpdate(false)} onSave={handleUpdateResult}>
-          <FormInput label="Score A" type="number" onChange={v => setForm({ ...form, scoreA: Number(v) })} />
-          <FormInput label="Score B" type="number" onChange={v => setForm({ ...form, scoreB: Number(v) })} />
-          <FormInput label="Remarks" onChange={v => setForm({ ...form, remarks: v })} />
+          <FormInput label="Score A" type="number" onChange={(v) => setForm({ ...form, scoreA: Number(v) })} />
+          <FormInput label="Score B" type="number" onChange={(v) => setForm({ ...form, scoreB: Number(v) })} />
+          <FormInput label="Remarks" onChange={(v) => setForm({ ...form, remarks: v })} />
         </Modal>
       )}
     </div>
   );
 }
 
-/* ------------------ Helper UI ------------------ */
+/* ------------------ Helper Components ------------------ */
 
 function FormInput({ label, type = "text", onChange }) {
   return (
     <div className="mb-3">
-      <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>
+      <label className="block text-sm font-medium mb-1">{label}</label>
       <input
         type={type}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+        className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
       />
+    </div>
+  );
+}
+
+function FormSelect({ label, options, valueKey, labelKey, onChange }) {
+  return (
+    <div className="mb-3">
+      <label className="block text-sm font-medium mb-1">{label}</label>
+      <select
+        onChange={(e) => onChange(e.target.value)}
+        className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
+      >
+        <option value="">Select {label}</option>
+        {options.map((opt) => (
+          <option key={opt[valueKey]} value={opt[valueKey]}>
+            {opt[labelKey]}
+          </option>
+        ))}
+      </select>
     </div>
   );
 }
@@ -258,12 +261,8 @@ function Modal({ title, children, onClose, onSave }) {
         <h2 className="text-lg font-semibold mb-4">{title}</h2>
         {children}
         <div className="flex justify-end gap-2 mt-4">
-          <button onClick={onClose} className="px-4 py-2 bg-gray-200 rounded-md hover:bg-gray-300">
-            Close
-          </button>
-          <button onClick={onSave} className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
-            Save
-          </button>
+          <button onClick={onClose} className="px-4 py-2 bg-gray-200 rounded-md hover:bg-gray-300">Close</button>
+          <button onClick={onSave} className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Save</button>
         </div>
       </div>
     </div>
