@@ -3,13 +3,13 @@ const NIT = require('../models/nit.model');
 const AuditLog = require('../models/auditLog.model');
 
 const registerNIT = asyncHandler(async (req, res) => {
-  const { name, code, location } = req.body;
-  const exists = await NIT.findOne({ name });
+  const { nitName, nitCode, nitLoc } = req.body;
+  const exists = await NIT.findOne({ nitName });
   if (exists) {
     res.status(400);
     throw new Error('NIT already registered');
   }
-  const nit = await NIT.create({ name, code, location });
+  const nit = await NIT.create({ name: nitName, code: nitCode, location: nitLoc });
   res.status(201).json(nit);
 });
 

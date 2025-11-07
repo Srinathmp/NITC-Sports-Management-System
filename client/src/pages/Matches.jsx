@@ -88,20 +88,18 @@ export default function Matches() {
       const [matchesRes, teamsRes, eventsRes] = await Promise.all([
         api.get("/matches"),
         api.get("/matches/teams"),
-        api.get("/events/allEvents")
+        api.get("/events/allEventsPublic")
       ]);
       setMatches(matchesRes.data);
       setTeams(teamsRes.data);
       setEvents(eventsRes.data);
-
+      setLoading(false);
       if (role === "CommonAdmin") {
         const res1 = await api.get("/matches/pending");
         setPending(res1.data);
       }
     } catch (err) {
       console.error("Error fetching data:", err);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -113,7 +111,7 @@ export default function Matches() {
 
   /* ---- Handlers ---- */
   const handleAddMatch = async () => {
-    await api.post("/matches", form);
+    await api.post("/matches/create", form);
     setShowAdd(false);
     fetchData();
   };

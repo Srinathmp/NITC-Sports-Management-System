@@ -57,7 +57,7 @@ export default function Events() {
       ? filtered
       : filtered.filter((e) => e.status !== "Pending" && e.status !== "PendingValidation"))
     setVisibleEvents(val)
-    console.log(filtered,val)
+    // console.log(filtered,val)
   }, [events, searchQuery, statusFilter]);
 
   if (loading) return <FullPageLoader />;
