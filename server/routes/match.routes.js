@@ -18,7 +18,7 @@ const { protect, authorizeRoles } = require('../middleware/auth.middleware');
 // router.patch('/:id/status', protect, authorizeRoles('CommonAdmin'), submitResult);
 
 // CommonAdmin creates matches
-router.post("/", protect, authorizeRoles("CommonAdmin"), createMatch);
+router.post("/create", protect, authorizeRoles("CommonAdmin"), createMatch);
 // All users can view all matches
 router.get("/", getAllMatches);
 // CommonAdmin sees pending results
