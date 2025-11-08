@@ -41,7 +41,7 @@ function ButtonToggle({ label, active, onClick }) {
 
 function LoginForm({ email, setEmail, password, setPassword, handleSubmit, loading }) {
   return (
-    <div className="p-8 md:p-12 flex flex-col justify-center max-h-[90vh] overflow-y-auto">
+    <>
       <h2 className="text-3xl font-bold text-gray-900 mb-2">Welcome Back</h2>
       <p className="text-gray-500 mb-8">
         Sign in to continue to the Inter-NIT Sports System
@@ -54,7 +54,7 @@ function LoginForm({ email, setEmail, password, setPassword, handleSubmit, loadi
           {loading ? "Logging in..." : "Sign In"}
         </button>
       </form>
-    </div>
+    </>
   );
 }
 
@@ -91,25 +91,7 @@ function RegisterUserForm({ formData, setFormData, handleSubmit }) {
         </div>
 
         {/* Select NIT */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Select NIT</label>
-          <div className="relative">
-            <Building className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
-            <select
-              name="nit_id"
-              value={formData.nit_id}
-              onChange={(e) => setFormData({ ...formData, nit_id: e.target.value })}
-              required
-              className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-transparent outline-none bg-white"
-            >
-              <option value="">Choose your NIT</option>
-              {dummyNITs.map((nit) => (
-                <option key={nit} value={nit}>{nit}</option>
-              ))}
-            </select>
-          </div>
-        </div>
-
+        <InputField icon={<Building />} name="NIT-Code" label="NIT-Code" value={formData.nit_id} onChange={(e) => setFormData({ ...formData, nit_id: e.target.value })} placeholder="Enter your NIT's code" />
         <button
           type="submit"
           className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg"
@@ -184,7 +166,7 @@ const Login = () => {
       else navigate("/");
 
     } catch (err) {
-      console.error(err);
+      alert(err.response.data.message);
       setError(
         err.response?.data?.message || "Invalid credentials. Please try again."
       );
@@ -211,7 +193,7 @@ const Login = () => {
       setNitName("")
       alert("Succesfull!!")
     } catch (err) {
-      console.error(err);
+      alert(err.response.data.message);
       setError(
         err.response?.data?.message || "Invalid credentials. Please try again."
       );
@@ -220,27 +202,58 @@ const Login = () => {
     }
   }
 
-  const handleSubmit = () => { }
+  const handleSubmitRegister = async (e) => {
+    e.preventDefault();
+    setError("");
+
+    const requiredFields = ["name", "email", "phone", "password", "role", "nit_id"];
+
+    const missing = requiredFields.filter((f) => !formData[f]?.trim());
+    if (missing.length > 0) {
+      console.log(missing)
+      setError(`Please fill in all required fields.`);
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      const res = await api.post("/users/register", formData);
+      alert("Succesfull!!")
+      setFormData({ email: "", password: "", name: "", phone: "", role: "Coach", nit_id: ""})
+    } catch (err) {
+      alert(err.response.data.message);
+      setError(
+        err.response?.data?.message || "Invalid credentials. Please try again."
+      );
+    } finally {
+      setLoading(false);
+    }
+  }
+
   const [mode, setMode] = useState("login");
-  const [formData, setFormData] = useState({ email: "", password: "", name: "", phone: "", role: "Coach", nit_id: "", nitName: "", nitCode: "", location: "", });
+  const handleChangeSelect = (e) => { setMode(e.target.value); }
+  const [formData, setFormData] = useState({ email: "", password: "", name: "", phone: "", role: "Coach", nit_id: ""});
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-blue-200 to-blue-100 px-4 py-10">
       <div className="w-full max-w-5xl grid md:grid-cols-2 bg-white rounded-3xl overflow-hidden shadow-xl border border-gray-200">
         {/* LEFT PANEL */}
-        {mode === "login" && (
-          <LoginForm email={email} setEmail={setEmail} password={password} setPassword={setPassword} handleSubmit={handleSubmitLogin} loading={loading} />
-        )}
-        {mode === "registerUser" && (
-          // <RegisterUserForm />
-          <>..............in develop</>
-        )}
-        {mode === "registerNIT" && (
-          <RegisterNITForm nitName={nitName} setNitName={setNitName} nitCode={nitCode} setNitCode={setNitCode} nitLoc={nitLoc} setNitLoc={setNitLoc} handleSubmit={handleSubmitNIT} loading={loading} />
-        )}
 
+        <div className="p-8 md:px-8 flex flex-col justify-center overflow-y-auto order-2 md:order-1">
+          {mode === "login" && (
+            <LoginForm email={email} setEmail={setEmail} password={password} setPassword={setPassword} handleSubmit={handleSubmitLogin} loading={loading} />
+          )}
+          {mode === "registerUser" && (
+            <RegisterUserForm formData={formData} setFormData={setFormData} handleSubmit={handleSubmitRegister} />
+            // <>..............in develop</>
+          )}
+          {mode === "registerNIT" && (
+            <RegisterNITForm nitName={nitName} setNitName={setNitName} nitCode={nitCode} setNitCode={setNitCode} nitLoc={nitLoc} setNitLoc={setNitLoc} handleSubmit={handleSubmitNIT} loading={loading} />
+          )}
+        </div>
         {/* RIGHT PANEL */}
-        <div className="bg-gradient-to-b from-blue-600 to-blue-700 p-8 md:p-12 flex flex-col justify-center items-center text-white">
+        <div className="order-1 md:order-2 bg-gradient-to-b from-blue-600 to-blue-700 p-8 md:p-12 flex flex-col justify-center items-center text-white">
           <Trophy className="h-16 w-16 mb-6 text-white" />
           <h1 className="text-4xl font-bold mb-2">INSMS</h1>
           <p className="text-lg text-blue-100">Inter-NIT Sports Management System</p>
@@ -248,13 +261,23 @@ const Login = () => {
             Connecting athletes, coaches, and institutes
           </p>
 
-          <div className="w-full max-w-xs space-y-3">
+          <div className="w-full max-w-xs space-y-3 hidden md:block">
             <ButtonToggle label="Login" active={mode === "login"} onClick={() => setMode("login")} />
             <ButtonToggle label="Register User" active={mode === "registerUser"} onClick={() => setMode("registerUser")} />
             <ButtonToggle label="Register NIT" active={mode === "registerNIT"} onClick={() => setMode("registerNIT")} />
           </div>
 
-          <div className="mt-12 text-center text-sm text-blue-200">
+          <select
+            value={mode}
+            onChange={handleChangeSelect}
+            className="w-full mt-4 border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none md:hidden text-blue-500 bg-white text-center font-bold"
+          >
+            <option value="login">Login</option>
+            <option value="registerUser">Register User</option>
+            <option value="registerNIT">Register NIT</option>
+          </select>
+
+          <div className="mt-12 text-center text-sm text-blue-200 hidden md:block">
             <p>© 2024 INSMS. All rights reserved.</p>
           </div>
         </div>

@@ -6,19 +6,18 @@ const NIT = require('../models/nit.model');
 
 // Register user
 const registerUser = asyncHandler(async (req, res) => {
-  const { name, email, password, role, nit_code, contactNumber } = req.body;
+  const { name, email, password, role, nit_id, contactNumber } = req.body;
   const userExists = await User.findOne({ email });
   if (userExists) {
     res.status(400);
     throw new Error('User already exists');
   }
-  const nit = await NIT.find({ code: nit_code });
-  if (!nit) { res.status(404); throw new Error('NIT not found'); }
-  const nit_id = nit._id
+  const nit = await NIT.find({ code: nit_id });
+  if (nit.length==0) { res.status(404); throw new Error('NIT not found'); }
   const salt = await bcrypt.genSalt(10);
   const hash = await bcrypt.hash(password, salt);
   const user = await User.create({
-    name, email, passwordHash: hash, role, nit_id, contactNumber
+    name, email, passwordHash: hash, role, nit_id:nit[0]._id, contactNumber
   });
   res.status(201).json({ id: user._id, name: user.name, email: user.email, role: user.role });
 });

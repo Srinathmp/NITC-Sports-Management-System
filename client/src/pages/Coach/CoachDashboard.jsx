@@ -149,7 +149,7 @@ export default function CoachDashboard() {
         <div className="min-h-screen bg-gray-50 p-8 px-4 md:px-8">
             <div className="mb-6">
                 <h1 className="text-3xl font-bold text-gray-900">Welcome, {name}</h1>
-                <p className="text-md text-gray-500">NIT Trichy</p>
+                <p className="text-md text-gray-500">COACH, NIT Trichy</p>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
