@@ -18,15 +18,29 @@ const createMatch = asyncHandler(async (req, res) => {
 });
 
 /* -------------------------------------------------------------
-   2. Get all matches (public / logged-in)
+   2. Get all matches (paginated)
 ------------------------------------------------------------- */
 const getAllMatches = asyncHandler(async (req, res) => {
   try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+
+    const totalMatches = await Match.countDocuments();
     const matches = await Match.find()
       .populate("event_id", "name sport venue datetime")
       .populate("teamA_id teamB_id winner_id", "name nit_id")
-      .sort({ matchDateTime: -1 });
-    res.status(200).json(matches);
+      .sort({ matchDateTime: -1 })
+      .skip(skip)
+      .limit(limit)
+      .lean();
+
+    res.status(200).json({
+      items: matches,
+      page,
+      totalPages: Math.ceil(totalMatches / limit),
+      totalCount: totalMatches,
+    });
   } catch (err) {
     console.error("Error fetching matches:", err.message);
     res.status(500).json({ error: "Failed to fetch matches" });
@@ -34,7 +48,7 @@ const getAllMatches = asyncHandler(async (req, res) => {
 });
 
 /* -------------------------------------------------------------
-   3. NIT Admin updates match result (score, remarks, etc.)
+   3. NIT Admin updates match result
 ------------------------------------------------------------- */
 const updateMatchResult = asyncHandler(async (req, res) => {
   try {
@@ -42,7 +56,6 @@ const updateMatchResult = asyncHandler(async (req, res) => {
     const match = await Match.findById(req.params.id);
     if (!match) return res.status(404).json({ error: "Match not found" });
 
-    // Determine winner
     let winner_id = null;
     if (scoreA > scoreB) winner_id = match.teamA_id;
     else if (scoreB > scoreA) winner_id = match.teamB_id;
@@ -67,13 +80,10 @@ const updateMatchResult = asyncHandler(async (req, res) => {
     // Update NIT points
     if (winner_id) {
       const winningTeam = await Team.findById(winner_id).populate("nit_id");
-      if (winningTeam && winningTeam.nit_id) {
-        await NIT.findByIdAndUpdate(winningTeam.nit_id._id, {
-          $inc: { points: 20 },
-        });
+      if (winningTeam?.nit_id) {
+        await NIT.findByIdAndUpdate(winningTeam.nit_id._id, { $inc: { points: 20 } });
       }
     } else {
-      // Tie → both get 10 points
       const teamA = await Team.findById(match.teamA_id).populate("nit_id");
       const teamB = await Team.findById(match.teamB_id).populate("nit_id");
       if (teamA?.nit_id)
@@ -112,8 +122,6 @@ const getPendingPublishingMatches = asyncHandler(async (req, res) => {
 ------------------------------------------------------------- */
 const publishMatchResult = asyncHandler(async (req, res) => {
   try {
-    console.log("req.user in publishMatchResult:", req.user);
-
     const match = await Match.findById(req.params.id)
       .populate("teamA_id teamB_id event_id", "name sport");
     if (!match)
@@ -144,7 +152,7 @@ const publishMatchResult = asyncHandler(async (req, res) => {
 });
 
 /* -------------------------------------------------------------
-   6. Get all teams (for dropdowns in frontend)
+   6. Get all teams
 ------------------------------------------------------------- */
 const getAllTeams = asyncHandler(async (req, res) => {
   try {
@@ -156,14 +164,11 @@ const getAllTeams = asyncHandler(async (req, res) => {
   }
 });
 
-/* -------------------------------------------------------------
-   EXPORTS
-------------------------------------------------------------- */
 module.exports = {
   createMatch,
   getAllMatches,
   updateMatchResult,
   getPendingPublishingMatches,
   publishMatchResult,
-  getAllTeams
+  getAllTeams,
 };
