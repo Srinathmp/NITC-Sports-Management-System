@@ -119,7 +119,8 @@ function CommonAdminDashboard() {
   return (
     <div className="min-h-screen bg-gray-100 p-4 md:p-8">
       <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-900">Welcome,{name} (Dashboard)</h1>
+        <h1 className="text-3xl font-bold text-gray-900">Welcome, {name}</h1>
+        <p className="text-md text-gray-500">COMMON ADMIN</p>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <StatCard title="Total NITs" value={`${nit}`} subtitle={`+${nitPending} pending approval`} Icon={Users} />

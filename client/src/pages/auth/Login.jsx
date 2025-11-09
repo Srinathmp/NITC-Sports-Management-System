@@ -122,6 +122,7 @@ const Login = () => {
   const [formData, setFormData] = useState({ email: "", password: "", name: "", phone: "", role: "Coach", nit_id: "" });
 
   useEffect(() => {
+    console.log(isAuthenticated)
     if (isAuthenticated) {
       if (user == 'CommonAdmin') navigate('/common-admin/dashboard')
       if (user == 'NITAdmin') navigate('/nit-admin/dashboard')

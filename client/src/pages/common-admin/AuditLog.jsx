@@ -105,6 +105,7 @@ function AuditLogPage() {
 
   useEffect(() => {
     fetchAuditLogs();
+    window.scrollTo({ top: 0, behavior: "smooth" });
   }, [page]);
 
   // Search filter
