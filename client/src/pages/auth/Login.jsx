@@ -10,15 +10,7 @@ function InputField({ icon, label, name, value, onChange, type = "text", placeho
       <label className="block text-sm font-medium text-gray-700 mb-2">{label}</label>
       <div className="relative">
         <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5">{icon}</div>
-        <input
-          type={type}
-          name={name}
-          value={value}
-          onChange={onChange}
-          placeholder={placeholder}
-          required
-          className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-lg placeholder-gray-400 focus:ring-2 focus:ring-blue-400 focus:border-transparent outline-none"
-        />
+        <input type={type} name={name} value={value} onChange={onChange} placeholder={placeholder} required className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-lg placeholder-gray-400 focus:ring-2 focus:ring-blue-400 focus:border-transparent outline-none" />
       </div>
     </div>
   );
@@ -58,7 +50,7 @@ function LoginForm({ email, setEmail, password, setPassword, handleSubmit, loadi
   );
 }
 
-function RegisterUserForm({ formData, setFormData, handleSubmit }) {
+function RegisterUserForm({ formData, setFormData, handleSubmit, loading }) {
   const dummyNITs = ["NIT Delhi", "NIT Trichy", "NIT Warangal", "NIT Surathkal", "NIT Calicut",];
 
   return (
@@ -75,28 +67,22 @@ function RegisterUserForm({ formData, setFormData, handleSubmit }) {
         {/* Role */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">Role</label>
-          <div className="relative">
+          <div className="relative px-8 py-2 border border-gray-300 rounded-lg md:p-0">
             <Shield className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
-            <select
-              name="role"
-              value={formData.role}
-              onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-              required
-              className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-transparent outline-none bg-white"
-            >
+            <select name="role" value={formData.role} onChange={(e) => setFormData({ ...formData, role: e.target.value })} required className="w-full pl-11 pr-4 py-3 md:border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-transparent outline-none bg-white" >
               <option value="Coach">Coach</option>
               <option value="NITAdmin">NIT Admin</option>
             </select>
           </div>
         </div>
 
-        {/* Select NIT */}
         <InputField icon={<Building />} name="NIT-Code" label="NIT-Code" value={formData.nit_id} onChange={(e) => setFormData({ ...formData, nit_id: e.target.value })} placeholder="Enter your NIT's code" />
         <button
+          disabled={loading}
           type="submit"
-          className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg"
+          className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg disabled:cursor-not-allowed"
         >
-          Create Account
+          {loading ? "Registering...." : "Create Account"}
         </button>
       </form>
     </div>
@@ -105,7 +91,7 @@ function RegisterUserForm({ formData, setFormData, handleSubmit }) {
 
 function RegisterNITForm({ nitName, setNitName, nitCode, setNitCode, nitLoc, setNitLoc, handleSubmit, loading }) {
   return (
-    <div className="p-8 md:p-12 flex flex-col justify-center">
+    <div className="flex flex-col p-8 md:p-12 justify-center">
       <h2 className="text-3xl font-bold text-gray-900 mb-2">Register Institute</h2>
       <p className="text-gray-500 mb-8">Register your NIT with INSMS</p>
 
@@ -113,10 +99,7 @@ function RegisterNITForm({ nitName, setNitName, nitCode, setNitCode, nitLoc, set
         <InputField icon={<Building />} name="nitName" label="Institute Name" value={nitName} onChange={(e) => setNitName(e.target.value)} placeholder="National Institute of Technology" />
         <InputField icon={<Code />} name="nitCode" label="Institute Code" value={nitCode} onChange={(e) => setNitCode(e.target.value)} placeholder="NIT-XXX" />
         <InputField icon={<MapPin />} name="location" label="Location" value={nitLoc} onChange={(e) => setNitLoc(e.target.value)} placeholder="City, State" />
-        <button
-          type="submit"
-          className=" cursor-pointer w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg disabled:cursor-not-allowed" disabled={loading}
-        >
+        <button type="submit" className=" cursor-pointer w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg disabled:cursor-not-allowed" disabled={loading} >
           {loading ? "Registering....." : "Register Institute"}
         </button>
       </form>
@@ -125,15 +108,18 @@ function RegisterNITForm({ nitName, setNitName, nitCode, setNitCode, nitLoc, set
 }
 
 const Login = () => {
-  const { login, isAuthenticated, user } = useAuth();
+  const navigate = useNavigate();
+  const [error, setError] = useState("");
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [nitLoc, setNitLoc] = useState("")
+  const [mode, setMode] = useState("login");
   const [nitName, setNitName] = useState("")
   const [nitCode, setNitCode] = useState("")
-  const [nitLoc, setNitLoc] = useState("")
+  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-  const navigate = useNavigate();
+  const { login, isAuthenticated, user } = useAuth();
+  const handleChangeSelect = (e) => { setMode(e.target.value); }
+  const [formData, setFormData] = useState({ email: "", password: "", name: "", phone: "", role: "Coach", nit_id: "" });
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -148,7 +134,7 @@ const Login = () => {
     setError("");
 
     if (!email || !password) {
-      setError("Please enter both email and password.");
+      alert("Please enter both email and password.");
       return;
     }
 
@@ -164,12 +150,9 @@ const Login = () => {
       else if (role === "NITAdmin") navigate("/nit-admin/dashboard");
       else if (role === "Coach") navigate("/coach/dashboard");
       else navigate("/");
-
     } catch (err) {
       alert(err.response.data.message);
-      setError(
-        err.response?.data?.message || "Invalid credentials. Please try again."
-      );
+      setError(err.response?.data?.message || "Invalid credentials. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -194,9 +177,7 @@ const Login = () => {
       alert("Succesfull!!")
     } catch (err) {
       alert(err.response.data.message);
-      setError(
-        err.response?.data?.message || "Invalid credentials. Please try again."
-      );
+      setError(err.response?.data?.message || "Invalid credentials. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -217,49 +198,40 @@ const Login = () => {
 
     try {
       setLoading(true);
-
       const res = await api.post("/users/register", formData);
       alert("Succesfull!!")
-      setFormData({ email: "", password: "", name: "", phone: "", role: "Coach", nit_id: ""})
+      setFormData({ email: "", password: "", name: "", phone: "", role: "Coach", nit_id: "" })
     } catch (err) {
       alert(err.response.data.message);
-      setError(
-        err.response?.data?.message || "Invalid credentials. Please try again."
-      );
+      setError(err.response?.data?.message || "Invalid credentials. Please try again.");
     } finally {
       setLoading(false);
     }
   }
 
-  const [mode, setMode] = useState("login");
-  const handleChangeSelect = (e) => { setMode(e.target.value); }
-  const [formData, setFormData] = useState({ email: "", password: "", name: "", phone: "", role: "Coach", nit_id: ""});
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-blue-200 to-blue-100 px-4 py-10">
       <div className="w-full max-w-5xl grid md:grid-cols-2 bg-white rounded-3xl overflow-hidden shadow-xl border border-gray-200">
         {/* LEFT PANEL */}
-
         <div className="p-8 md:px-8 flex flex-col justify-center overflow-y-auto order-2 md:order-1">
           {mode === "login" && (
             <LoginForm email={email} setEmail={setEmail} password={password} setPassword={setPassword} handleSubmit={handleSubmitLogin} loading={loading} />
           )}
           {mode === "registerUser" && (
-            <RegisterUserForm formData={formData} setFormData={setFormData} handleSubmit={handleSubmitRegister} />
-            // <>..............in develop</>
+            <RegisterUserForm formData={formData} setFormData={setFormData} handleSubmit={handleSubmitRegister} loading={loading} />
           )}
           {mode === "registerNIT" && (
             <RegisterNITForm nitName={nitName} setNitName={setNitName} nitCode={nitCode} setNitCode={setNitCode} nitLoc={nitLoc} setNitLoc={setNitLoc} handleSubmit={handleSubmitNIT} loading={loading} />
           )}
         </div>
+
         {/* RIGHT PANEL */}
         <div className="order-1 md:order-2 bg-gradient-to-b from-blue-600 to-blue-700 p-8 md:p-12 flex flex-col justify-center items-center text-white">
           <Trophy className="h-16 w-16 mb-6 text-white" />
           <h1 className="text-4xl font-bold mb-2">INSMS</h1>
           <p className="text-lg text-blue-100">Inter-NIT Sports Management System</p>
-          <p className="text-sm text-blue-200 mb-8">
-            Connecting athletes, coaches, and institutes
-          </p>
+          <p className="text-sm text-blue-200 mb-8"> Connecting athletes, coaches, and institutes </p>
 
           <div className="w-full max-w-xs space-y-3 hidden md:block">
             <ButtonToggle label="Login" active={mode === "login"} onClick={() => setMode("login")} />
@@ -267,18 +239,15 @@ const Login = () => {
             <ButtonToggle label="Register NIT" active={mode === "registerNIT"} onClick={() => setMode("registerNIT")} />
           </div>
 
-          <select
-            value={mode}
-            onChange={handleChangeSelect}
-            className="w-full mt-4 border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none md:hidden text-blue-500 bg-white text-center font-bold"
-          >
-            <option value="login">Login</option>
-            <option value="registerUser">Register User</option>
-            <option value="registerNIT">Register NIT</option>
-          </select>
-
+          <div className="w-full mt-4 border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none md:hidden text-blue-500 bg-white text-center font-bold">
+            <select value={mode} onChange={handleChangeSelect} className="w-full" >
+              <option value="login">Login</option>
+              <option value="registerUser">Register User</option>
+              <option value="registerNIT">Register NIT</option>
+            </select>
+          </div>
           <div className="mt-12 text-center text-sm text-blue-200 hidden md:block">
-            <p>© 2024 INSMS. All rights reserved.</p>
+            <p>© 2025 INSMS. All rights reserved.</p>
           </div>
         </div>
       </div>
