@@ -1,8 +1,8 @@
 const asyncHandler = require('express-async-handler');
+const NIT = require('../models/nit.model');
+const User = require('../models/user.model');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const User = require('../models/user.model');
-const NIT = require('../models/nit.model');
 
 // Register user
 const registerUser = asyncHandler(async (req, res) => {
