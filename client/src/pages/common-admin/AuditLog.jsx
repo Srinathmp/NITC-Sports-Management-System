@@ -7,6 +7,8 @@ import {
   User,
   Server,
   Calendar,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import api from "../../api/axios";
 
@@ -19,7 +21,6 @@ const handleExport = async () => {
   document.body.appendChild(link);
   link.click();
 };
-
 
 const AuditLogItem = ({
   icon,
@@ -75,24 +76,25 @@ const AuditLogItem = ({
 };
 
 function AuditLogPage() {
-  const [page, setPage] = useState(0)
-  const [total, setTotal] = useState(0)
   const [logs, setLogs] = useState([]);
   const [filteredLogs, setFilteredLogs] = useState([]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // Fetch logs from backend
+  // Pagination state
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+
+  // Fetch logs
   const fetchAuditLogs = async () => {
     try {
       setLoading(true);
       setError("");
-      const res = await api.get(`/auditlogs/?page=${page}`);
+      const res = await api.get(`/auditlogs?page=${page}&limit=8`);
       setLogs(res.data.formatted || []);
-      setTotal(res.data.totalItem);
       setFilteredLogs(res.data.formatted || []);
-      
+      setTotalPages(res.data.totalPages || 1);
     } catch (err) {
       console.error(err);
       setError("Failed to load audit logs. Please try again later.");
@@ -103,9 +105,9 @@ function AuditLogPage() {
 
   useEffect(() => {
     fetchAuditLogs();
-  }, []);
+  }, [page]);
 
-  // Search filter logic
+  // Search filter
   useEffect(() => {
     if (search.trim() === "") {
       setFilteredLogs(logs);
@@ -130,12 +132,16 @@ function AuditLogPage() {
             Track all system activities and administrative actions
           </p>
         </div>
-        <button onClick={handleExport} className="flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors">
+        <button
+          onClick={handleExport}
+          className="flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
+        >
           <Upload className="h-4 w-4" />
           <span>Export Log</span>
         </button>
       </div>
 
+      {/* Search and Filters */}
       <div className="flex flex-col md:flex-row md:items-center gap-4 mb-6">
         <div className="relative flex-grow">
           <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
@@ -155,7 +161,7 @@ function AuditLogPage() {
         </button>
       </div>
 
-      {/* Main Content */}
+      {/* Main Log Container */}
       <div className="bg-white rounded-lg shadow-sm">
         <div className="flex items-center gap-3 p-5 border-b border-gray-200">
           <Activity className="h-5 w-5 text-blue-600" />
@@ -164,21 +170,22 @@ function AuditLogPage() {
               Recent Activities
             </h2>
             <p className="text-sm text-gray-500">
-              Showing {filteredLogs.length} of {logs.length} audit entries
+              Page {page} of {totalPages}
             </p>
           </div>
         </div>
 
         {loading ? (
-          <div className="p-5 text-center text-gray-500">Loading audit logs...</div>
+          <div className="p-5 text-center text-gray-500">
+            Loading audit logs...
+          </div>
         ) : error ? (
           <div className="p-5 text-center text-red-600">{error}</div>
         ) : filteredLogs.length === 0 ? (
           <div className="p-5 text-center text-gray-500">No logs found.</div>
         ) : (
           <div className="p-5 space-y-4">
-            {
-            filteredLogs.map((item, index) => (
+            {filteredLogs.map((item, index) => (
               <AuditLogItem
                 key={item._id || index}
                 icon={
@@ -192,13 +199,46 @@ function AuditLogPage() {
                 status={item.status || "info"}
                 actionTitle={item.action || "Performed Action"}
                 actionDetails={item.details || "No details available"}
-                timestamp={item.timestamp || item.createdAt}
+                timestamp={item.timestamp}
                 isHighlighted={index === 0}
               />
             ))}
           </div>
         )}
       </div>
+
+      {/* Pagination */}
+      {!loading && !error && (
+        <div className="flex justify-center items-center gap-3 mt-6">
+          <button
+            onClick={() => setPage((p) => Math.max(p - 1, 1))}
+            disabled={page === 1}
+            className={`flex items-center gap-1 px-3 py-2 rounded-lg border text-sm font-medium ${
+              page === 1
+                ? "text-white bg-blue-300 cursor-not-allowed"
+                : "text-white bg-blue-500 hover:bg-blue-400"
+            }`}
+          >
+            <ChevronLeft className="h-4 w-4" /> Prev
+          </button>
+
+          <span className="text-gray-600 text-sm">
+            Page <b>{page}</b> of <b>{totalPages}</b>
+          </span>
+
+          <button
+            onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
+            disabled={page === totalPages}
+            className={`flex items-center gap-1 px-3 py-2 rounded-lg border text-sm font-medium ${
+              page === totalPages
+                ?"text-white bg-blue-300 cursor-not-allowed"
+                : "text-white bg-blue-500 hover:bg-blue-400"
+            }`}
+          >
+            Next <ChevronRight className="h-4 w-4" />
+          </button>
+        </div>
+      )}
     </div>
   );
 }

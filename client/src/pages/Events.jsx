@@ -34,7 +34,7 @@ export default function Events() {
   /* ---- Fetch Events ---- */
   const fetchEvents = async () => {
     try {
-      const res = role ? await api.get("/events/allEvents"): await api.get("/events/allEventsPublic");
+      const res = role ? await api.get("/events/allEvents") : await api.get("/events/allEventsPublic");
       setEvents(res.data || []);
       setFilteredEvents(res.data || []);
       setLoading(false);
@@ -85,7 +85,7 @@ export default function Events() {
   /* ---- Styling ---- */
   const labelStyle = {
     Scheduled: "bg-blue-600 text-white",
-    Pending: "bg-yellow-500 text-white",
+    PendingValidation: "bg-yellow-500 text-white",
     Cancelled: "bg-red-600 text-white",
     Completed: "bg-green-600 text-white",
   };
@@ -177,25 +177,49 @@ export default function Events() {
       {/* View Modal */}
       {showViewModal && selected && (
         <Modal title="Event Details" onClose={() => setShowViewModal(false)}>
-          <p><b>Name:</b> {selected.name}</p>
-          <p><b>Sport:</b> {selected.sport}</p>
-          <p><b>Venue:</b> {selected.venue}</p>
-          <p><b>Date:</b> {new Date(selected.datetime).toLocaleString()}</p>
-          <p><b>Status:</b> {selected.status}</p>
-          <p><b>Stage:</b> {selected.stage || "N/A"}</p>
+          <div className="overflow-x-auto border border-black/30 rounded-lg">
+            <table className="w-full text-sm text-left text-gray-700 border border-gray-200 rounded-xl overflow-hidden shadow-sm">
+              <tbody>
+                <tr className="border-b border-black-10 hover:bg-gray-50 transition">
+                  <th className="border-r border-black/30 px-4 py-3 font-bold bg-blue-50 w-1/3 rounded-tl-xl">Name</th>
+                  <td className="px-4 py-3 font-semibold">{selected.name}</td>
+                </tr>
+                <tr className="border-b border-black-10 hover:bg-gray-50 transition">
+                  <th className="border-r border-black/30 px-4 py-3 font-bold bg-blue-50">Sport</th>
+                  <td className="px-4 py-3 font-semibold">{selected.sport}</td>
+                </tr>
+                <tr className="border-b border-black-10 hover:bg-gray-50 transition">
+                  <th className="border-r border-black/30 px-4 py-3 font-bold bg-blue-50">Venue</th>
+                  <td className="px-4 py-3 font-semibold">{selected.venue}</td>
+                </tr>
+                <tr className="border-b border-black-10 hover:bg-gray-50 transition">
+                  <th className="border-r border-black/30 px-4 py-3 font-bold bg-blue-50">Date</th>
+                  <td className="px-4 py-3 font-semibold">{new Date(selected.datetime).toLocaleString()}</td>
+                </tr>
+                <tr className="border-b border-black-10 hover:bg-gray-50 transition">
+                  <th className="border-r border-black/30 px-4 py-3 font-bold bg-blue-50">Status</th>
+                  <td className="px-4 py-3 font-semibold">{selected.status}</td>
+                </tr>
+                <tr className="hover:bg-gray-50black-10ion">
+                  <th className="border-r border-black/30 px-4 py-3 font-bold bg-blue-50 rounded-bl-xl">Stage</th>
+                  <td className="px-4 py-3 font-semibold rounded-br-xl">{selected.stage || "N/A"}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
 
           {/* ✅ Approve / Reject Buttons for CommonAdmin */}
           {role === "CommonAdmin" && selected.status === "PendingValidation" && (
-            <div className="flex justify-end gap-3 mt-5 text-black">
+            <div className="flex justify-end gap-3 mt-6 text-black">
               <button
                 onClick={() => handleValidation("Scheduled")}
-                className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+                className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
               >
                 <CheckCircle size={16} /> Approve
               </button>
               <button
                 onClick={() => handleValidation("Cancelled")}
-                className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+                className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition"
               >
                 <XCircle size={16} /> Reject
               </button>
@@ -203,6 +227,7 @@ export default function Events() {
           )}
         </Modal>
       )}
+
     </div>
   );
 }
