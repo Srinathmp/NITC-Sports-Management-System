@@ -15,18 +15,18 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // Routes
-app.use('/api/mess', require('./routes/mess.routes'));
-app.use('/api/events', require('./routes/event.routes'));
-app.use('/api/v1/teams', require('./routes/team.routes'));
-app.use('/api/nits',          require('./routes/nit.routes'));
-app.use('/api/auditlogs', require('./routes/auditLog.routes'));
-app.use('/api/users',         require('./routes/user.routes'));
-app.use('/api/events',        require('./routes/event.routes'));
-app.use('/api/matches',       require('./routes/match.routes'));
-app.use('/api/dashboard', require('./routes/dashboard.routes'));
-app.use('/api/v1/leaderboard', require('./routes/leaderboard.routes'));
-app.use('/api/notifications', require('./routes/notification.routes'));
-app.use('/api/accommodation', require('./routes/accommodation.routes'));
+app.use('/api/mess',            require('./routes/mess.routes'));
+app.use('/api/events',          require('./routes/event.routes'));
+app.use('/api/v1/teams',        require('./routes/team.routes'));
+app.use('/api/nits',            require('./routes/nit.routes'));
+app.use('/api/auditlogs',       require('./routes/auditLog.routes'));
+app.use('/api/users',           require('./routes/user.routes'));
+app.use('/api/events',          require('./routes/event.routes'));
+app.use('/api/matches',         require('./routes/match.routes'));
+app.use('/api/dashboard',       require('./routes/dashboard.routes'));
+app.use('/api/v1/leaderboard',  require('./routes/leaderboard.routes'));
+app.use('/api/notifications',   require('./routes/notification.routes'));
+app.use('/api/accommodation',   require('./routes/accommodation.routes'));
 
 // Error handler
 app.use(notFound);

@@ -205,15 +205,19 @@ const deletePlayerInMyTeamBySport = asyncHandler(async (req, res) => {
  * Public list; if req.user exists (optional auth), marks isMyTeam.
  */
 const listTeamsPublic = asyncHandler(async (req, res) => {
-  const { search = '', sport } = req.query;
+  const { search = '', sport, page = 1, limit = 9 } = req.query;
   const q = {};
   if (sport && sport !== 'All Sports') q.sport = sport;
 
+  const skip = (parseInt(page) - 1) * parseInt(limit);
+
+  // Base team query
   const teams = await Team.find(q)
     .populate({ path: 'nit_id', select: 'name' })
     .populate({ path: 'coach_id', select: 'name role' })
     .lean();
 
+  // Search filtering (if applicable)
   const filtered = (search
     ? teams.filter(t => {
         const rx = new RegExp(search.trim(), 'i');
@@ -235,8 +239,19 @@ const listTeamsPublic = asyncHandler(async (req, res) => {
     isMyTeam: me ? (t.coach_id?._id?.toString() === me) : false,
   }));
 
-  res.json({ items: out, total: out.length });
+  const total = out.length;
+  const paginated = out.slice(skip, skip + parseInt(limit));
+
+  res.json({
+    items: paginated,
+    total,
+    totalPages: Math.ceil(total / parseInt(limit)),
+    currentPage: parseInt(page),
+  });
 });
+
+module.exports = { listTeamsPublic };
+
 
 /**
  * GET /api/v1/teams/mine

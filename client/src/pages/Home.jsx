@@ -1,20 +1,10 @@
 import "../index.css";
+import api from "../api/axios";
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
-import api from "../api/axios";
-
-import {
-    Trophy,
-    LogIn,
-    ChartColumn,
-    Medal,
-    University,
-    Dumbbell,
-    ClipboardList
-} from "lucide-react";
-
 import { LinkBtn } from "../components/Button";
 import { LiveCard, StatCard, UpcomingCard, PerformerCard } from "../components/Card";
+import { Trophy, LogIn, ChartColumn, Medal, University, Dumbbell, ClipboardList } from "lucide-react";
 
 export default function Home() {
     const [stats, setStats] = useState({});
