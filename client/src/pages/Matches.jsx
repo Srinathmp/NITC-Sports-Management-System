@@ -111,11 +111,12 @@ export default function Matches() {
   const [teams, setTeams] = useState([]);
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showAdd, setShowAdd] = useState(false);
   const [form, setForm] = useState({});
   const [selectedMatch, setSelectedMatch] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
-
+  const [showUpdate,setShowUpdate]= useState(false)
   // Pagination
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -192,6 +193,23 @@ export default function Matches() {
       fetchData(page + 1);
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
+  };
+
+  const handleAddMatch = async () => {
+    await api.post("/matches/create", form);
+    setShowAdd(false);
+    fetchData();
+  };
+
+  const handleUpdateResult = async () => {
+    await api.patch(`/matches/${selectedMatch._id}/result`, form);
+    setShowUpdate(false);
+    fetchData();
+  };
+
+  const handlePublish = async (id) => {
+    await api.patch(`/matches/${id}/publish`);
+    fetchData();
   };
 
   const liveMatches = matches.filter((m) => m.status === "Ongoing");
@@ -307,6 +325,76 @@ export default function Matches() {
         <StatCard title="Live Matches" stat={liveMatches.length} subtitle="Currently running" Item={Users} />
         <StatCard title="Completed" stat={completed.length} subtitle="Finished games" Item={Clock} />
         <StatCard title="Upcoming" stat={upcoming.length} subtitle="Fixtures scheduled" Item={Trophy} />
+      </div>
+
+       {showAdd && (
+        <Modal title="Add Match" onClose={() => setShowAdd(false)} onSave={handleAddMatch}>
+          <FormSelect label="Event" options={events} valueKey="_id" labelKey="name"
+            onChange={(v) => setForm({ ...form, event_id: v })} />
+          <FormSelect label="Team A" options={teams} valueKey="_id" labelKey="name"
+            onChange={(v) => setForm({ ...form, teamA_id: v })} />
+          <FormSelect label="Team B" options={teams} valueKey="_id" labelKey="name"
+            onChange={(v) => setForm({ ...form, teamB_id: v })} />
+          <FormInput label="Venue" onChange={(v) => setForm({ ...form, venue: v })} />
+          <FormInput type="datetime-local" label="Match Date & Time" onChange={(v) => setForm({ ...form, matchDateTime: v })} />
+        </Modal>
+      )}
+
+      {/* Update Result Modal */}
+      {showUpdate && selectedMatch && (
+        <Modal title="Update Match Result" onClose={() => setShowUpdate(false)} onSave={handleUpdateResult}>
+          <FormInput label="Score A" type="number" onChange={(v) => setForm({ ...form, scoreA: Number(v) })} />
+          <FormInput label="Score B" type="number" onChange={(v) => setForm({ ...form, scoreB: Number(v) })} />
+          <FormInput label="Remarks" onChange={(v) => setForm({ ...form, remarks: v })} />
+        </Modal>
+      )}
+    </div>
+  );
+}
+
+
+function FormInput({ label, type = "text", onChange }) {
+  return (
+    <div className="mb-3">
+      <label className="block text-sm font-medium mb-1">{label}</label>
+      <input
+        type={type}
+        onChange={(e) => onChange(e.target.value)}
+        className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
+      />
+    </div>
+  );
+}
+
+function FormSelect({ label, options, valueKey, labelKey, onChange }) {
+  return (
+    <div className="mb-3">
+      <label className="block text-sm font-medium mb-1">{label}</label>
+      <select
+        onChange={(e) => onChange(e.target.value)}
+        className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
+      >
+        <option value="">Select {label}</option>
+        {options.map((opt) => (
+          <option key={opt[valueKey]} value={opt[valueKey]}>
+            {opt[labelKey]}
+          </option>
+        ))}
+      </select>
+    </div>
+  );
+}
+
+function Modal({ title, children, onClose, onSave }) {
+  return (
+    <div className="fixed inset-0 bg-black/40 flex justify-center items-center z-50">
+      <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-lg">
+        <h2 className="text-lg font-semibold mb-4">{title}</h2>
+        {children}
+        <div className="flex justify-end gap-2 mt-4">
+          <button onClick={onClose} className="px-4 py-2 bg-gray-200 rounded-md hover:bg-gray-300">Close</button>
+          <button onClick={onSave} className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Save</button>
+        </div>
       </div>
     </div>
   );

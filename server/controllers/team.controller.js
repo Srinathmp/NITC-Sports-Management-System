@@ -1,6 +1,6 @@
 const asyncHandler = require('express-async-handler');
 const Team = require('../models/team.model');
-const NIT  = require('../models/nit.model');
+const NIT = require('../models/nit.model');
 
 // ------- existing handlers (kept) -------
 
@@ -55,7 +55,7 @@ const getMyTeamBySport = asyncHandler(async (req, res) => {
   const { sport } = req.query;
 
   if (!coachId) return res.status(401).json({ message: 'Unauthorized' });
-  if (!sport)   return res.status(400).json({ message: 'sport is required' });
+  if (!sport) return res.status(400).json({ message: 'sport is required' });
 
   const team = await Team.findOne({ coach_id: coachId, sport }).lean();
   if (!team) return res.status(404).json({ message: 'Team not found for this sport' });
@@ -90,7 +90,7 @@ const addPlayerToMyTeamBySport = asyncHandler(async (req, res) => {
   const { sport, player } = req.body;
 
   if (!coachId) return res.status(401).json({ message: 'Unauthorized' });
-  if (!sport)    return res.status(400).json({ message: 'sport is required' });
+  if (!sport) return res.status(400).json({ message: 'sport is required' });
 
   if (!player || !player.name || !player.position || player.jerseyNo == null) {
     return res.status(400).json({ message: 'player.name, player.position, player.jerseyNo are required' });
@@ -133,7 +133,7 @@ const updatePlayerInMyTeamBySport = asyncHandler(async (req, res) => {
   const { sport, player = {} } = req.body;
 
   if (!coachId) return res.status(401).json({ message: 'Unauthorized' });
-  if (!sport)    return res.status(400).json({ message: 'sport is required' });
+  if (!sport) return res.status(400).json({ message: 'sport is required' });
   if (!Number.isFinite(oldJerseyNo) || oldJerseyNo <= 0) {
     return res.status(400).json({ message: 'Invalid jerseyNo in URL' });
   }
@@ -152,7 +152,7 @@ const updatePlayerInMyTeamBySport = asyncHandler(async (req, res) => {
     team.players[idx].jerseyNo = n;
   }
 
-  if (player.name != null)     team.players[idx].name = String(player.name).trim();
+  if (player.name != null) team.players[idx].name = String(player.name).trim();
   if (player.position != null) team.players[idx].position = String(player.position).trim();
 
   await team.save();
@@ -179,7 +179,7 @@ const deletePlayerInMyTeamBySport = asyncHandler(async (req, res) => {
   const { sport } = req.query;
 
   if (!coachId) return res.status(401).json({ message: 'Unauthorized' });
-  if (!sport)    return res.status(400).json({ message: 'sport is required' });
+  if (!sport) return res.status(400).json({ message: 'sport is required' });
   if (!Number.isFinite(jerseyNo) || jerseyNo <= 0) {
     return res.status(400).json({ message: 'Invalid jerseyNo in URL' });
   }
@@ -220,11 +220,11 @@ const listTeamsPublic = asyncHandler(async (req, res) => {
   // Search filtering (if applicable)
   const filtered = (search
     ? teams.filter(t => {
-        const rx = new RegExp(search.trim(), 'i');
-        const coachName = t.coach_id?.name || '';
-        const nitName   = t.nit_id?.name || '';
-        return rx.test(t.name) || rx.test(coachName) || rx.test(nitName);
-      })
+      const rx = new RegExp(search.trim(), 'i');
+      const coachName = t.coach_id?.name || '';
+      const nitName = t.nit_id?.name || '';
+      return rx.test(t.name) || rx.test(coachName) || rx.test(nitName);
+    })
     : teams
   );
 
@@ -236,12 +236,12 @@ const listTeamsPublic = asyncHandler(async (req, res) => {
     sport: t.sport,
     coachName: t.coach_id?.name || '—',
     playersCount: Array.isArray(t.players) ? t.players.length : 0,
+    players: t.players,
     isMyTeam: me ? (t.coach_id?._id?.toString() === me) : false,
   }));
 
   const total = out.length;
   const paginated = out.slice(skip, skip + parseInt(limit));
-
   res.json({
     items: paginated,
     total,
@@ -249,9 +249,6 @@ const listTeamsPublic = asyncHandler(async (req, res) => {
     currentPage: parseInt(page),
   });
 });
-
-module.exports = { listTeamsPublic };
-
 
 /**
  * GET /api/v1/teams/mine

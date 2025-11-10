@@ -5,7 +5,7 @@ const matches = require('../models/match.model');
 const AuditLog = require('../models/auditLog.model');
 const User = require('../models/user.model');
 const teams = require('../models/team.model');
-// const Announcement = require('../models/announcement.model');
+const Announcement = require('../models/notification.model');
 
 function mapStatus(action) {
     const lower = action?.toLowerCase() || '';
@@ -35,7 +35,7 @@ const commonAdmin = asyncHandler(async (req, res) => {
             .sort({ createdAt: -1 })
             .limit(3)
             .skip((page - 1) * 3)
-            .select("name createdAt code isHost");
+            .select("name createdAt code isHost adminEmail");
 
         const logs = await AuditLog.aggregate([
             {
@@ -212,16 +212,15 @@ const public = asyncHandler(async (req, res) => {
         .limit(5)
         .lean();
 
-    const upcomingEvents = await events.find({ date: { $gte: new Date() } })
+    const upcomingEvents = await events.find({ status: "Scheduled" })
         .sort({ date: 1 })
-        .limit(5)
+        .limit(3)
         .lean();
 
-    const announcements = []
-    // await Announcement.find()
-    //     .sort({ createdAt: -1 })
-    //     .limit(5)
-    //     .lean();
+    const announcements = await Announcement.find({type: "Announcement"})
+        .sort({ createdAt: -1 })
+        .limit(3)
+        .lean();
 
     const totalNITs = await NIT.countDocuments();
     const totalEvents = await events.countDocuments();
