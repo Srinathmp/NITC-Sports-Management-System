@@ -16,7 +16,7 @@ const StatCard = ({ title, value, Icon, subtitle }) => (
   </div>
 );
 
-const PendingRegistrationItem = ({ nitName, registeredDate, code, fetchData }) => {
+const PendingRegistrationItem = ({ nitName, registeredDate, code, adminEmail, fetchData }) => {
   const [isHost, setIsHost] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const approveReq = async () => {
@@ -31,14 +31,15 @@ const PendingRegistrationItem = ({ nitName, registeredDate, code, fetchData }) =
   }
   return (
     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 border border-gray-200 rounded-lg hover:shadow-sm transition-all">
-      <div>
+      <div className='min-w-60'>
         <h4 className="font-semibold text-gray-800">{nitName}</h4>
+        <h3 className="font-semibold text-sm text-gray-800">Email:{adminEmail}</h3>
         <p className="text-sm text-gray-500">Applied: {registeredDate}</p>
       </div>
       <button className={`flex items-center justify-center gap-2 px-4 py-2 ${isHost ? 'bg-blue-600' : 'bg-blue-400'} text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors cursor-pointer`} onClick={() => setIsHost(!isHost)}>
         {isHost && <Check className="h-4 w-4" />}
         {!isHost && <X className="h-4 w-4" />}
-        <span>Set Host</span>
+        <span>Host</span>
       </button>
       <div className="flex gap-2 mt-3 sm:mt-0 flex-shrink-0 justify-between">
         <button className="flex items-center justify-center gap-2 px-4 py-2 bg-green-500 text-white rounded-lg text-sm font-medium hover:bg-green-600 transition-colors cursor-pointer disabled:cursor-not-allowed disabled:bg-green-400" onClick={approveReq} disabled={isLoading}>
@@ -139,8 +140,9 @@ function CommonAdminDashboard() {
           <div className={`flex flex-col gap-4 min-h-60 ${totalPage == 0 ? 'hidden' : ''}`}>
             {
               pendingList.map((curr, index) => {
+                console.log(curr)
                 const dateObj = new Date(curr.createdAt);
-                return <PendingRegistrationItem key={curr.code} nitName={curr.name} registeredDate={format(dateObj, 'MMM dd, yyyy')} code={curr.code} fetchData={fetchDashboard} />
+                return <PendingRegistrationItem key={curr.code} nitName={curr.name} registeredDate={format(dateObj, 'MMM dd, yyyy')} code={curr.code} adminEmail={curr.adminEmail} fetchData={fetchDashboard} />
               })
             }
           </div>

@@ -2,15 +2,29 @@ import api from "../../api/axios";
 import { useAuth } from "../../contexts/AuthContexts";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { Mail, Lock, User, Building, Phone, MapPin, Code, Shield, Trophy, } from "lucide-react";
+import { Mail, Lock, User, Building, Phone, MapPin, Code, Shield, Trophy, Eye, EyeOff } from "lucide-react";
 
 function InputField({ icon, label, name, value, onChange, type = "text", placeholder }) {
+  const [showPassword, setShowPassword] = useState(false);
+  const isPassword = type === "password";
+
   return (
     <div>
       <label className="block text-sm font-medium text-gray-700 mb-2">{label}</label>
       <div className="relative">
-        <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5">{icon}</div>
-        <input type={type} name={name} value={value} onChange={onChange} placeholder={placeholder} required className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-lg placeholder-gray-400 focus:ring-2 focus:ring-blue-400 focus:border-transparent outline-none" />
+        <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5"> {icon} </div>
+
+        {/* Input Field */}
+        <input type={isPassword && showPassword ? "text" : type} name={name} value={value} onChange={onChange} placeholder={placeholder} required
+          className="w-full pl-11 pr-11 py-3 border border-gray-300 rounded-lg placeholder-gray-400 focus:ring-2 focus:ring-blue-400 focus:border-transparent outline-none"
+        />
+
+        {/* Eye Icon for Password Toggle */}
+        {isPassword && (
+          <button type="button" onClick={() => setShowPassword((prev) => !prev)} className="cursor-pointer absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600" tabIndex={-1} >
+            {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+          </button>
+        )}
       </div>
     </div>
   );
@@ -89,16 +103,17 @@ function RegisterUserForm({ formData, setFormData, handleSubmit, loading }) {
   );
 }
 
-function RegisterNITForm({ nitName, setNitName, nitCode, setNitCode, nitLoc, setNitLoc, handleSubmit, loading }) {
+function RegisterNITForm({ formDataRegister, setFormDataRegister, handleSubmit, loading }) {
   return (
     <div className="flex flex-col p-8 md:p-12 justify-center">
       <h2 className="text-3xl font-bold text-gray-900 mb-2">Register Institute</h2>
       <p className="text-gray-500 mb-8">Register your NIT with INSMS</p>
 
       <form onSubmit={(handleSubmit)} className="space-y-5">
-        <InputField icon={<Building />} name="nitName" label="Institute Name" value={nitName} onChange={(e) => setNitName(e.target.value)} placeholder="National Institute of Technology" />
-        <InputField icon={<Code />} name="nitCode" label="Institute Code" value={nitCode} onChange={(e) => setNitCode(e.target.value)} placeholder="NIT-XXX" />
-        <InputField icon={<MapPin />} name="location" label="Location" value={nitLoc} onChange={(e) => setNitLoc(e.target.value)} placeholder="City, State" />
+        <InputField icon={<Building />} name="nitName" label="Institute Name" value={formDataRegister.nitName} onChange={(e) => setFormDataRegister({ ...formDataRegister, nitName: e.target.value })} placeholder="National Institute of Technology" />
+        <InputField icon={<Mail />} name="admin-email" label="Admin Email" value={formDataRegister.adminEmail} onChange={(e) => setFormDataRegister({ ...formDataRegister, adminEmail: e.target.value })} placeholder="your.email@example.com" />
+        <InputField icon={<Code />} name="nitCode" label="Institute Code" value={formDataRegister.nitCode} onChange={(e) => setFormDataRegister({ ...formDataRegister, nitCode: e.target.value })} placeholder="NIT-XXX" />
+        <InputField icon={<MapPin />} name="location" label="Location" value={formDataRegister.nitLoc} onChange={(e) => setFormDataRegister({ ...formDataRegister, nitLoc: e.target.value })} placeholder="City, State" />
         <button type="submit" className=" cursor-pointer w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg disabled:cursor-not-allowed" disabled={loading} >
           {loading ? "Registering....." : "Register Institute"}
         </button>
@@ -111,14 +126,12 @@ const Login = () => {
   const navigate = useNavigate();
   const [error, setError] = useState("");
   const [email, setEmail] = useState("");
-  const [nitLoc, setNitLoc] = useState("")
   const [mode, setMode] = useState("login");
-  const [nitName, setNitName] = useState("")
-  const [nitCode, setNitCode] = useState("")
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const { login, isAuthenticated, user } = useAuth();
   const handleChangeSelect = (e) => { setMode(e.target.value); }
+  const [formDataRegister, setFormDataRegister] = useState({ nitName: "", nitCode: "", nitLoc: "", adminEmail: "" });
   const [formData, setFormData] = useState({ email: "", password: "", name: "", phone: "", role: "Coach", nit_id: "" });
 
   useEffect(() => {
@@ -163,18 +176,20 @@ const Login = () => {
     e.preventDefault();
     setError("");
 
-    if (!nitName || !nitCode || !nitLoc) {
-      setError("Please fill all details.");
+    const requiredFields = ["nitName", "nitCode", "nitLoc", "adminEmail"];
+
+    const missing = requiredFields.filter((f) => !formDataRegister[f]?.trim());
+    if (missing.length > 0) {
+      console.log(missing)
+      alert(`Please fill in all required fields.`);
       return;
     }
 
     try {
       setLoading(true);
 
-      const res = await api.post("/nits/register", { nitName, nitCode, nitLoc });
-      setNitCode("")
-      setNitLoc("")
-      setNitName("")
+      const res = await api.post("/nits/register", formDataRegister);
+      setFormDataRegister({ nitName: "", nitCode: "", nitLoc: "", adminEmail: "" });
       alert("Succesfull!!")
     } catch (err) {
       alert(err.response.data.message);
@@ -223,7 +238,7 @@ const Login = () => {
             <RegisterUserForm formData={formData} setFormData={setFormData} handleSubmit={handleSubmitRegister} loading={loading} />
           )}
           {mode === "registerNIT" && (
-            <RegisterNITForm nitName={nitName} setNitName={setNitName} nitCode={nitCode} setNitCode={setNitCode} nitLoc={nitLoc} setNitLoc={setNitLoc} handleSubmit={handleSubmitNIT} loading={loading} />
+            <RegisterNITForm formDataRegister={formDataRegister} setFormDataRegister={setFormDataRegister} handleSubmit={handleSubmitNIT} loading={loading} />
           )}
         </div>
 

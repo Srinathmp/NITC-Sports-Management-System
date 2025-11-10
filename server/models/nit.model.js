@@ -28,9 +28,13 @@ const nitSchema = new Schema({
         type: Boolean,
         default: false
     },
-    points:{
+    points: {
         type: Number,
-        default:0
+        default: 0
+    },
+    adminEmail: {
+        type: String,
+        trim: true
     }
 }, {
     timestamps: true

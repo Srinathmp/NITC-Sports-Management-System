@@ -1,5 +1,6 @@
 import "../index.css";
 import api from "../api/axios";
+import { format } from 'date-fns';
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { LinkBtn } from "../components/Button";
@@ -21,6 +22,7 @@ export default function Home() {
                 setTop(data.topPerformers);
                 setLive(data.liveMatches);
                 setEvents(data.upcomingEvents);
+                console.log(data)
                 setNotes(data.announcements);
             } catch (err) {
                 console.error("Public home load failed", err);
@@ -93,7 +95,6 @@ export default function Home() {
 
                             {live?.length > 0 ? (
                                 live.map((m, i) => {
-                                    console.log(m);
                                     return <LiveCard
                                         key={i}
                                         game_name={m.sport}
@@ -156,7 +157,7 @@ export default function Home() {
                                         <UpcomingCard
                                             key={i}
                                             game={e.sport}
-                                            date={new Date(e.date).toLocaleDateString()}
+                                            date={format(new Date(e.datetime), 'MMM dd, yyyy')}
                                             teams={`${e.teams?.length || 0} teams`}
                                         />
                                     ))
@@ -179,9 +180,9 @@ export default function Home() {
                                 {notes?.length > 0 ? (
                                     notes.map((n, i) => (
                                         <div key={i} className="space-y-1 rounded-xl bg-white/70 p-4 text-black">
-                                            <p className="font-semibold">{n.title}</p>
+                                            <p className="font-semibold">{n.type}</p>
                                             <p className="text-sm">{n.message}</p>
-                                            <p className="text-sm">{new Date(n.createdAt).toLocaleString()}</p>
+                                            <p className="text-sm">{format(new Date(n.createdAt), 'MMM dd, yyyy')}</p>
                                         </div>
                                     ))
                                 ) : (

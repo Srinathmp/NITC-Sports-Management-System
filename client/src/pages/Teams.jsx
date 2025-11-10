@@ -57,55 +57,105 @@ function TeamDetailModal({ team, onClose }) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm" onClick={onClose}>
-      <div
-        className="bg-white border border-gray-200 rounded-lg shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="flex items-center justify-between p-6 border-b border-gray-200 flex-shrink-0">
-          <div className="flex items-center gap-3">
-            <div className="bg-blue-100 p-2 rounded-full">
-              <Users className="h-6 w-6 text-blue-600" />
-            </div>
-            <h2 className="text-2xl font-bold text-gray-900">{team.teamName}</h2>
-          </div>
-          <button
-            onClick={onClose}
-            className="text-gray-500 hover:text-gray-900 transition p-2 hover:bg-gray-100 rounded-full"
-          >
-            <X className="h-6 w-6" />
-          </button>
+
+    <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
+      <div className="bg-white rounded-lg p-6 shadow-xl w-96 relative">
+
+        <button onClick={onClose} className="absolute top-3 right-3 text-gray-500 hover:text-gray-700">✖</button>
+
+        <h2 className="text-xl font-bold mb-3 text-gray-800">{team?.sport} Team</h2>
+        <p className="text-sm text-gray-600 mb-4">{team?.playersCount} players</p>
+
+        <div className="max-h-60 overflow-y-auto border rounded-md">
+          <table className="w-full text-sm text-gray-700">
+            <thead className="bg-gray-100 border-b text-gray-700">
+              <tr>
+                <th className="py-2 px-2 text-left w-10">#</th>
+                <th className="py-2 px-2 text-left w-16">Jersey</th>
+                <th className="py-2 px-2 text-left">Player</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {team?.players?.length > 0 ? (
+                team.players.map((p, i) => (
+                  <tr key={i} className="border-b">
+                    <td className="py-2 px-2">{i + 1}</td>
+                    <td className="py-2 px-2">{p.jerseyNo || '-'}</td>
+                    <td className="py-2 px-2">{p.name}</td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="3" className="py-3 text-center text-gray-500">
+                    No players added
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
         </div>
-
-        <div className="p-6 overflow-y-auto">
-          <div className="mb-6 text-center">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 rounded-full">
-              <MapPin className="h-4 w-4 text-gray-500" />
-              <p className="text-sm font-medium text-gray-600">{team.nitName}</p>
-            </div>
-          </div>
-
-          <div className="text-center mb-4">
-            <p className="text-sm text-gray-500 mb-1">Coach</p>
-            <p className="text-lg font-semibold text-gray-900">{team.coachName}</p>
-          </div>
-
-          <div className="flex items-center justify-between mt-2">
-            <h3 className="text-lg font-semibold text-gray-900">
-              Team Members ({team.playersCount})
-            </h3>
-            {team.isMyTeam && (
-              <button
-                onClick={onEdit}
-                className="rounded-md bg-blue-600 text-white px-3 py-2 text-sm font-medium hover:bg-blue-700"
-              >
-                Edit Team
-              </button>
-            )}
-          </div>
+        <div className="mt-2 items-center flex justify-center">
+          {team.isMyTeam && (
+            <button
+              onClick={onEdit}
+              className="rounded-md bg-blue-600 text-white px-3 py-2 text-sm font-medium hover:bg-blue-700"
+            >
+              Edit Team
+            </button>
+          )}
         </div>
       </div>
     </div>
+    //     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm" onClick={onClose}>
+    //   <div
+    //     className="bg-white border border-gray-200 rounded-lg shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col"
+    //     onClick={(e) => e.stopPropagation()}
+    //   >
+    //     <div className="flex items-center justify-between p-6 border-b border-gray-200 flex-shrink-0">
+    //       <div className="flex items-center gap-3">
+    //         <div className="bg-blue-100 p-2 rounded-full">
+    //           <Users className="h-6 w-6 text-blue-600" />
+    //         </div>
+    //         <h2 className="text-2xl font-bold text-gray-900">{team.teamName}</h2>
+    //       </div>
+    //       <button
+    //         onClick={onClose}
+    //         className="text-gray-500 hover:text-gray-900 transition p-2 hover:bg-gray-100 rounded-full"
+    //       >
+    //         <X className="h-6 w-6" />
+    //       </button>
+    //     </div>
+
+    //     <div className="p-6 overflow-y-auto">
+    //       <div className="mb-6 text-center">
+    //         <div className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 rounded-full">
+    //           <MapPin className="h-4 w-4 text-gray-500" />
+    //           <p className="text-sm font-medium text-gray-600">{team.nitName}</p>
+    //         </div>
+    //       </div>
+
+    //       <div className="text-center mb-4">
+    //         <p className="text-sm text-gray-500 mb-1">Coach</p>
+    //         <p className="text-lg font-semibold text-gray-900">{team.coachName}</p>
+    //       </div>
+
+    //       <div className="flex items-center justify-between mt-2">
+    //         <h3 className="text-lg font-semibold text-gray-900">
+    //           Team Members ({team.playersCount})
+    //         </h3>
+    //         {team.isMyTeam && (
+    //           <button
+    //             onClick={onEdit}
+    //             className="rounded-md bg-blue-600 text-white px-3 py-2 text-sm font-medium hover:bg-blue-700"
+    //           >
+    //             Edit Team
+    //           </button>
+    //         )}
+    //       </div>
+    //     </div>
+    //   </div>
+    // </div>
   );
 }
 
@@ -133,6 +183,7 @@ export default function Teams() {
         },
       });
       setTeams(data.items || []);
+      console.log(data.items)
       setTotalPages(data.totalPages || 1);
       setTotalTeams(data.total || 0);
     } catch (err) {
@@ -222,8 +273,8 @@ export default function Teams() {
           onClick={() => setPage((p) => Math.max(1, p - 1))}
           disabled={page === 1}
           className={`flex items-center gap-1 px-3 py-2 rounded-lg border text-sm font-medium ${page === 1
-              ? "text-white bg-blue-300 cursor-not-allowed"
-              : "text-white bg-blue-500 hover:bg-blue-400"
+            ? "text-white bg-blue-300 cursor-not-allowed"
+            : "text-white bg-blue-500 hover:bg-blue-400"
             }`}>
           Prev
         </button>
