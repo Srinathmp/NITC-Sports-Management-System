@@ -10,7 +10,8 @@ const {
   updatePlayerInMyTeamBySport,
   deletePlayerInMyTeamBySport,
   listTeamsPublic,
-  listMyTeams
+  listMyTeams,
+  getMyTeams
 } = require('../controllers/team.controller');
 
 const { protect, authorizeRoles } = require('../middleware/auth.middleware');
@@ -39,5 +40,8 @@ router.get('/public', optionalProtect, listTeamsPublic);
 
 // NEW: coach’s own teams
 router.get('/mine', protect, authorizeRoles('Coach'), listMyTeams);
+
+//NEW: coach's teams for booking accommodation, redundant with /mine but didn't want to change existing route
+router.get("/my-teams", protect, authorizeRoles("Coach"), getMyTeams);
 
 module.exports = router;

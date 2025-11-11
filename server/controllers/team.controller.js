@@ -275,6 +275,18 @@ const listMyTeams = asyncHandler(async (req, res) => {
   res.json({ items: out, total: out.length });
 });
 
+// Get my teams - used for Booking accommodation
+const getMyTeams = async (req, res) => {
+  try {
+    const coachId = req.user._id;
+    const teams = await Team.find({ coach_id: coachId }).select("name _id sport");
+    res.status(200).json(teams);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to fetch coach teams" });
+  }
+};
+
+
 module.exports = {
   createTeam,
   getTeamsByNIT,
@@ -284,5 +296,6 @@ module.exports = {
   updatePlayerInMyTeamBySport,
   deletePlayerInMyTeamBySport,
   listTeamsPublic,   // ✅ NEW
-  listMyTeams        // ✅ NEW
+  listMyTeams,        // ✅ NEW
+  getMyTeams         // ✅ NEW
 };

@@ -12,6 +12,7 @@ function SidebarNav({ isOpen }) {
         { title: 'Matches', icon: Calendar, link: '/coach/matches' },
         { title: 'Leaderboard', icon: ChartColumn, link: '/coach/leaderboard' },
         { title: 'Accomodation', icon: LocationEdit, link: '/coach/accomodation' },
+        { title: 'Bookings', icon: LocationEdit, link: '/coach/bookings' }
 
     ];
 

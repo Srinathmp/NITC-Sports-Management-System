@@ -18,6 +18,7 @@ import Accomodation from "./pages/nit-admin/Accomodation";
 import CommonAdmin from "./pages/common-admin/CommonAdmin";
 import CommonAdminDashboard from "./pages/common-admin/CommonDashboard";
 import AuditLogPage from "./pages/common-admin/AuditLog";
+import BookingPage from "./pages/Coach/BookingPage";    
 import {useAuth} from "./contexts/AuthContexts"
 
 export default function App() {
@@ -42,6 +43,7 @@ export default function App() {
                 <Route path="matches" element={<Matches />} />
                 <Route path="events" element={<Events />} />
                 <Route path="accomodation" element={<Accomodation />} />
+                <Route path="bookings" element={<BookingPage />} />
             </Route>
             <Route path="/nit-admin" element={<NitAdmin />} >
                 <Route index element={<Navigate to="dashboard" replace />} />

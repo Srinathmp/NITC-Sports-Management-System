@@ -27,8 +27,8 @@ app.use('/api/dashboard',       require('./routes/dashboard.routes'));
 app.use('/api/v1/leaderboard',  require('./routes/leaderboard.routes'));
 app.use('/api/notifications',   require('./routes/notification.routes'));
 app.use('/api/accommodation',   require('./routes/accommodation.routes'));
-
-// Error handler
+app.use('/api/bookings', require('./routes/booking.routes'));
+// Error handler  
 app.use(notFound);
 app.use(errorHandler);
 
