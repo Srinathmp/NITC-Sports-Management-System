@@ -13,11 +13,11 @@ const registerUser = asyncHandler(async (req, res) => {
     throw new Error('User already exists');
   }
   const nit = await NIT.find({ code: nit_id });
-  if (nit.length==0) { res.status(404); throw new Error('NIT not found'); }
+  if (nit.length == 0 || nit[0].status == 'Pending') { res.status(404); throw new Error('NIT not found'); }
   const salt = await bcrypt.genSalt(10);
   const hash = await bcrypt.hash(password, salt);
   const user = await User.create({
-    name, email, passwordHash: hash, role, nit_id:nit[0]._id, contactNumber
+    name, email, passwordHash: hash, role, nit_id: nit[0]._id, contactNumber
   });
   res.status(201).json({ id: user._id, name: user.name, email: user.email, role: user.role });
 });
@@ -28,7 +28,7 @@ const authUser = asyncHandler(async (req, res) => {
   const user = await User.findOne({ email });
   if (user && (await bcrypt.compare(password, user.passwordHash))) {
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '8h' });
-    res.json({ token, id: user._id, name: user.name, role: user.role });
+    res.json({ token, id: user._id, name: user.name, role: user.role, nit_id:user.nit_id });
   } else {
     res.status(401);
     throw new Error('Invalid email or password');
@@ -44,7 +44,7 @@ const verify = asyncHandler(async (req, res) => {
       const user = await User.findById(decoded.id).select('-passwordHash');
       res
         .status(200)
-        .json({ role: user.role })
+        .json({ role: user.role, name: user.name, email: user.email, nit_id: user.nit_id })
     } catch (error) {
       res.status(401);
       throw new Error('Not authorized : Token failed');

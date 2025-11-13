@@ -25,7 +25,7 @@ const optionalProtect = (req, res, next) => {
 };
 
 // Existing routes
-router.post('/', protect, authorizeRoles('Coach'), createTeam);
+router.post('/create', protect, authorizeRoles('Coach'), createTeam);
 router.get('/nit/:code', getTeamsByNIT);
 router.get('/view', getAllNIT);
 

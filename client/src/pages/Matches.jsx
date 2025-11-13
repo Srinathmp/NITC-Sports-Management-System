@@ -262,7 +262,7 @@ export default function Matches() {
       </div>
 
       {/* Matches */}
-      <h2 className="text-2xl font-bold">All Matches</h2>
+      <h2 className="text-2xl font-bold">{statusFilter} Matches</h2>
       <div className="space-y-4 min-h-80">
         {filteredMatches.map((m) => (
           <MatchCard
@@ -343,8 +343,8 @@ export default function Matches() {
       {/* Update Result Modal */}
       {showUpdate && selectedMatch && (
         <Modal title="Update Match Result" onClose={() => setShowUpdate(false)} onSave={handleUpdateResult}>
-          <FormInput label="Score A" type="number" onChange={(v) => setForm({ ...form, scoreA: Number(v) })} />
-          <FormInput label="Score B" type="number" onChange={(v) => setForm({ ...form, scoreB: Number(v) })} />
+          <FormInput label={selectedMatch.teamA_id?.name} type="number" onChange={(v) => setForm({ ...form, scoreA: Number(v) })} />
+          <FormInput label={selectedMatch.teamB_id?.name} type="number" onChange={(v) => setForm({ ...form, scoreB: Number(v) })} />
           <FormInput label="Remarks" onChange={(v) => setForm({ ...form, remarks: v })} />
         </Modal>
       )}

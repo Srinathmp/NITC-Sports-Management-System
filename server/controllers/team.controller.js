@@ -1,25 +1,26 @@
 const asyncHandler = require('express-async-handler');
 const Team = require('../models/team.model');
 const NIT = require('../models/nit.model');
+const event = require('../models/event.model')
 
 // ------- existing handlers (kept) -------
 
 const createTeam = asyncHandler(async (req, res) => {
-  const { name, sport, nit_code, players } = req.body;
+  const { name, event_id, nit_id, players } = req.body;
 
   // find NIT first
-  const nit = await NIT.findOne({ code: nit_code });
+  const nit = await NIT.findOne({ _id: nit_id });
   if (!nit) { res.status(404); throw new Error('NIT not found'); }
-
+  const sportFind = await event.findOne({ _id: event_id }).select('sport')
+  const { sport } = sportFind
   // ensure uniqueness within the same NIT & sport
-  const exists = await Team.findOne({ name, sport, nit_id: nit._id });
+  const exists = await Team.findOne({ name, sport, nit_id: nit._id, event_id });
   if (exists) {
     res.status(400);
     throw new Error('Team already registered for this sport in the NIT');
   }
-
   const team = await Team.create({
-    name, sport, nit_id: nit._id, players, coach_id: req.user._id
+    name, sport, nit_id: nit._id, players, coach_id: req.user._id, event_id
   });
 
   res.status(201).json(team);

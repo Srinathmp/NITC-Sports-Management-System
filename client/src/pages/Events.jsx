@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import api from "../api/axios";
+import { useAuth } from '../contexts/AuthContexts';
 import {
   Search, Filter, Trophy, Calendar, MapPin, Users, Eye, Edit,
   CheckCircle, XCircle
@@ -29,15 +30,16 @@ export default function Events() {
   const [toast, setToast] = useState(null);
   const [visibleEvents, setVisibleEvents] = useState([])
 
-  const role = localStorage.getItem("user");
+  const { user } = useAuth();
 
   /* ---- Fetch Events ---- */
   const fetchEvents = async () => {
     try {
-      const res = role ? await api.get("/events/allEvents") : await api.get("/events/allEventsPublic");
+      const res = await api.get("/events/allEventsPublic");
       setEvents(res.data || []);
       setFilteredEvents(res.data || []);
       setLoading(false);
+      console.log(res.data)
     } catch (err) {
       console.error("Error fetching events:", err);
       setLoading(false);
@@ -53,10 +55,10 @@ export default function Events() {
     if (searchQuery.trim())
       filtered = filtered.filter(e => e.name.toLowerCase().includes(searchQuery.toLowerCase()));
     setFilteredEvents(filtered);
-    const val = (role === "NITAdmin" || role === "CommonAdmin"
+    const val = (user === "NITAdmin" || user === "CommonAdmin"
       ? filtered
       : filtered.filter((e) => e.status !== "Pending" && e.status !== "PendingValidation"))
-    setVisibleEvents(val)
+    setVisibleEvents(events)
     // console.log(filtered,val)
   }, [events, searchQuery, statusFilter]);
 
@@ -90,7 +92,7 @@ export default function Events() {
     Completed: "bg-green-600 text-white",
   };
 
-  /* ---- Role-based visibility ---- */
+  /* ---- user-based visibility ---- */
 
   return (
     <div className="w-full p-8 px-4 md:px-8">
@@ -161,7 +163,7 @@ export default function Events() {
                 <Eye size={16} /> View Details
               </button>
 
-              {role === "NITAdmin" && (
+              {user === "NITAdmin" && (
                 <button
                   onClick={() => openViewModal(ev)}
                   className="w-full py-2 bg-yellow-500 text-white rounded-lg font-semibold hover:bg-yellow-600 flex items-center justify-center gap-2"
@@ -209,7 +211,7 @@ export default function Events() {
           </div>
 
           {/* ✅ Approve / Reject Buttons for CommonAdmin */}
-          {role === "CommonAdmin" && selected.status === "PendingValidation" && (
+          {user === "CommonAdmin" && selected.status === "PendingValidation" && (
             <div className="flex justify-end gap-3 mt-6 text-black">
               <button
                 onClick={() => handleValidation("Scheduled")}
