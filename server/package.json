@@ -100,7 +100,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "nodemon server.js",
-    "dev": "nodemon server.js",
+    "dev": "vercel dev",
     "seed:import": "node scripts/seed.js",
     "seed:destroy": "node scripts/seed.js --delete"
   },
