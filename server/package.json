@@ -76,6 +76,7 @@
     "safer-buffer": "^2.1.2",
     "send": "^1.2.0",
     "serve-static": "^2.2.0",
+    "serverless-http": "^4.0.0",
     "setprototypeof": "^1.2.0",
     "side-channel": "^1.1.0",
     "side-channel-list": "^1.0.0",
