@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, use } from "react";
 import api from "../api/axios";
 import {
   Calendar,
@@ -14,6 +14,7 @@ import {
   ChevronRight,
 } from "lucide-react";
 import FullPageLoader from "../components/FullPageLoader";
+import {useAuth} from '../contexts/AuthContexts'
 
 /* ------------------ UI Components ------------------ */
 
@@ -32,7 +33,77 @@ function StatCard({ title, stat, subtitle, Item }) {
   );
 }
 
-function MatchCard({ m, updateResult }) {
+// function MatchCard({ m, updateResult }) {
+//   const statusLabel =
+//     m.status === "Completed"
+//       ? "Completed"
+//       : m.status === "Ongoing"
+//       ? "LIVE"
+//       : "Upcoming";
+
+//   const badgeClasses =
+//     statusLabel === "LIVE"
+//       ? "bg-red-100 text-red-800"
+//       : statusLabel === "Completed"
+//       ? "bg-blue-100 text-blue-800"
+//       : "bg-orange-100 text-orange-800";
+
+//   const team1Score = m.scoreA ?? null;
+//   const team2Score = m.scoreB ?? null;
+//   const scoreDisplay =
+//     team1Score !== null ? `${team1Score} - ${team2Score}` : "vs";
+
+//   return (
+//     <div className="relative rounded-xl border border-[#b8b8b8ab] bg-white p-4 shadow-sm transition hover:shadow-md">
+//       <div className="top-4 left-4 font-medium flex justify-between">
+//         <div
+//           className={`rounded-full px-2.5 py-0.5 text-xs items-center flex ${badgeClasses}`}
+//         >
+//           {statusLabel === "LIVE" && (
+//             <span className="relative mr-1.5 flex h-2 w-2">
+//               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+//               <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
+//             </span>
+//           )}
+//           {statusLabel}
+//         </div>
+//         <div>{updateResult}</div>
+//       </div>
+
+//       <div className="flex flex-col items-center justify-around pt-10 sm:flex-row sm:pt-4">
+//         <div className="flex w-full items-center justify-around gap-4 text-center sm:w-auto sm:justify-start lg:gap-8">
+//           <span className="w-1/3 font-semibold text-[#535353ec] sm:w-auto sm:text-right">
+//             {m.teamA_id?.name}
+//           </span>
+//           <span className="text-xl font-bold text-gray-900">{scoreDisplay}</span>
+//           <span className="w-1/3 font-semibold text-[#535353ec] sm:w-auto sm:text-left">
+//             {m.teamB_id?.name}
+//           </span>
+//         </div>
+
+//         <div className="mt-4 flex w-full flex-wrap items-center justify-center gap-x-4 gap-y-2 border-t pt-4 text-sm text-gray-500 font-semibold sm:mt-0 sm:w-auto sm:flex-nowrap sm:justify-end sm:border-t-0 sm:pt-0">
+//           <span>{m.event_id?.sport}</span>
+//           <span className="flex items-center">
+//             <Calendar size={12} className="mr-1" />{" "}
+//             {new Date(m.matchDateTime).toLocaleDateString()}
+//           </span>
+//           <span className="flex items-center">
+//             <Clock size={12} className="mr-1" />{" "}
+//             {new Date(m.matchDateTime).toLocaleTimeString([], {
+//               hour: "2-digit",
+//               minute: "2-digit",
+//             })}
+//           </span>
+//           <span className="flex items-center">
+//             <MapPin size={12} className="mr-1" /> {m.venue || "TBD"}
+//           </span>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// }
+
+function MatchCard({ m, updateResult, onPublish, user }) {
   const statusLabel =
     m.status === "Completed"
       ? "Completed"
@@ -54,10 +125,11 @@ function MatchCard({ m, updateResult }) {
 
   return (
     <div className="relative rounded-xl border border-[#b8b8b8ab] bg-white p-4 shadow-sm transition hover:shadow-md">
-      <div className="top-4 left-4 font-medium flex justify-between">
-        <div
-          className={`rounded-full px-2.5 py-0.5 text-xs items-center flex ${badgeClasses}`}
-        >
+
+      {/* Status + Update Button */}
+      <div className="flex justify-between mb-2">
+
+        <div className={`rounded-full px-2.5 py-0.5 text-xs flex ${badgeClasses}`}>
           {statusLabel === "LIVE" && (
             <span className="relative mr-1.5 flex h-2 w-2">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
@@ -66,10 +138,13 @@ function MatchCard({ m, updateResult }) {
           )}
           {statusLabel}
         </div>
+
+        {/* Update Result Button (NIT Admin only) */}
         <div>{updateResult}</div>
       </div>
 
-      <div className="flex flex-col items-center justify-around pt-10 sm:flex-row sm:pt-4">
+      {/* Team Names + Score */}
+      <div className="flex flex-col items-center justify-around pt-6 sm:flex-row sm:pt-2">
         <div className="flex w-full items-center justify-around gap-4 text-center sm:w-auto sm:justify-start lg:gap-8">
           <span className="w-1/3 font-semibold text-[#535353ec] sm:w-auto sm:text-right">
             {m.teamA_id?.name}
@@ -80,6 +155,7 @@ function MatchCard({ m, updateResult }) {
           </span>
         </div>
 
+        {/* Match Details */}
         <div className="mt-4 flex w-full flex-wrap items-center justify-center gap-x-4 gap-y-2 border-t pt-4 text-sm text-gray-500 font-semibold sm:mt-0 sm:w-auto sm:flex-nowrap sm:justify-end sm:border-t-0 sm:pt-0">
           <span>{m.event_id?.sport}</span>
           <span className="flex items-center">
@@ -98,9 +174,24 @@ function MatchCard({ m, updateResult }) {
           </span>
         </div>
       </div>
+
+      {/* 🟦 Publish Result (COMMON ADMIN ONLY) */}
+      {user === "CommonAdmin" &&
+        m.status === "Completed" &&
+        m.pendingPublishing === true && (
+          <div className="mt-4 flex justify-end">
+            <button
+              onClick={() => onPublish(m._id)}
+              className="bg-green-600 text-white px-3 py-1.5 rounded-md hover:bg-green-700 text-sm"
+            >
+              Publish Result
+            </button>
+          </div>
+        )}
     </div>
   );
 }
+
 
 /* ------------------ Main Component ------------------ */
 
@@ -121,7 +212,7 @@ export default function Matches() {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
-  const role = localStorage.getItem("user");
+  const {user} = useAuth();
 
   /* ---- Fetch Paginated Data ---- */
   const fetchData = async (pageNum = 1) => {
@@ -147,7 +238,7 @@ export default function Matches() {
       setPage(pageNum);
       setLoading(false);
 
-      if (role === "CommonAdmin") {
+      if (user === "CommonAdmin") {
         const res1 = await api.get("/matches/pending");
         setPending(res1.data);
       }
@@ -224,7 +315,7 @@ export default function Matches() {
           <h1 className="text-4xl font-bold">Matches</h1>
           <p className="text-[#000000a1]">View scores and upcoming fixtures</p>
         </div>
-        {role === "CommonAdmin" && (
+        {user === "CommonAdmin" && (
           <button
             onClick={() => setShowAdd(true)}
             className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
@@ -268,8 +359,9 @@ export default function Matches() {
           <MatchCard
             key={m._id}
             m={m}
+            user={user}
             updateResult={
-              role === "NITAdmin" && m.status !== "Completed" && (
+              user === "NITAdmin" && m.status !== "Completed" && (
                 <button
                   onClick={() => {
                     setSelectedMatch(m);
@@ -281,6 +373,7 @@ export default function Matches() {
                 </button>
               )
             }
+            onPublish={handlePublish}
           />
         ))}
         {filteredMatches.length === 0 && (
