@@ -69,10 +69,14 @@ function NitDashboard() {
   const [myEventsSubtitle, setMyEventsSubtitle] = useState('');
   const [registeredTeams, setRegisteredTeams] = useState(0);
   const [registeredTeamsSubtitle, setRegisteredTeamsSubtitle] = useState('');
-  const [accommodation, setAccommodation] = useState(0);
-  const [accommodationSubtitle, setAccommodationSubtitle] = useState('');
-  const [messBookings, setMessBookings] = useState(0);
-  const [messBookingsSubtitle, setMessBookingsSubtitle] = useState('');
+  // const [accommodation, setAccommodation] = useState(0);
+  // const [accommodationSubtitle, setAccommodationSubtitle] = useState('');
+  // const [messBookings, setMessBookings] = useState(0);
+  // const [messBookingsSubtitle, setMessBookingsSubtitle] = useState('');
+  const [accCapacity, setAccCapacity] = useState(0);
+  const [accOccupied, setAccOccupied] = useState(0);
+  const [messCapacity, setMessCapacity] = useState(0);
+  const [messOccupied, setMessOccupied] = useState(0);
 
   const handleRedirect = () => navigate('/nit-admin/create-event');
 
@@ -92,8 +96,26 @@ function NitDashboard() {
     }
   };
 
+  const fetchAccommodationSummary = async () => {
+  try {
+    const res = await api.get("/accommodation/accommodation-summary");
+
+    const acc = res.data.accommodation;
+    const mess = res.data.mess;
+
+    setAccCapacity(acc.totalCapacity);
+    setAccOccupied(acc.totalOccupied);
+
+    setMessCapacity(mess.totalCapacity);
+    setMessOccupied(mess.totalOccupied);
+  } catch (error) {
+    console.error("Failed to load accommodation summary:", error);
+  }
+};
+
   useEffect(() => {
     fetchDashboard();
+    fetchAccommodationSummary();
   }, []);
 
   if (isLoading) {
@@ -113,8 +135,8 @@ function NitDashboard() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <StatCard title="My Teams" value={myTeams} subtitle={`Across ${mySports} sports`} Icon={Calendar} />
         <StatCard title="Registered Teams" value={registeredTeams} subtitle={`From ${totalNits} NITs`} Icon={Users} />
-        <StatCard title="Accommodation" value={accommodation} subtitle={accommodationSubtitle} Icon={MapPin} />
-        <StatCard title="Mess Bookings" value={messBookings} subtitle={messBookingsSubtitle} Icon={Utensils} />
+        <StatCard title="Accommodation" value={`${accOccupied}/${accCapacity}`} subtitle="Occupied / Total" Icon={MapPin}/>
+        <StatCard title="Mess Bookings" value={`${messOccupied}/${messCapacity}`} subtitle="Occupied / Total" Icon={Utensils}/>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -145,8 +167,21 @@ function NitDashboard() {
           <h2 className="text-xl font-semibold text-gray-900">Accommodation Overview</h2>
           <p className="text-sm text-gray-500 mb-6">Current accommodation and mess status</p>
           <div className="space-y-4">
-            <ProgressBar label="Room Occupancy" percentage={85} colorClass="bg-blue-600" />
-            <ProgressBar label="Mess Capacity" percentage={64} colorClass="bg-orange-500" />
+            <ProgressBar
+              label="Room Occupancy"
+              percentage={
+                accCapacity === 0 ? 0 : Math.round((accOccupied / accCapacity) * 100)
+              }
+              colorClass="bg-blue-600"
+            />
+
+            <ProgressBar
+              label="Mess Capacity"
+              percentage={
+                messCapacity === 0 ? 0 : Math.round((messOccupied / messCapacity) * 100)
+              }
+              colorClass="bg-orange-500"
+            />
           </div>
           <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-4">
             <DashboardButton title="Manage Rooms" Icon={Bed} navigate={navigate} location='/nit-admin/accomodation' />
