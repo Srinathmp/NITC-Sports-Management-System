@@ -4,15 +4,7 @@ const events = require('../models/event.model');
 const matches = require('../models/match.model');
 const AuditLog = require('../models/auditLog.model');
 const User = require('../models/user.model');
-const teams = require('../models/team.model');
-const Announcement = require('../models/notification.model');
-
-function mapStatus(action) {
-    const lower = action?.toLowerCase() || '';
-    if (lower.includes('approve') || lower.includes('create') || lower.includes('publish')) return 'success';
-    if (lower.includes('reject') || lower.includes('delete')) return 'pending';
-    return 'info';
-}
+const teams = require('../models/team.model')
 
 /* -------------------- COMMON ADMIN DASHBOARD -------------------- */
 const commonAdmin = asyncHandler(async (req, res) => {
@@ -80,6 +72,13 @@ const commonAdmin = asyncHandler(async (req, res) => {
         res.status(500).json({ message: "Server error" });
     }
 });
+
+function mapStatus(action) {
+    const lower = action?.toLowerCase() || '';
+    if (lower.includes('approve') || lower.includes('create') || lower.includes('publish')) return 'success';
+    if (lower.includes('reject') || lower.includes('delete')) return 'pending';
+    return 'info';
+}
 
 /* -------------------- NIT ADMIN DASHBOARD -------------------- */
 const nitAdmin = asyncHandler(async (req, res) => {
@@ -217,7 +216,7 @@ const public = asyncHandler(async (req, res) => {
         .limit(3)
         .lean();
 
-    const announcements = await Announcement.find({type: "Announcement"})
+    const announcements = await AuditLog.find({ type: "Announcement" })
         .sort({ createdAt: -1 })
         .limit(3)
         .lean();

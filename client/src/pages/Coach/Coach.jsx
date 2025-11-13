@@ -36,7 +36,7 @@ function SidebarNav({ isOpen }) {
 }
 
 function Coach() {
-    const { logout }= useAuth();
+    const { logout,nitId }= useAuth();
     const navigate = useNavigate();
     const [isOpen, setIsOpen] = useState(false);
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);

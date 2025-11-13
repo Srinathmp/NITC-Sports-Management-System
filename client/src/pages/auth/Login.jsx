@@ -157,9 +157,9 @@ const Login = () => {
 
       console.log(email, password);
       const res = await api.post("/users/login", { email, password });
-      const { token, role, name } = res.data;
+      const { token, role, name, nit_id } = res.data;
 
-      login(token, role, name, email);
+      login(token, role, name, email, nit_id);
       if (role === "CommonAdmin") navigate("/common-admin/dashboard");
       else if (role === "NITAdmin") navigate("/nit-admin/dashboard");
       else if (role === "Coach") navigate("/coach/dashboard");

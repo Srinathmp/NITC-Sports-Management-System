@@ -2,6 +2,7 @@ const asyncHandler = require('express-async-handler');
 const NIT = require('../models/nit.model');
 const AuditLog = require('../models/auditLog.model');
 const transporter = require('../services/emailService');
+const nitModel = require('../models/nit.model');
 
 const registerNIT = asyncHandler(async (req, res) => {
   const { nitName, nitCode, nitLoc, adminEmail } = req.body;
@@ -27,13 +28,13 @@ const updateNITStatus = asyncHandler(async (req, res) => {
     if (!nit) { res.status(404); throw new Error('NIT not found'); }
     nit[0].status = status;
     nit[0].isHost = isHost;
-    await transporter.sendMail({
+    transporter.sendMail({
       from: '"INSMS Admin" <noreply@insms.com>', // Sender address
       to: nit[0].adminEmail,                         // List of receivers
       subject: `Status Update`, // Subject line
-      replyTo:"commonadmin@insms.com",
-      html: 
-      `
+      replyTo: "commonadmin@insms.com",
+      html:
+        `
         <div style="
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         background-color: #f8fafc;
@@ -57,13 +58,12 @@ const updateNITStatus = asyncHandler(async (req, res) => {
           <p><strong>Host NIT:</strong> ${nit[0].isHost ? "Yes ✅" : "No ❌"}</p>
           <br />
           <p><strong>Registration Status:</strong>
-            <span style="color: ${
-              status === "Approved"
-                ? "#16a34a"
-                : status === "Rejected"
-                ? "#dc2626"
-                : "#ca8a04"
-            };">
+            <span style="color: ${status === "Approved"
+          ? "#16a34a"
+          : status === "Rejected"
+            ? "#dc2626"
+            : "#ca8a04"
+        };">
               ${status}
             </span>
           </p>
@@ -80,7 +80,10 @@ const updateNITStatus = asyncHandler(async (req, res) => {
       `, // HTML body
     });
     await nit[0].save();
-    await AuditLog.create({ action: 'Approve', user_id: req.user._id, entity: 'NIT', entity_id: nit[0]._id, details: `Status set to ${status}` });
+    await AuditLog.create({ action: 'Approve', user_id: req.user._id, entity: 'NIT', entity_id: nit[0]._id, details: `${nit[0].name} registration ${status}` });
+    if (status === "Rejected") {
+      await nitModel.deleteOne({ code: code });
+    }
     res.json(nit[0]);
   } catch (error) {
 

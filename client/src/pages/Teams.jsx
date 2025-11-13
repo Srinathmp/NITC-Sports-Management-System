@@ -1,9 +1,10 @@
-import { Search, Check, ChevronDown, Users, Eye, X, MapPin } from "lucide-react";
+import { Search, Check, ChevronDown, Users, Eye } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../api/axios";
 import FullPageLoader from "../components/FullPageLoader";
 
+/* ------------------ Stat Card ------------------ */
 function StatCard({ title, stat, subtitle }) {
   return (
     <div className="flex items-center justify-between rounded-xl bg-white p-6 hover:shadow-xl border border-[#9c9c9c5e]">
@@ -19,6 +20,7 @@ function StatCard({ title, stat, subtitle }) {
   );
 }
 
+/* ------------------ Team Card ------------------ */
 function TeamCard({ team, onViewDetails }) {
   const { teamName, nitName, playersCount, sport, coachName } = team;
   return (
@@ -34,8 +36,12 @@ function TeamCard({ team, onViewDetails }) {
         <p className="flex items-center gap-2">
           <Users className="h-4 w-4 text-gray-500" /> {playersCount} players
         </p>
-        <p>Sport: <span className="font-medium">{sport}</span></p>
-        <p>Coach: <span className="font-medium">{coachName}</span></p>
+        <p>
+          Sport: <span className="font-medium">{sport}</span>
+        </p>
+        <p>
+          Coach: <span className="font-medium">{coachName}</span>
+        </p>
       </div>
 
       <button
@@ -48,6 +54,7 @@ function TeamCard({ team, onViewDetails }) {
   );
 }
 
+/* ------------------ Team Detail Modal ------------------ */
 function TeamDetailModal({ team, onClose }) {
   const navigate = useNavigate();
   if (!team) return null;
@@ -57,11 +64,11 @@ function TeamDetailModal({ team, onClose }) {
   };
 
   return (
-
     <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
       <div className="bg-white rounded-lg p-6 shadow-xl w-96 relative">
-
-        <button onClick={onClose} className="absolute top-3 right-3 text-gray-500 hover:text-gray-700">✖</button>
+        <button onClick={onClose} className="absolute top-3 right-3 text-gray-500 hover:text-gray-700">
+          ✖
+        </button>
 
         <h2 className="text-xl font-bold mb-3 text-gray-800">{team?.sport} Team</h2>
         <p className="text-sm text-gray-600 mb-4">{team?.playersCount} players</p>
@@ -75,13 +82,12 @@ function TeamDetailModal({ team, onClose }) {
                 <th className="py-2 px-2 text-left">Player</th>
               </tr>
             </thead>
-
             <tbody>
               {team?.players?.length > 0 ? (
                 team.players.map((p, i) => (
                   <tr key={i} className="border-b">
                     <td className="py-2 px-2">{i + 1}</td>
-                    <td className="py-2 px-2">{p.jerseyNo || '-'}</td>
+                    <td className="py-2 px-2">{p.jerseyNo || "-"}</td>
                     <td className="py-2 px-2">{p.name}</td>
                   </tr>
                 ))
@@ -95,6 +101,7 @@ function TeamDetailModal({ team, onClose }) {
             </tbody>
           </table>
         </div>
+
         <div className="mt-2 items-center flex justify-center">
           {team.isMyTeam && (
             <button
@@ -107,100 +114,74 @@ function TeamDetailModal({ team, onClose }) {
         </div>
       </div>
     </div>
-    //     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm" onClick={onClose}>
-    //   <div
-    //     className="bg-white border border-gray-200 rounded-lg shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col"
-    //     onClick={(e) => e.stopPropagation()}
-    //   >
-    //     <div className="flex items-center justify-between p-6 border-b border-gray-200 flex-shrink-0">
-    //       <div className="flex items-center gap-3">
-    //         <div className="bg-blue-100 p-2 rounded-full">
-    //           <Users className="h-6 w-6 text-blue-600" />
-    //         </div>
-    //         <h2 className="text-2xl font-bold text-gray-900">{team.teamName}</h2>
-    //       </div>
-    //       <button
-    //         onClick={onClose}
-    //         className="text-gray-500 hover:text-gray-900 transition p-2 hover:bg-gray-100 rounded-full"
-    //       >
-    //         <X className="h-6 w-6" />
-    //       </button>
-    //     </div>
-
-    //     <div className="p-6 overflow-y-auto">
-    //       <div className="mb-6 text-center">
-    //         <div className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 rounded-full">
-    //           <MapPin className="h-4 w-4 text-gray-500" />
-    //           <p className="text-sm font-medium text-gray-600">{team.nitName}</p>
-    //         </div>
-    //       </div>
-
-    //       <div className="text-center mb-4">
-    //         <p className="text-sm text-gray-500 mb-1">Coach</p>
-    //         <p className="text-lg font-semibold text-gray-900">{team.coachName}</p>
-    //       </div>
-
-    //       <div className="flex items-center justify-between mt-2">
-    //         <h3 className="text-lg font-semibold text-gray-900">
-    //           Team Members ({team.playersCount})
-    //         </h3>
-    //         {team.isMyTeam && (
-    //           <button
-    //             onClick={onEdit}
-    //             className="rounded-md bg-blue-600 text-white px-3 py-2 text-sm font-medium hover:bg-blue-700"
-    //           >
-    //             Edit Team
-    //           </button>
-    //         )}
-    //       </div>
-    //     </div>
-    //   </div>
-    // </div>
   );
 }
 
+/* ------------------ Main Component ------------------ */
 export default function Teams() {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedSport, setSelectedSport] = useState(0);
   const [sports] = useState(["All Sports", "Basketball", "Football", "Cricket"]);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedTeam, setSelectedTeam] = useState(null);
-  const [teams, setTeams] = useState([]);
+
+  const [teams, setTeams] = useState([]); // full list
+  const [filteredTeams, setFilteredTeams] = useState([]); // filtered
   const [loading, setLoading] = useState(true);
+
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [totalTeams, setTotalTeams] = useState(0);
+  const perPage = 9;
 
+  /* Fetch all teams once */
   const fetchTeams = async () => {
     try {
       setLoading(true);
-      const { data } = await api.get("/v1/teams/public", {
-        params: {
-          page,
-          limit: 9,
-          search: searchTerm || undefined,
-          sport: sports[selectedSport],
-        },
-      });
+      const { data } = await api.get("/v1/teams/public");
       setTeams(data.items || []);
-      console.log(data.items)
-      setTotalPages(data.totalPages || 1);
-      setTotalTeams(data.total || 0);
+      setFilteredTeams(data.items || []);
+      setLoading(false);
     } catch (err) {
       console.error(err);
-    } finally {
       setLoading(false);
     }
   };
 
-  // Fetch on filters / page change
+  /* Fetch once on mount */
   useEffect(() => {
     fetchTeams();
-  }, [page, selectedSport, searchTerm]);
+  }, []);
+
+  /* Apply local filters */
+  useEffect(() => {
+    let filtered = [...teams];
+
+    const sport = sports[selectedSport];
+    if (sport !== "All Sports") {
+      filtered = filtered.filter((t) => t.sport === sport);
+    }
+
+    if (searchTerm.trim()) {
+      const q = searchTerm.toLowerCase();
+      filtered = filtered.filter(
+        (t) =>
+          t.teamName.toLowerCase().includes(q) ||
+          t.nitName.toLowerCase().includes(q) ||
+          t.coachName.toLowerCase().includes(q)
+      );
+    }
+
+    setFilteredTeams(filtered);
+    setPage(1); // reset to page 1 when filters change
+  }, [searchTerm, selectedSport, teams]);
 
   if (loading) return <FullPageLoader />;
 
+  /* Pagination logic */
+  const totalTeams = filteredTeams.length;
   const totalSports = new Set(teams.map((t) => t.sport)).size;
+  const totalPageCount = Math.ceil(totalTeams / perPage);
+  const paginatedTeams = filteredTeams.slice((page - 1) * perPage, page * perPage);
 
   return (
     <div className="flex flex-col gap-8 min-h-screen w-full p-8 pt-5 px-4 md:px-8 bg-gray-50">
@@ -216,10 +197,7 @@ export default function Teams() {
           <input
             placeholder="Search teams, NITs, or coaches..."
             value={searchTerm}
-            onChange={(e) => {
-              setPage(1);
-              setSearchTerm(e.target.value);
-            }}
+            onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full p-2.5 pl-10 rounded-lg border border-[#00000039] bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
@@ -233,8 +211,9 @@ export default function Teams() {
             <ChevronDown className={`transition-transform ${isOpen ? "rotate-180" : ""}`} />
           </button>
           <div
-            className={`${isOpen ? "block" : "hidden"
-              } z-20 absolute flex flex-col bg-white w-full mt-2 rounded-lg border border-[#00000039] p-1 shadow-lg`}
+            className={`${
+              isOpen ? "block" : "hidden"
+            } z-20 absolute flex flex-col bg-white w-full mt-2 rounded-lg border border-[#00000039] p-1 shadow-lg`}
           >
             {sports.map((s, index) => (
               <button
@@ -242,7 +221,6 @@ export default function Teams() {
                 className="flex items-center gap-4 hover:bg-[#cacaca98] text-left"
                 onClick={() => {
                   setIsOpen(false);
-                  setPage(1);
                   setSelectedSport(index);
                 }}
               >
@@ -254,40 +232,46 @@ export default function Teams() {
         </div>
       </div>
 
-      {/* Grid */}
+      {/* Teams Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {teams.length > 0 ? (
-          teams.map((team) => (
-            <TeamCard key={team.id} team={team} onViewDetails={setSelectedTeam} />
-          ))
+        {paginatedTeams.length > 0 ? (
+          paginatedTeams.map((team) => <TeamCard key={team.id} team={team} onViewDetails={setSelectedTeam} />)
         ) : (
-          <p className="sm:col-span-2 lg:col-span-3 text-center text-gray-500 py-10">
-            No teams found.
-          </p>
+          <p className="sm:col-span-2 lg:col-span-3 text-center text-gray-500 py-10">No teams found.</p>
         )}
       </div>
 
       {/* Pagination */}
       <div className="flex justify-center items-center gap-4 mt-6">
         <button
-          onClick={() => setPage((p) => Math.max(1, p - 1))}
+          onClick={() => {
+            setPage((p) => Math.max(1, p - 1));
+            window.scrollTo({ top: 0, behavior: "smooth" });
+          }}
           disabled={page === 1}
-          className={`flex items-center gap-1 px-3 py-2 rounded-lg border text-sm font-medium ${page === 1
-            ? "text-white bg-blue-300 cursor-not-allowed"
-            : "text-white bg-blue-500 hover:bg-blue-400"
-            }`}>
+          className={`flex items-center gap-1 px-3 py-2 rounded-lg border text-sm font-medium ${
+            page === 1
+              ? "text-white bg-blue-300 cursor-not-allowed"
+              : "text-white bg-blue-500 hover:bg-blue-400"
+          }`}
+        >
           Prev
         </button>
         <span className="text-gray-700 font-medium">
-          Page {page} of {totalPages}
+          Page {page} of {totalPageCount}
         </span>
         <button
-          onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-          disabled={page === totalPages}
-          className={`flex items-center gap-1 px-3 py-2 rounded-lg border text-sm font-medium ${page === totalPages
-            ? "text-white bg-blue-300 cursor-not-allowed"
-            : "text-white bg-blue-500 hover:bg-blue-400"
-            }`}>
+          onClick={() => {
+            setPage((p) => Math.min(totalPageCount, p + 1));
+            window.scrollTo({ top: 0, behavior: "smooth" });
+          }}
+          disabled={page === totalPageCount}
+          className={`flex items-center gap-1 px-3 py-2 rounded-lg border text-sm font-medium ${
+            page === totalPageCount
+              ? "text-white bg-blue-300 cursor-not-allowed"
+              : "text-white bg-blue-500 hover:bg-blue-400"
+          }`}
+        >
           Next
         </button>
       </div>

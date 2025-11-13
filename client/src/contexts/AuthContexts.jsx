@@ -7,8 +7,9 @@ const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
     const [email, setEmail] = useState('')
-    const [user, setUser] = useState(localStorage.getItem('user'));
-    const [name, setName] = useState(localStorage.getItem('name'));
+    const [user, setUser] = useState('');
+    const [name, setName] = useState('');
+    const [nitId, setNitId] = useState('');
     const [isLoading, setIsLoading] = useState(true);
     const [token, setToken] = useState(localStorage.getItem('token'));
     const navigate = useNavigate();
@@ -18,7 +19,9 @@ export function AuthProvider({ children }) {
             try {
                 const response = await api.get('/users/me');
                 setUser(response.data.role)
-                setUser(response.data.name)
+                setName(response.data.name)
+                setEmail(response.data.email)
+                setNitId(response.data.nit_id)
             } catch (error) {
                 alert("Auth Error: Invalid token. Redirecting....");
                 logout();
@@ -31,27 +34,29 @@ export function AuthProvider({ children }) {
         validateToken();
     }, [])
 
-    const login = (userToken, userData, userName, email) => {
+    const login = (userToken, userData, userName, email, nit_id) => {
         localStorage.setItem('token', userToken);
-        localStorage.setItem('user', userData);
-        localStorage.setItem('name', userName);
         setEmail(email)
         setName(userName)
         api.defaults.headers.common['Authorization'] = `Bearer ${userToken}`;
         setToken(userToken);
         setUser(userData);
+        setNitId(nit_id);
     };
 
     const logout = () => {
         localStorage.removeItem('token');
-        localStorage.removeItem('user');
+        // localStorage.removeItem('user');
         delete api.defaults.headers.common['Authorization'];
         setToken(null);
-        setUser(null);
+        setEmail('');
+        setName('');
+        setUser('');
+        setNitId('');
         navigate('/');
     };
 
-    const value = { name, email, user, token, isLoading, login, logout, isAuthenticated: !!user, validateToken };
+    const value = { name, email, user, token, isLoading, login, logout, isAuthenticated: !!user, validateToken, nitId };
 
     return (
         <AuthContext.Provider value={value}>

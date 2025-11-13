@@ -39,6 +39,7 @@ function CommonAdmin() {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
     const toggleDropdown = () => {
+        console.log(name,email,user);
         setIsDropdownOpen(!isDropdownOpen);
     };
 
@@ -69,8 +70,8 @@ function CommonAdmin() {
                                 <div className="absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-lg border border-gray-200 z-10 py-1">
                                     <div className="px-4 py-2 border-b border-gray-100">
                                         <p className="text-base font-medium text-gray-900">{name}</p>
-                                        <p className="text-sm text-gray-500">{email}</p>
                                         <p className="text-xs text-gray-400">{user}</p>
+                                        <p className="text-sm text-gray-500">{email}</p>
                                     </div>
                                     <button className="flex items-center w-full px-4 py-2 text-gray-700 hover:bg-gray-100 space-x-3">
                                         <Settings className="h-5 w-5" />

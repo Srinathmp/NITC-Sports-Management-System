@@ -40,14 +40,18 @@ const validateEvent = asyncHandler(async (req, res) => {
     throw new Error('Event not found');
   }
   ev.status = status;
-  await ev.save();
-  await AuditLog.create({
-    action: 'Approve',
-    user_id: req.user._id,
-    entity: 'Event',
-    entity_id: ev._id,
-    details: `status=${status}`,
-  });
+  if (status === "Cancelled") {
+    await Event.deleteOne({ _id: id })
+  } else {
+    await ev.save();
+    await AuditLog.create({
+      action: 'Approve',
+      user_id: req.user._id,
+      entity: 'Event',
+      entity_id: ev._id,
+      details: `status=${status}`,
+    });
+  }
   res.json(ev);
 });
 
@@ -85,7 +89,7 @@ const getAllEvents = asyncHandler(async (req, res) => {
 
 const getAllEventsPublic = asyncHandler(async (req, res) => {
   try {
-    let filter = { status: { $ne: 'PendingValidation' } };
+    let filter = {};
     const events = await Event.find(filter)
       .populate('created_by', 'name role email')
       .sort({ datetime: 1 });
