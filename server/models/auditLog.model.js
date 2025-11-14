@@ -12,16 +12,16 @@ const auditLogSchema = new Schema({
         ref: 'User',
         required: true
     },
-    entity: { // The type of document that was changed
+    entity: {
         type: String,
         required: true,
         trim: true
     },
-    entity_id: { // The specific document ID
+    entity_id: {
         type: Schema.Types.ObjectId,
         required: true
     },
-    details: { // A short description of the change
+    details: {
         type: String,
         trim: true
     }

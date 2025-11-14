@@ -19,13 +19,13 @@ function StatCard({ title, value, subtitle, icon: Icon }) {
 
 function PlayerTableRow({ player, onEdit, onDelete }) {
   return (
-    <tr className="border-b bg-white hover:bg-gray-50">
+    <tr className="border-b bg-white hover:bg-gray-50 [&>*]:text-center">
       <td className="px-4 py-3 text-sm font-medium text-gray-700">
         {player.jerseyNo != null ? `#${player.jerseyNo}` : '-'}
       </td>
       <td className="px-4 py-3 text-sm font-semibold text-gray-900">{player.name}</td>
-      <td className="px-4 py-3 text-sm text-gray-500">{player.position}</td>
-      <td className="px-4 py-3 flex gap-2">
+      {/* <td className="px-4 py-3 text-sm text-gray-500">{player.position}</td> */}
+      <td className="px-4 py-3 flex gap-2 items-center justify-center">
         <button onClick={() => onEdit(player)} className="text-gray-500 hover:text-blue-600 p-1.5 rounded-md hover:bg-gray-100">
           <Edit className="h-4 w-4" />
         </button>
@@ -59,13 +59,13 @@ function PlayerModal({ open, onClose, onSubmit, initial, title }) {
 
   const submit = e => {
     e.preventDefault();
-    if (!form.jersey || !form.name || !form.position) {
+    if (!form.jersey || !form.name) {
       setError('All fields are required');
       return;
     }
 
     onSubmit({
-      jersey: Number(form.jersey.replace('#', '')),
+      jerseyNo: Number(form.jersey.replace('#', '')),
       name: form.name.trim(),
       position: form.position.trim()
     });
@@ -220,7 +220,7 @@ export default function ManageTeams() {
           <table className="w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr className="[&>*]:px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
-                <th>Jersey</th><th>Name</th><th>Position</th><th>Actions</th>
+                <th>Jersey</th><th>Name</th><th>Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">

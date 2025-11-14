@@ -4,7 +4,6 @@ const User = require('../models/user.model');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
-// Register user
 const registerUser = asyncHandler(async (req, res) => {
   const { name, email, password, role, nit_id, contactNumber } = req.body;
   const userExists = await User.findOne({ email });
@@ -22,7 +21,6 @@ const registerUser = asyncHandler(async (req, res) => {
   res.status(201).json({ id: user._id, name: user.name, email: user.email, role: user.role });
 });
 
-// Authenticate & get token
 const authUser = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
   const user = await User.findOne({ email });

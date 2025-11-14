@@ -1,10 +1,9 @@
 const Accommodation = require("../models/accommodation.model");
-const Mess  =  require("../models/mess.model");
+const Mess = require("../models/mess.model");
+
 exports.getAllAccommodations = async (req, res) => {
   try {
-    // No populate needed now
     const accommodations = await Accommodation.find().sort({ createdAt: -1 });
-
     res.status(200).json(accommodations);
   } catch (err) {
     console.error("Error fetching accommodations:", err.message);
@@ -19,7 +18,7 @@ exports.addAccommodation = async (req, res) => {
     await accommodation.save();
     res.status(201).json(accommodation);
   } catch (err) {
-    res.status(400).json({ error: "Error creating accommodation"+err });
+    res.status(400).json({ error: "Error creating accommodation" + err });
   }
 };
 
@@ -32,13 +31,12 @@ exports.updateAccommodation = async (req, res) => {
     );
     res.status(200).json(accommodation);
   } catch (err) {
-    res.status(400).json({ error: "Error updating accommodation"});
+    res.status(400).json({ error: "Error updating accommodation" });
   }
 };
 
 exports.getAccommodationSummary = async (req, res) => {
   try {
-    // ACCOMMODATION TOTALS
     const accData = await Accommodation.aggregate([
       {
         $group: {
@@ -54,7 +52,6 @@ exports.getAccommodationSummary = async (req, res) => {
       totalOccupied: 0
     };
 
-    // MESS TOTALS
     const messData = await Mess.aggregate([
       {
         $group: {

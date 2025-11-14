@@ -20,6 +20,14 @@ const listPendingNITs = asyncHandler(async (req, res) => {
   res.json(list);
 });
 
+const getAllNIT = asyncHandler(async (req, res) => {
+  const nits = await NIT.find({ status: "Approved" })
+        .select("_id name code location")
+        .sort({ name: 1 });
+
+    res.json(nits);
+})
+
 const updateNITStatus = asyncHandler(async (req, res) => {
   try {
     const { code } = req.params;
@@ -90,4 +98,4 @@ const updateNITStatus = asyncHandler(async (req, res) => {
   }
 });
 
-module.exports = { registerNIT, listPendingNITs, updateNITStatus };
+module.exports = { registerNIT, listPendingNITs, updateNITStatus,getAllNIT };

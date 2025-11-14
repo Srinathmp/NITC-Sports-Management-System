@@ -7,7 +7,6 @@ import { useAuth } from '../../contexts/AuthContexts';
 import api from '../../api/axios';
 import FullPageLoader from '../../components/FullPageLoader';
 
-/* ------------------ Card Components ------------------ */
 function StatCard({ title, value, subtitle, Icon }) {
     return (
         <div className="flex items-center justify-between rounded-lg bg-white p-4 shadow-sm border border-gray-100 transition-shadow duration-200 hover:shadow-lg">
@@ -86,7 +85,6 @@ function RecentResultCard({ result }) {
     );
 }
 
-/* ------------------ Modals ------------------ */
 function TeamDetailsModal({ open, onClose, team }) {
     if (!open) return null;
     return (
@@ -252,7 +250,6 @@ function RegisterTeamModal({ open, onClose, onSuccess, nit_id }) {
     );
 }
 
-/* ------------------ Main Dashboard ------------------ */
 export default function CoachDashboard() {
     const { name, nitId } = useAuth();
     const [isLoading, setIsLoading] = useState(true);

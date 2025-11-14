@@ -9,16 +9,6 @@ exports.getAllMess = async (req, res) => {
   }
 };
 
-// exports.addMess = async (req, res) => {
-//   try {
-//     const mess = new Mess(req.body);
-//     await mess.save();
-//     res.status(201).json(mess);
-//   } catch (err) {
-//     res.status(400).json({ error: "Error creating mess entry"+err });
-//   }
-// };
-
 exports.addMess = async (req, res) => {
   try {
     const { mess_name, capacity_per_meal, location, remarks } = req.body;

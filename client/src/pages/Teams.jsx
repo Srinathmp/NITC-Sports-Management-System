@@ -4,7 +4,6 @@ import { useNavigate } from "react-router-dom";
 import api from "../api/axios";
 import FullPageLoader from "../components/FullPageLoader";
 
-/* ------------------ Stat Card ------------------ */
 function StatCard({ title, stat, subtitle }) {
   return (
     <div className="flex items-center justify-between rounded-xl bg-white p-6 hover:shadow-xl border border-[#9c9c9c5e]">
@@ -20,7 +19,6 @@ function StatCard({ title, stat, subtitle }) {
   );
 }
 
-/* ------------------ Team Card ------------------ */
 function TeamCard({ team, onViewDetails }) {
   const { teamName, nitName, playersCount, sport, coachName } = team;
   return (
@@ -54,7 +52,6 @@ function TeamCard({ team, onViewDetails }) {
   );
 }
 
-/* ------------------ Team Detail Modal ------------------ */
 function TeamDetailModal({ team, onClose }) {
   const navigate = useNavigate();
   if (!team) return null;
@@ -117,7 +114,6 @@ function TeamDetailModal({ team, onClose }) {
   );
 }
 
-/* ------------------ Main Component ------------------ */
 export default function Teams() {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedSport, setSelectedSport] = useState(0);
@@ -133,7 +129,6 @@ export default function Teams() {
   const [totalPages, setTotalPages] = useState(1);
   const perPage = 9;
 
-  /* Fetch all teams once */
   const fetchTeams = async () => {
     try {
       setLoading(true);
@@ -147,12 +142,10 @@ export default function Teams() {
     }
   };
 
-  /* Fetch once on mount */
   useEffect(() => {
     fetchTeams();
   }, []);
 
-  /* Apply local filters */
   useEffect(() => {
     let filtered = [...teams];
 
@@ -177,7 +170,6 @@ export default function Teams() {
 
   if (loading) return <FullPageLoader />;
 
-  /* Pagination logic */
   const totalTeams = filteredTeams.length;
   const totalSports = new Set(teams.map((t) => t.sport)).size;
   const totalPageCount = Math.ceil(totalTeams / perPage);

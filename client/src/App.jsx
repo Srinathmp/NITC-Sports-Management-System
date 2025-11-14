@@ -20,6 +20,7 @@ import CommonAdminDashboard from "./pages/common-admin/CommonDashboard";
 import AuditLogPage from "./pages/common-admin/AuditLog";
 import BookingPage from "./pages/Coach/BookingPage";    
 import {useAuth} from "./contexts/AuthContexts"
+import CommonAdminUserManagement from "./pages/common-admin/UserManagement";
 
 export default function App() {
     return (
@@ -63,6 +64,7 @@ export default function App() {
                 <Route path="teams" element={<Teams />} />
                 <Route path="matches" element={<Matches />} />
                 <Route path="events" element={<Events />} />
+                <Route path="userhandle" element={<CommonAdminUserManagement />} />
             </Route>
             <Route path="*" element={<div>404:NOT FOUND!!!</div>} />
         </Routes>

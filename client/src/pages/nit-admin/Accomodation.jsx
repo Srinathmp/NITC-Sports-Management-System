@@ -46,7 +46,6 @@ function Accommodation() {
     fetchData();
   }, []);
 
-  // Handle Save for Accommodation
   const handleSaveAccommodation = async () => {
     try {
       if (editItem) {
@@ -64,7 +63,6 @@ function Accommodation() {
     }
   };
 
-  // Handle Save for Mess
   const handleSaveMess = async () => {
     try {
       if (editItem) {

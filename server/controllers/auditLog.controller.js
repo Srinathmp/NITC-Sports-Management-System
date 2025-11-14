@@ -2,10 +2,6 @@ const AuditLog = require('../models/auditLog.model');
 const User = require('../models/user.model');
 const { Parser } = require('json2csv');
 
-// @desc Get all audit logs with pagination
-// @route GET /api/auditlogs?page=1&limit=8
-// @access CommonAdmin / NITAdmin
-
 const getAuditLogs = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
@@ -68,7 +64,6 @@ const exportAuditLogs = async (req, res) => {
   }
 };
 
-// Helper to map action to visual status
 function mapStatus(action) {
   const lower = action?.toLowerCase() || '';
   if (lower.includes('approve') || lower.includes('create') || lower.includes('publish'))
