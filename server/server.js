@@ -10,7 +10,7 @@ connectDB();
 
 const app = express();
 app.use(cors({
-  origin: "https://your-frontend.vercel.app",
+  origin: "https://nitc-sports-management-system-g1s2.vercel.app",
   credentials: true
 }));
 app.use(express.json());
