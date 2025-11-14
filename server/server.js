@@ -9,7 +9,10 @@ dotenv.config({ path: './.env' });
 connectDB();
 
 const app = express();
-app.use(cors());
+app.use(cors(
+  origin: "https://nitc-sports-management-system-g1s2.vercel.app",
+  credentials: true
+));
 app.use(express.json());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
