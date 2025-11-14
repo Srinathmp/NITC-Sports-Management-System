@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, Outlet, NavLink, useLocation, Navigate, useNavigate } from "react-router-dom";
-import { Bell, Trophy, Settings, LogOut, Calendar, ChartColumn, User, Users, LayoutList, Menu, X, Shield, Plus, Locate, LocationEdit } from "lucide-react";
+import { Bell, Trophy, Settings, LogOut, Calendar, ChartColumn, User, Users, LayoutList, Menu, X, Shield, Plus, Locate, LocationEdit, User2 } from "lucide-react";
 import { useAuth } from "../../contexts/AuthContexts";
 
 function SidebarNav({ isOpen }) {
@@ -11,6 +11,7 @@ function SidebarNav({ isOpen }) {
         { title: 'Events', icon: Trophy, link: '/common-admin/events' },
         { title: 'Matches', icon: Calendar, link: '/common-admin/matches' },
         { title: 'Leaderboard', icon: ChartColumn, link: '/common-admin/leaderboard' },
+        { title: 'User manage', icon: User2, link: '/common-admin/userhandle' },
     ];
 
     const path = useLocation();
@@ -55,10 +56,6 @@ function CommonAdmin() {
                     </Link>
 
                     <div className="flex items-center space-x-4">
-                        <button className="relative p-2 rounded-full hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            <Bell className="h-6 w-6 text-gray-600" />
-                            <span className="absolute top-2 right-2 block h-2 w-2 rounded-full bg-red-500 ring-2 ring-white"></span>
-                        </button>
                         <div className="relative">
                             <button onClick={toggleDropdown} className="flex items-center space-x-2 p-2 rounded-full bg-gray-100 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500" >
                                 <div className="h-8 w-8 rounded-full bg-blue-500 text-white flex items-center justify-center font-semibold text-sm">

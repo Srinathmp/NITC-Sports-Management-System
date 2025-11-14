@@ -7,13 +7,10 @@ const event = require('../models/event.model')
 
 const createTeam = asyncHandler(async (req, res) => {
   const { name, event_id, nit_id, players } = req.body;
-
-  // find NIT first
   const nit = await NIT.findOne({ _id: nit_id });
   if (!nit) { res.status(404); throw new Error('NIT not found'); }
   const sportFind = await event.findOne({ _id: event_id }).select('sport')
-  const { sport } = sportFind
-  // ensure uniqueness within the same NIT & sport
+  const { sport } = sportFind;
   const exists = await Team.findOne({ name, sport, nit_id: nit._id, event_id });
   if (exists) {
     res.status(400);
@@ -46,11 +43,6 @@ const getAllNIT = asyncHandler(async (req, res) => {
   res.json(teams);
 });
 
-// ------- coach: fetch team by sport -------
-
-/**
- * GET /api/v1/teams/me/by-sport?sport=Basketball
- */
 const getMyTeamBySport = asyncHandler(async (req, res) => {
   const coachId = req.user?._id;
   const { sport } = req.query;
@@ -80,12 +72,7 @@ const getMyTeamBySport = asyncHandler(async (req, res) => {
   });
 });
 
-// ------- coach: add player -------
 
-/**
- * POST /api/v1/teams/me/by-sport/players
- * body: { sport, player: { name, position, jerseyNo } }
- */
 const addPlayerToMyTeamBySport = asyncHandler(async (req, res) => {
   const coachId = req.user?._id;
   const { sport, player } = req.body;
@@ -93,7 +80,7 @@ const addPlayerToMyTeamBySport = asyncHandler(async (req, res) => {
   if (!coachId) return res.status(401).json({ message: 'Unauthorized' });
   if (!sport) return res.status(400).json({ message: 'sport is required' });
 
-  if (!player || !player.name || !player.position || player.jerseyNo == null) {
+  if (!player || !player.name || player.jerseyNo == null) {
     return res.status(400).json({ message: 'player.name, player.position, player.jerseyNo are required' });
   }
 
@@ -122,12 +109,7 @@ const addPlayerToMyTeamBySport = asyncHandler(async (req, res) => {
   });
 });
 
-// ------- coach: update player (by old jerseyNo in URL) -------
 
-/**
- * PATCH /api/v1/teams/me/by-sport/players/:jerseyNo
- * body: { sport, player: { name?, position?, jerseyNo? } }
- */
 const updatePlayerInMyTeamBySport = asyncHandler(async (req, res) => {
   const coachId = req.user?._id;
   const oldJerseyNo = Number(req.params.jerseyNo);
@@ -169,11 +151,7 @@ const updatePlayerInMyTeamBySport = asyncHandler(async (req, res) => {
   });
 });
 
-// ------- coach: delete player (by jerseyNo in URL) -------
 
-/**
- * DELETE /api/v1/teams/me/by-sport/players/:jerseyNo?sport=Basketball
- */
 const deletePlayerInMyTeamBySport = asyncHandler(async (req, res) => {
   const coachId = req.user?._id;
   const jerseyNo = Number(req.params.jerseyNo);
@@ -197,14 +175,6 @@ const deletePlayerInMyTeamBySport = asyncHandler(async (req, res) => {
 });
 
 
-// -------------------------------------------------------------------
-// NEW: Public listing + Coach’s own teams (for Teams page & modal edit)
-// -------------------------------------------------------------------
-
-/**
- * GET /api/v1/teams/public?search=&sport=
- * Public list; if req.user exists (optional auth), marks isMyTeam.
- */
 const listTeamsPublic = asyncHandler(async (req, res) => {
   const { search = '', sport, page = 1, limit = 9 } = req.query;
   const q = {};
@@ -218,7 +188,6 @@ const listTeamsPublic = asyncHandler(async (req, res) => {
     .populate({ path: 'coach_id', select: 'name role' })
     .lean();
 
-  // Search filtering (if applicable)
   const filtered = (search
     ? teams.filter(t => {
       const rx = new RegExp(search.trim(), 'i');
@@ -251,10 +220,6 @@ const listTeamsPublic = asyncHandler(async (req, res) => {
   });
 });
 
-/**
- * GET /api/v1/teams/mine
- * All teams for the logged-in Coach.
- */
 const listMyTeams = asyncHandler(async (req, res) => {
   const coachId = req.user?._id;
   if (!coachId) return res.status(401).json({ message: 'Unauthorized' });
@@ -276,7 +241,6 @@ const listMyTeams = asyncHandler(async (req, res) => {
   res.json({ items: out, total: out.length });
 });
 
-// Get my teams - used for Booking accommodation
 const getMyTeams = async (req, res) => {
   try {
     const coachId = req.user._id;
@@ -296,7 +260,7 @@ module.exports = {
   addPlayerToMyTeamBySport,
   updatePlayerInMyTeamBySport,
   deletePlayerInMyTeamBySport,
-  listTeamsPublic,   // ✅ NEW
-  listMyTeams,        // ✅ NEW
-  getMyTeams         // ✅ NEW
+  listTeamsPublic,
+  listMyTeams,    
+  getMyTeams      
 };

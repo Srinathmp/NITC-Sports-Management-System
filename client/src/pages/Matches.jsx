@@ -16,8 +16,6 @@ import {
 import FullPageLoader from "../components/FullPageLoader";
 import {useAuth} from '../contexts/AuthContexts'
 
-/* ------------------ UI Components ------------------ */
-
 function StatCard({ title, stat, subtitle, Item }) {
   return (
     <div className="flex items-center justify-between rounded-xl bg-white p-6 hover:shadow-xl border border-[#9c9c9c5e]">
@@ -31,79 +29,7 @@ function StatCard({ title, stat, subtitle, Item }) {
       </div>
     </div>
   );
-}
-
-// function MatchCard({ m, updateResult }) {
-//   const statusLabel =
-//     m.status === "Completed"
-//       ? "Completed"
-//       : m.status === "Ongoing"
-//       ? "LIVE"
-//       : "Upcoming";
-
-//   const badgeClasses =
-//     statusLabel === "LIVE"
-//       ? "bg-red-100 text-red-800"
-//       : statusLabel === "Completed"
-//       ? "bg-blue-100 text-blue-800"
-//       : "bg-orange-100 text-orange-800";
-
-//   const team1Score = m.scoreA ?? null;
-//   const team2Score = m.scoreB ?? null;
-//   const scoreDisplay =
-//     team1Score !== null ? `${team1Score} - ${team2Score}` : "vs";
-
-//   return (
-//     <div className="relative rounded-xl border border-[#b8b8b8ab] bg-white p-4 shadow-sm transition hover:shadow-md">
-//       <div className="top-4 left-4 font-medium flex justify-between">
-//         <div
-//           className={`rounded-full px-2.5 py-0.5 text-xs items-center flex ${badgeClasses}`}
-//         >
-//           {statusLabel === "LIVE" && (
-//             <span className="relative mr-1.5 flex h-2 w-2">
-//               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-//               <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
-//             </span>
-//           )}
-//           {statusLabel}
-//         </div>
-//         <div>{updateResult}</div>
-//       </div>
-
-//       <div className="flex flex-col items-center justify-around pt-10 sm:flex-row sm:pt-4">
-//         <div className="flex w-full items-center justify-around gap-4 text-center sm:w-auto sm:justify-start lg:gap-8">
-//           <span className="w-1/3 font-semibold text-[#535353ec] sm:w-auto sm:text-right">
-//             {m.teamA_id?.name}
-//           </span>
-//           <span className="text-xl font-bold text-gray-900">{scoreDisplay}</span>
-//           <span className="w-1/3 font-semibold text-[#535353ec] sm:w-auto sm:text-left">
-//             {m.teamB_id?.name}
-//           </span>
-//         </div>
-
-//         <div className="mt-4 flex w-full flex-wrap items-center justify-center gap-x-4 gap-y-2 border-t pt-4 text-sm text-gray-500 font-semibold sm:mt-0 sm:w-auto sm:flex-nowrap sm:justify-end sm:border-t-0 sm:pt-0">
-//           <span>{m.event_id?.sport}</span>
-//           <span className="flex items-center">
-//             <Calendar size={12} className="mr-1" />{" "}
-//             {new Date(m.matchDateTime).toLocaleDateString()}
-//           </span>
-//           <span className="flex items-center">
-//             <Clock size={12} className="mr-1" />{" "}
-//             {new Date(m.matchDateTime).toLocaleTimeString([], {
-//               hour: "2-digit",
-//               minute: "2-digit",
-//             })}
-//           </span>
-//           <span className="flex items-center">
-//             <MapPin size={12} className="mr-1" /> {m.venue || "TBD"}
-//           </span>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// }
-
-function MatchCard({ m, updateResult, onPublish, user }) {
+}function MatchCard({ m, updateResult, onPublish, user }) {
   const statusLabel =
     m.status === "Completed"
       ? "Completed"
@@ -126,7 +52,6 @@ function MatchCard({ m, updateResult, onPublish, user }) {
   return (
     <div className="relative rounded-xl border border-[#b8b8b8ab] bg-white p-4 shadow-sm transition hover:shadow-md">
 
-      {/* Status + Update Button */}
       <div className="flex justify-between mb-2">
 
         <div className={`rounded-full px-2.5 py-0.5 text-xs flex ${badgeClasses}`}>
@@ -139,11 +64,10 @@ function MatchCard({ m, updateResult, onPublish, user }) {
           {statusLabel}
         </div>
 
-        {/* Update Result Button (NIT Admin only) */}
         <div>{updateResult}</div>
       </div>
 
-      {/* Team Names + Score */}
+    
       <div className="flex flex-col items-center justify-around pt-6 sm:flex-row sm:pt-2">
         <div className="flex w-full items-center justify-around gap-4 text-center sm:w-auto sm:justify-start lg:gap-8">
           <span className="w-1/3 font-semibold text-[#535353ec] sm:w-auto sm:text-right">
@@ -155,7 +79,7 @@ function MatchCard({ m, updateResult, onPublish, user }) {
           </span>
         </div>
 
-        {/* Match Details */}
+      
         <div className="mt-4 flex w-full flex-wrap items-center justify-center gap-x-4 gap-y-2 border-t pt-4 text-sm text-gray-500 font-semibold sm:mt-0 sm:w-auto sm:flex-nowrap sm:justify-end sm:border-t-0 sm:pt-0">
           <span>{m.event_id?.sport}</span>
           <span className="flex items-center">
@@ -175,7 +99,6 @@ function MatchCard({ m, updateResult, onPublish, user }) {
         </div>
       </div>
 
-      {/* 🟦 Publish Result (COMMON ADMIN ONLY) */}
       {user === "CommonAdmin" &&
         m.status === "Completed" &&
         m.pendingPublishing === true && (
@@ -193,7 +116,6 @@ function MatchCard({ m, updateResult, onPublish, user }) {
 }
 
 
-/* ------------------ Main Component ------------------ */
 
 export default function Matches() {
   const [matches, setMatches] = useState([]);
@@ -214,7 +136,6 @@ export default function Matches() {
 
   const {user} = useAuth();
 
-  /* ---- Fetch Paginated Data ---- */
   const fetchData = async (pageNum = 1) => {
     try {
       setLoading(true);
@@ -252,7 +173,6 @@ export default function Matches() {
     fetchData(1);
   }, []);
 
-  /* ---- Filter (client-side) ---- */
   useEffect(() => {
     let filtered = [...matches];
     if (statusFilter !== "All") filtered = filtered.filter((m) => m.status === statusFilter);
@@ -271,7 +191,6 @@ export default function Matches() {
 
   if (loading) return <FullPageLoader />;
 
-  /* ---- Pagination ---- */
   const handlePrev = () => {
     if (page > 1) {
       fetchData(page - 1);
@@ -309,7 +228,7 @@ export default function Matches() {
 
   return (
     <div className="mx-auto container p-5 flex flex-col gap-8 min-h-screen">
-      {/* Header */}
+    
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-4xl font-bold">Matches</h1>
@@ -325,7 +244,7 @@ export default function Matches() {
         )}
       </div>
 
-      {/* 🔍 Search + Filter */}
+    
       <div className="flex flex-col md:flex-row gap-4 items-center mb-6 w-full">
         <div className="relative w-full md:w-2/3">
           <Search className="absolute left-3 top-3 text-gray-400" size={18} />
@@ -352,7 +271,7 @@ export default function Matches() {
         </div>
       </div>
 
-      {/* Matches */}
+    
       <h2 className="text-2xl font-bold">{statusFilter} Matches</h2>
       <div className="space-y-4 min-h-80">
         {filteredMatches.map((m) => (
@@ -381,7 +300,7 @@ export default function Matches() {
         )}
       </div>
 
-      {/* Pagination */}
+    
       <div className="flex justify-center items-center gap-4 mt-6">
         <button
           onClick={handlePrev}
@@ -412,7 +331,7 @@ export default function Matches() {
         </button>
       </div>
 
-      {/* Stats */}
+    
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 py-4">
         <StatCard title="Total Matches" stat={matches.length} subtitle="Total games" Item={Calendar} />
         <StatCard title="Live Matches" stat={liveMatches.length} subtitle="Currently running" Item={Users} />
@@ -433,7 +352,7 @@ export default function Matches() {
         </Modal>
       )}
 
-      {/* Update Result Modal */}
+    
       {showUpdate && selectedMatch && (
         <Modal title="Update Match Result" onClose={() => setShowUpdate(false)} onSave={handleUpdateResult}>
           <FormInput label={selectedMatch.teamA_id?.name} type="number" onChange={(v) => setForm({ ...form, scoreA: Number(v) })} />

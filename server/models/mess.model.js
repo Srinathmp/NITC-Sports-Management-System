@@ -1,4 +1,3 @@
-// models/mess.model.js
 const mongoose = require("mongoose");
 const { Schema } = mongoose;
 

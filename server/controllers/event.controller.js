@@ -8,16 +8,7 @@ const NIT = require('../models/nit.model');
 
 const createEvent = asyncHandler(async (req, res) => {
   const { name, sport, venue, datetime, tournamentYear, stage } = req.body;
-  const ev = await Event.create({
-    name,
-    sport,
-    venue,
-    datetime,
-    created_by: req.user._id,
-    tournamentYear,
-    stage,
-    status: 'PendingValidation'
-  });
+  const ev = await Event.create({ name, sport, venue, datetime, created_by: req.user._id, tournamentYear, stage, status: 'PendingValidation' });
   res.status(201).json(ev);
 });
 
@@ -64,17 +55,12 @@ async function isHostNITAdmin(userId) {
 }
 
 /* ------------------ New / Updated Controllers ------------------ */
-
-// Get all events (dynamic visibility)
 const getAllEvents = asyncHandler(async (req, res) => {
   try {
     let filter = {};
-
-    // NITAdmin & CommonAdmin can see everything (including pending)
     if (req.user?.role === 'NITAdmin' || req.user?.role === 'CommonAdmin') {
       filter = {};
     } else {
-      // Other users cannot see pending events
       filter = { status: { $ne: 'PendingValidation' } };
     }
     const events = await Event.find(filter)
@@ -100,14 +86,12 @@ const getAllEventsPublic = asyncHandler(async (req, res) => {
   }
 });
 
-// Get single event
 const getEventById = asyncHandler(async (req, res) => {
   const event = await Event.findById(req.params.id).populate('created_by', 'name role email');
   if (!event) return res.status(404).json({ error: 'Event not found' });
   res.status(200).json(event);
 });
 
-// Update event by NIT admin
 const updateEvent = asyncHandler(async (req, res) => {
   if (!(await isHostNITAdmin(req.user._id))) {
     return res.status(403).json({ message: 'Only host NIT admins can perform this action' });
@@ -118,7 +102,6 @@ const updateEvent = asyncHandler(async (req, res) => {
   res.status(200).json(updated);
 });
 
-// Update event status (by NIT admin)
 const updateEventStatus = asyncHandler(async (req, res) => {
   if (!(await isHostNITAdmin(req.user._id))) {
     return res.status(403).json({ message: 'Only host NIT admins can perform this action' });
@@ -130,18 +113,16 @@ const updateEventStatus = asyncHandler(async (req, res) => {
   res.status(200).json(updated);
 });
 
-// Delete event
 const deleteEvent = asyncHandler(async (req, res) => {
   const deleted = await Event.findByIdAndDelete(req.params.id);
   if (!deleted) return res.status(404).json({ error: 'Event not found' });
   res.status(200).json({ message: 'Event deleted successfully' });
 });
 
-/* ------------------ NEW FEATURE ------------------ */
 // CommonAdmin Approve / Reject Pending Event
 const validateEventByAdmin = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  const { status } = req.body; // 'Scheduled' or 'Cancelled'
+  const { status } = req.body;
 
   if (req.user.role !== 'CommonAdmin') {
     return res.status(403).json({ message: 'Only Common Admins can validate events' });
@@ -179,5 +160,5 @@ module.exports = {
   updateEventStatus,
   deleteEvent,
   getAllEventsPublic,
-  validateEventByAdmin, // new controller
+  validateEventByAdmin,
 };

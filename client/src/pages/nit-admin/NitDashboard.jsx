@@ -69,10 +69,6 @@ function NitDashboard() {
   const [myEventsSubtitle, setMyEventsSubtitle] = useState('');
   const [registeredTeams, setRegisteredTeams] = useState(0);
   const [registeredTeamsSubtitle, setRegisteredTeamsSubtitle] = useState('');
-  // const [accommodation, setAccommodation] = useState(0);
-  // const [accommodationSubtitle, setAccommodationSubtitle] = useState('');
-  // const [messBookings, setMessBookings] = useState(0);
-  // const [messBookingsSubtitle, setMessBookingsSubtitle] = useState('');
   const [accCapacity, setAccCapacity] = useState(0);
   const [accOccupied, setAccOccupied] = useState(0);
   const [messCapacity, setMessCapacity] = useState(0);
@@ -158,9 +154,7 @@ function NitDashboard() {
                 return <EventItem title={item.name} date={format(dateObj, 'MMM dd, yyyy')} loc={item.venue} teams={item.registeredTeams} />
               })
             }
-            {/* <EventItem title="Football" details="2024-02-16 • Sports Ground" tagText="12 teams registered" />
-            <EventItem title="Cricket" details="2024-02-17 • Cricket Field" tagText="16 teams registered" /> */}
-          </div>
+            </div>
         </div>
 
         <div className="lg:col-span-1 bg-white rounded-lg shadow-sm p-6">

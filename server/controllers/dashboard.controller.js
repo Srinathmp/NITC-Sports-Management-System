@@ -5,6 +5,7 @@ const matches = require('../models/match.model');
 const AuditLog = require('../models/auditLog.model');
 const User = require('../models/user.model');
 const teams = require('../models/team.model')
+const notificationModel = require('../models/notification.model')
 
 /* -------------------- COMMON ADMIN DASHBOARD -------------------- */
 const commonAdmin = asyncHandler(async (req, res) => {
@@ -216,7 +217,7 @@ const public = asyncHandler(async (req, res) => {
         .limit(3)
         .lean();
 
-    const announcements = await AuditLog.find({ type: "Announcement" })
+    const announcements = await notificationModel.find({ type: "Announcement",recipientRole:"All" })
         .sort({ createdAt: -1 })
         .limit(3)
         .lean();

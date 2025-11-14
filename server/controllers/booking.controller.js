@@ -4,7 +4,6 @@ const Mess = require("../models/mess.model");
 const AccommodationBooking = require("../models/accommodationBooking.model");
 const MessBooking = require("../models/messBooking.model");
 
-// POST /api/bookings/accommodation
 exports.bookAccommodation = async (req, res) => {
   const session = await mongoose.startSession();
   try {
@@ -16,7 +15,6 @@ exports.bookAccommodation = async (req, res) => {
     }
 
     await session.withTransaction(async () => {
-      // 1) Atomically check capacity and increment occupied
       const updated = await Accommodation.findOneAndUpdate(
         {
           _id: accommodation_id,
@@ -29,7 +27,6 @@ exports.bookAccommodation = async (req, res) => {
         throw new Error("Accommodation fully booked or insufficient capacity");
       }
 
-      // 2) Create the booking
       await AccommodationBooking.create(
         [{ accommodation_id, coach_id, team_id, count: Number(count), remarks: remarks || "" }],
         { session }
@@ -45,7 +42,6 @@ exports.bookAccommodation = async (req, res) => {
   }
 };
 
-// GET /api/bookings/accommodation/my
 exports.myAccommodationBookings = async (req, res) => {
   try {
     const coach_id = req.user?._id;
@@ -58,7 +54,6 @@ exports.myAccommodationBookings = async (req, res) => {
   }
 };
 
-// POST /api/bookings/mess
 exports.bookMess = async (req, res) => {
   const session = await mongoose.startSession();
   try {
@@ -68,9 +63,7 @@ exports.bookMess = async (req, res) => {
     if (!mess_id || !team_id || !count) {
       return res.status(400).json({ error: "mess_id, team_id and count are required" });
     }
-
     await session.withTransaction(async () => {
-      // 1) Atomically check capacity_per_meal and increment occupied
       const updated = await Mess.findOneAndUpdate(
         {
           _id: mess_id,
@@ -83,7 +76,6 @@ exports.bookMess = async (req, res) => {
         throw new Error("Mess fully booked for meal or insufficient capacity");
       }
 
-      // 2) Create the booking
       await MessBooking.create(
         [{ mess_id, coach_id, team_id, count: Number(count), remarks: remarks || "" }],
         { session }
@@ -99,7 +91,6 @@ exports.bookMess = async (req, res) => {
   }
 };
 
-// GET /api/bookings/mess/my
 exports.myMessBookings = async (req, res) => {
   try {
     const coach_id = req.user?._id;

@@ -4,9 +4,6 @@ const AuditLog = require('../models/auditLog.model');
 const Team = require('../models/team.model');
 const NIT = require('../models/nit.model');
 
-/* -------------------------------------------------------------
-   1. Create a new match (CommonAdmin)
-------------------------------------------------------------- */
 const createMatch = asyncHandler(async (req, res) => {
   try {
     const match = await Match.create(req.body);
@@ -17,9 +14,6 @@ const createMatch = asyncHandler(async (req, res) => {
   }
 });
 
-/* -------------------------------------------------------------
-   2. Get all matches (paginated)
-------------------------------------------------------------- */
 const getAllMatches = asyncHandler(async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
@@ -47,9 +41,6 @@ const getAllMatches = asyncHandler(async (req, res) => {
   }
 });
 
-/* -------------------------------------------------------------
-   3. NIT Admin updates match result
-------------------------------------------------------------- */
 const updateMatchResult = asyncHandler(async (req, res) => {
   try {
     const { scoreA, scoreB, remarks } = req.body;
@@ -99,9 +90,6 @@ const updateMatchResult = asyncHandler(async (req, res) => {
   }
 });
 
-/* -------------------------------------------------------------
-   4. CommonAdmin - get all matches pending publishing
-------------------------------------------------------------- */
 const getPendingPublishingMatches = asyncHandler(async (req, res) => {
   try {
     const pendingMatches = await Match.find({
@@ -117,9 +105,6 @@ const getPendingPublishingMatches = asyncHandler(async (req, res) => {
   }
 });
 
-/* -------------------------------------------------------------
-   5. CommonAdmin - publish match result
-------------------------------------------------------------- */
 const publishMatchResult = asyncHandler(async (req, res) => {
   try {
     const match = await Match.findById(req.params.id)
@@ -151,9 +136,6 @@ const publishMatchResult = asyncHandler(async (req, res) => {
   }
 });
 
-/* -------------------------------------------------------------
-   6. Get all teams
-------------------------------------------------------------- */
 const getAllTeams = asyncHandler(async (req, res) => {
   try {
     const teams = await Team.find().select("_id name sport nit_id");

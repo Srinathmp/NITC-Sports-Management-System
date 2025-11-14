@@ -48,7 +48,6 @@ export default function Events() {
 
   useEffect(() => { fetchEvents(); }, []);
 
-  /* ---- Filters ---- */
   useEffect(() => {
     let filtered = [...events];
     if (statusFilter !== "All") filtered = filtered.filter(e => e.status === statusFilter);
@@ -59,12 +58,10 @@ export default function Events() {
       ? filtered
       : filtered.filter((e) => e.status !== "Pending" && e.status !== "PendingValidation"))
     setVisibleEvents(events)
-    // console.log(filtered,val)
   }, [events, searchQuery, statusFilter]);
 
   if (loading) return <FullPageLoader />;
 
-  /* ---- Modal Actions ---- */
   const openViewModal = (e) => {
     setSelected(e);
     setShowViewModal(true);
@@ -84,7 +81,6 @@ export default function Events() {
     }
   };
 
-  /* ---- Styling ---- */
   const labelStyle = {
     Scheduled: "bg-blue-600 text-white",
     PendingValidation: "bg-yellow-500 text-white",
@@ -92,7 +88,6 @@ export default function Events() {
     Completed: "bg-green-600 text-white",
   };
 
-  /* ---- user-based visibility ---- */
 
   return (
     <div className="w-full p-8 px-4 md:px-8">
@@ -101,7 +96,6 @@ export default function Events() {
       <h1 className="text-3xl font-bold">Events</h1>
       <p className="text-gray-500 mb-8">Browse upcoming and ongoing tournaments</p>
 
-      {/* Search + Filter */}
       <div className="flex flex-col md:flex-row gap-4 items-center mb-6 w-full">
         <div className="relative w-full md:w-2/3">
           <Search className="absolute left-3 top-3 text-gray-400" size={18} />
@@ -176,7 +170,6 @@ export default function Events() {
         ))}
       </div>
 
-      {/* View Modal */}
       {showViewModal && selected && (
         <Modal title="Event Details" onClose={() => setShowViewModal(false)}>
           <div className="overflow-x-auto border border-black/30 rounded-lg">
@@ -210,7 +203,6 @@ export default function Events() {
             </table>
           </div>
 
-          {/* ✅ Approve / Reject Buttons for CommonAdmin */}
           {user === "CommonAdmin" && selected.status === "PendingValidation" && (
             <div className="flex justify-end gap-3 mt-6 text-black">
               <button
@@ -234,7 +226,6 @@ export default function Events() {
   );
 }
 
-/* ------------------ Modal ------------------ */
 function Modal({ title, children, onClose }) {
   return (
     <div className="fixed inset-0 bg-black/40 flex justify-center items-center z-50">

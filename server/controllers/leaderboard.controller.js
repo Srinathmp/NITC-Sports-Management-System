@@ -1,25 +1,11 @@
 const asyncHandler = require('express-async-handler');
 const NIT = require('../models/nit.model');
 
-/**
- * GET /api/v1/leaderboard?page=1&limit=10
- * Points are taken directly from NIT.points
- * Response:
- * {
- *   topPerformers: [{ name, points, nit_id }],
- *   rankings: [{ rank, name, points, nit_id }],
- *   totalPages,
- *   totalInstitutes,
- *   highestScore
- * }
- */
 const getLeaderboard = asyncHandler(async (req, res) => {
   const page  = Math.max(1, Number(req.query.page || 1));
   const limit = Math.max(1, Math.min(50, Number(req.query.limit || 10)));
 
-  // Fetch all NITs (you can filter to Approved if you want)
   const allNits = await NIT
-    // .find({ status: 'Approved' }) // uncomment if you want only approved ones
     .find({})
     .select({ name: 1, points: 1 })
     .sort({ points: -1, _id: 1 })

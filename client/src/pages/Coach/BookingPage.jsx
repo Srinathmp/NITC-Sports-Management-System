@@ -1,7 +1,5 @@
-// src/pages/coach/BookingPage.jsx
 import React, { useEffect, useState } from "react";
 import api from "../../api/axios";
-// import { Tabs, Tab } from "./_simpleTabs"; // tiny helper (shown below) or replace with your UI lib
 import { Plus } from "lucide-react";
 
 export default function BookingPage() {
@@ -22,20 +20,19 @@ export default function BookingPage() {
   );
 }
 
-/* --------------- Accommodation Tab --------------- */
 function AccommodationBookingTab() {
   const [list, setList] = useState([]);
   const [myBookings, setMyBookings] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [selected, setSelected] = useState(null);
   const [count, setCount] = useState(1);
-  const [teamId, setTeamId] = useState(""); // you can auto-fill from coach context
+  const [teamId, setTeamId] = useState("");
   const [teams, setTeams] = useState([]); 
 
   const fetchTeams = async () => {
     const res = await api.get("/v1/teams/my-teams");
     setTeams(res.data || []);
-    if (res.data.length === 1) setTeamId(res.data[0]._id); // auto-select
+    if (res.data.length === 1) setTeamId(res.data[0]._id);
   };
 
 
@@ -135,7 +132,6 @@ function AccommodationBookingTab() {
   );
 }
 
-/* --------------- Mess Tab --------------- */
 function MessBookingTab() {
   const [list, setList] = useState([]);
   const [myBookings, setMyBookings] = useState([]);
@@ -148,7 +144,7 @@ function MessBookingTab() {
   const fetchTeams = async () => {
     const res = await api.get("/v1/teams/my-teams");
     setTeams(res.data || []);
-    if (res.data.length === 1) setTeamId(res.data[0]._id); // auto-select
+    if (res.data.length === 1) setTeamId(res.data[0]._id);
   };
 
 
@@ -227,7 +223,6 @@ function MessBookingTab() {
 
       {showModal && selected && (
         <Modal title={`Book: ${selected.mess_name}`} onClose={() => setShowModal(false)} onSave={submitBooking}>
-          {/* <FormInput label="Team ID" value={teamId} onChange={setTeamId} /> */}
           <div className="mb-3">
             <label className="block text-sm font-medium text-gray-700 mb-1">Select Team</label>
             <select
@@ -250,7 +245,6 @@ function MessBookingTab() {
   );
 }
 
-/* ---------- Small helpers ---------- */
 function FormInput({ label, type = "text", value, onChange }) {
   return (
     <div className="mb-3">
@@ -281,7 +275,6 @@ function Modal({ title, children, onClose, onSave }) {
   );
 }
 
-/* Tiny tabs (or use your own UI component) */
 export function Tabs({ value, onChange, children }) {
   return (
     <>

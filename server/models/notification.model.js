@@ -2,15 +2,18 @@ const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
 const notificationSchema = new Schema({
-    user_id: { // The recipient, if it's a targeted notification
+    title: {
+        type: String
+    },
+    user_id: {
         type: Schema.Types.ObjectId,
         ref: 'User'
     },
-    created_by: { 
-        type: Schema.Types.ObjectId, 
-        ref: 'User' 
-    }, // who triggered it
-    recipientRole: { // Used for broadcasting to a role
+    created_by: {
+        type: Schema.Types.ObjectId,
+        ref: 'User'
+    },
+    recipientRole: {
         type: String,
         enum: ['All', 'CommonAdmin', 'NITAdmin', 'Coach'],
         default: 'All'

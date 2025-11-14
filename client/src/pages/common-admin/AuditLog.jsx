@@ -9,6 +9,7 @@ import {
   Calendar,
   ChevronLeft,
   ChevronRight,
+  MessageCircle,
 } from "lucide-react";
 import api from "../../api/axios";
 
@@ -82,11 +83,9 @@ function AuditLogPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // Pagination state
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
-  // Fetch logs
   const fetchAuditLogs = async () => {
     try {
       setLoading(true);
@@ -108,7 +107,6 @@ function AuditLogPage() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [page]);
 
-  // Search filter
   useEffect(() => {
     if (search.trim() === "") {
       setFilteredLogs(logs);
@@ -133,13 +131,22 @@ function AuditLogPage() {
             Track all system activities and administrative actions
           </p>
         </div>
-        <button
-          onClick={handleExport}
-          className="flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
-        >
-          <Upload className="h-4 w-4" />
-          <span>Export Log</span>
-        </button>
+        <div className="flex gap-4 [&>*]:w-full">
+          <button
+            onClick={handleExport}
+            className="flex items-center justify-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 transition-colors"
+          >
+            <MessageCircle className="h-4 w-4" />
+            <span>Announcement</span>
+          </button>
+          <button
+            onClick={handleExport}
+            className="flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
+          >
+            <Upload className="h-4 w-4" />
+            <span>Export Log</span>
+          </button>
+        </div>
       </div>
 
       {/* Search and Filters */}
@@ -214,11 +221,10 @@ function AuditLogPage() {
           <button
             onClick={() => setPage((p) => Math.max(p - 1, 1))}
             disabled={page === 1}
-            className={`flex items-center gap-1 px-3 py-2 rounded-lg border text-sm font-medium ${
-              page === 1
+            className={`flex items-center gap-1 px-3 py-2 rounded-lg border text-sm font-medium ${page === 1
                 ? "text-white bg-blue-300 cursor-not-allowed"
                 : "text-white bg-blue-500 hover:bg-blue-400"
-            }`}
+              }`}
           >
             <ChevronLeft className="h-4 w-4" /> Prev
           </button>
@@ -230,11 +236,10 @@ function AuditLogPage() {
           <button
             onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
             disabled={page === totalPages}
-            className={`flex items-center gap-1 px-3 py-2 rounded-lg border text-sm font-medium ${
-              page === totalPages
-                ?"text-white bg-blue-300 cursor-not-allowed"
+            className={`flex items-center gap-1 px-3 py-2 rounded-lg border text-sm font-medium ${page === totalPages
+                ? "text-white bg-blue-300 cursor-not-allowed"
                 : "text-white bg-blue-500 hover:bg-blue-400"
-            }`}
+              }`}
           >
             Next <ChevronRight className="h-4 w-4" />
           </button>

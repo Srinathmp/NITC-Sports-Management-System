@@ -61,10 +61,6 @@ function NitAdmin() {
                     </Link>
 
                     <div className="flex items-center space-x-4">
-                        <button className="relative p-2 rounded-full hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            <Bell className="h-6 w-6 text-gray-600" />
-                            <span className="absolute top-2 right-2 block h-2 w-2 rounded-full bg-red-500 ring-2 ring-white"></span>
-                        </button>
                         <div className="relative">
                             <button onClick={toggleDropdown} className="flex items-center space-x-2 p-2 rounded-full bg-gray-100 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500" >
                                 <div className="h-8 w-8 rounded-full bg-blue-500 text-white flex items-center justify-center font-semibold text-sm">
