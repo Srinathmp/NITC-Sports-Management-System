@@ -1,7 +1,7 @@
 import axios from "axios";
-
+// baseURL : http://localhost:5000/api for local development
 const api = axios.create({
-  baseURL: "http://localhost:5000/api",
+  baseURL: "https://api-nitc-sports-management-system-1.onrender.com/api",
 });
 
 api.interceptors.request.use((config) => {
